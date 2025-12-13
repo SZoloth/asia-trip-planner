@@ -2,347 +2,507 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asia Trip Planner 2025 | Sam & Carter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Asia Trip 2025 | Sam & Carter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        thailand: { bg: '#fef3c7', text: '#92400e', border: '#f59e0b' },
+                        cambodia: { bg: '#fee2e2', text: '#991b1b', border: '#ef4444' },
+                        taiwan: { bg: '#d1fae5', text: '#065f46', border: '#10b981' },
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .destination-card { cursor: grab; }
-        .destination-card:active { cursor: grabbing; }
-        .day-slot.drag-over { background-color: #dbeafe; border-color: #3b82f6; }
-        .destination-card.dragging { opacity: 0.5; }
-        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-        .scrollbar-thin::-webkit-scrollbar-track { background: #f1f5f9; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        .gradient-header { background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%); }
-        .country-thailand { border-left-color: #f59e0b; }
-        .country-cambodia { border-left-color: #ef4444; }
-        .country-taiwan { border-left-color: #10b981; }
-        .badge-thailand { background-color: #fef3c7; color: #92400e; }
-        .badge-cambodia { background-color: #fee2e2; color: #991b1b; }
-        .dest-closed { opacity: 0.6; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #fee2e2 10px, #fee2e2 20px); }
-        .dest-closed-badge { background-color: #dc2626; color: white; }
-        .badge-taiwan { background-color: #d1fae5; color: #065f46; }
-        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
-        @keyframes pulse-border { 0%, 100% { border-color: #3b82f6; } 50% { border-color: #93c5fd; } }
-        .pulse-border { animation: pulse-border 2s infinite; }
+        * { -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Custom scrollbar */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+
+        /* Glass morphism */
+        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glass-dark { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+        /* Card styles */
+        .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); transition: all 0.2s ease; }
+        .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        .card-interactive { cursor: pointer; }
+        .card-interactive:active { transform: scale(0.98); }
+
+        /* Destination card drag states */
+        .dest-card { cursor: grab; transition: all 0.15s ease; }
+        .dest-card:active { cursor: grabbing; }
+        .dest-card.dragging { opacity: 0.4; transform: scale(0.95); }
+
+        /* Day slot states */
+        .day-slot { transition: all 0.15s ease; }
+        .day-slot.drag-over { background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%); border-color: #818cf8; transform: scale(1.02); }
+        .day-slot-empty { border: 2px dashed #e2e8f0; }
+        .day-slot-filled { border: 2px solid #e2e8f0; background: white; }
+
+        /* Country badges */
+        .badge-thailand { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
+        .badge-cambodia { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
+        .badge-taiwan { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+
+        /* Country accents */
+        .accent-thailand { border-left: 3px solid #f59e0b; }
+        .accent-cambodia { border-left: 3px solid #ef4444; }
+        .accent-taiwan { border-left: 3px solid #10b981; }
+
+        /* Closed destination styling */
+        .dest-closed { position: relative; opacity: 0.5; }
+        .dest-closed::after {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(239,68,68,0.08) 8px, rgba(239,68,68,0.08) 16px);
+            border-radius: inherit; pointer-events: none;
+        }
+
+        /* NYE highlight */
+        .nye-glow {
+            background: linear-gradient(135deg, #faf5ff, #fdf4ff);
+            border: 2px solid #c084fc;
+            animation: nye-pulse 3s ease-in-out infinite;
+        }
+        @keyframes nye-pulse {
+            0%, 100% { border-color: #c084fc; box-shadow: 0 0 0 0 rgba(192,132,252,0.4); }
+            50% { border-color: #a855f7; box-shadow: 0 0 16px 2px rgba(192,132,252,0.2); }
+        }
+
+        /* Tab indicators */
+        .tab-active { color: #0ea5e9; }
+        .tab-active::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 24px; height: 3px; background: #0ea5e9; border-radius: 3px 3px 0 0;
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: white; font-weight: 600; padding: 10px 20px; border-radius: 12px;
+            transition: all 0.15s ease; box-shadow: 0 2px 8px rgba(14,165,233,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14,165,233,0.4); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-secondary {
+            background: #f1f5f9; color: #475569; font-weight: 500; padding: 10px 20px; border-radius: 12px;
+            transition: all 0.15s ease;
+        }
+        .btn-secondary:hover { background: #e2e8f0; }
+
+        /* Highlight badge */
+        .highlight-badge {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: white; font-size: 10px; font-weight: 700; padding: 4px 8px;
+            border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .closed-badge {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white; font-size: 10px; font-weight: 700; padding: 4px 8px;
+            border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* Progress bar */
+        .progress-ring { transform: rotate(-90deg); }
+
+        /* Mobile bottom nav */
+        @media (max-width: 768px) {
+            .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+        }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        .slide-up { animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Empty state */
+        .empty-state {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: 2px dashed #e2e8f0; border-radius: 12px;
+        }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen pb-20 md:pb-0">
     <!-- Header -->
-    <header class="gradient-header text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold flex items-center gap-3">
-                        <i class="fas fa-plane-departure"></i>
-                        Asia Trip 2025
-                    </h1>
-                    <p class="text-blue-100 mt-1">Sam & Carter's Adventure Planner</p>
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-violet-500 flex items-center justify-center text-white">
+                        <i class="fas fa-plane text-sm"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-800">Asia 2025</h1>
+                        <p class="text-xs text-slate-500">Sam & Carter</p>
+                    </div>
                 </div>
-                <div class="mt-4 md:mt-0 flex flex-wrap gap-4 text-sm">
-                    <div class="bg-white/20 rounded-lg px-4 py-2">
-                        <i class="fas fa-calendar-alt mr-2"></i>
-                        <span class="font-semibold">Dec 28 - Jan 16</span>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 text-sm bg-slate-100 rounded-full px-4 py-2">
+                        <i class="fas fa-calendar-alt text-slate-400"></i>
+                        <span class="font-medium text-slate-700">Dec 28 - Jan 16</span>
                     </div>
-                    <div class="bg-white/20 rounded-lg px-4 py-2">
-                        <i class="fas fa-clock mr-2"></i>
-                        <span class="font-semibold">20 Days</span>
-                    </div>
-                    <div class="bg-white/20 rounded-lg px-4 py-2" id="budget-display">
-                        <i class="fas fa-dollar-sign mr-2"></i>
-                        <span class="font-semibold">$0 est.</span>
+                    <div class="flex items-center gap-2 bg-emerald-50 rounded-full px-4 py-2">
+                        <span class="text-sm font-semibold text-emerald-700" id="budget-header">$0</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:block border-t border-slate-100">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex gap-1">
+                    <button onclick="showTab('planner')" id="tab-planner" class="relative px-5 py-3 font-medium text-sm tab-active transition-colors">
+                        <i class="fas fa-map-marked-alt mr-2"></i>Planner
+                    </button>
+                    <button onclick="showTab('destinations')" id="tab-destinations" class="relative px-5 py-3 font-medium text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                        <i class="fas fa-compass mr-2"></i>Explore
+                    </button>
+                    <button onclick="showTab('decisions')" id="tab-decisions" class="relative px-5 py-3 font-medium text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                        <i class="fas fa-lightbulb mr-2"></i>Decisions
+                    </button>
+                    <button onclick="showTab('logistics')" id="tab-logistics" class="relative px-5 py-3 font-medium text-sm text-slate-500 hover:text-slate-700 transition-colors">
+                        <i class="fas fa-info-circle mr-2"></i>Info
+                    </button>
+                </div>
+            </div>
+        </nav>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="bg-white border-b sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex gap-8">
-                <button onclick="showTab('planner')" id="tab-planner" class="py-4 px-2 font-medium tab-active">
-                    <i class="fas fa-map-marked-alt mr-2"></i>Trip Planner
-                </button>
-                <button onclick="showTab('destinations')" id="tab-destinations" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-landmark mr-2"></i>All Destinations
-                </button>
-                <button onclick="showTab('decisions')" id="tab-decisions" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-balance-scale mr-2"></i>Decisions
-                </button>
-                <button onclick="showTab('logistics')" id="tab-logistics" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-info-circle mr-2"></i>Logistics
-                </button>
-            </div>
-        </div>
-    </nav>
-
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-6">
+    <main class="max-w-6xl mx-auto px-4 py-6">
         <!-- Planner Tab -->
-        <div id="content-planner">
-            <!-- Quick Actions -->
-            <div class="mb-6 flex flex-wrap gap-3">
-                <button onclick="loadTemplate('thailand')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg font-medium transition">
-                    <i class="fas fa-magic mr-2"></i>Load Thailand Only
-                </button>
-                <button onclick="loadTemplate('thailand-cambodia')" class="bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-lg font-medium transition">
-                    <i class="fas fa-magic mr-2"></i>Load Thailand + Cambodia
-                </button>
-                <button onclick="loadTemplate('all')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg font-medium transition">
-                    <i class="fas fa-magic mr-2"></i>Load All Three Countries
-                </button>
-                <button onclick="clearItinerary()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition ml-auto">
-                    <i class="fas fa-eraser mr-2"></i>Clear All
-                </button>
+        <div id="content-planner" class="fade-in">
+            <!-- Quick Templates -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Quick Start</h2>
+                    <button onclick="clearItinerary()" class="text-sm text-slate-400 hover:text-red-500 transition-colors">
+                        <i class="fas fa-eraser mr-1"></i>Clear all
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="loadTemplate('thailand')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium text-sm transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                        Thailand Only
+                    </button>
+                    <button onclick="loadTemplate('thailand-cambodia')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium text-sm transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                        + Cambodia
+                    </button>
+                    <button onclick="loadTemplate('all')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium text-sm transition-colors">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        All Three
+                    </button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <!-- Destinations Sidebar -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-xl shadow-sm border p-4 sticky top-24">
-                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
-                            <i class="fas fa-list mr-2 text-blue-500"></i>
-                            Destinations
-                        </h3>
-                        <input type="text" id="destination-search" placeholder="Search..."
-                               class="w-full px-3 py-2 border rounded-lg mb-3 text-sm"
-                               oninput="filterDestinations(this.value)">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Sidebar - Destinations -->
+                <div class="lg:col-span-3">
+                    <div class="card p-4 sticky top-32">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-slate-800">Destinations</h3>
+                            <span class="text-xs text-slate-400" id="dest-count">0 places</span>
+                        </div>
 
-                        <div class="space-y-2 max-h-96 overflow-y-auto scrollbar-thin" id="destination-list">
+                        <div class="relative mb-4">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="destination-search" placeholder="Search..."
+                                   class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border-0 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                                   oninput="filterDestinations(this.value)">
+                        </div>
+
+                        <div class="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin pr-1" id="destination-list">
                             <!-- Populated by JS -->
                         </div>
                     </div>
                 </div>
 
                 <!-- Calendar Grid -->
-                <div class="lg:col-span-3">
-                    <div class="bg-white rounded-xl shadow-sm border p-6">
-                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center justify-between">
-                            <span><i class="fas fa-calendar mr-2 text-blue-500"></i>20-Day Itinerary</span>
-                            <span class="text-sm font-normal text-gray-500">Drag destinations to days</span>
-                        </h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3" id="calendar-grid">
+                <div class="lg:col-span-9">
+                    <div class="card p-5 mb-6">
+                        <div class="flex items-center justify-between mb-5">
+                            <div>
+                                <h3 class="font-semibold text-slate-800">Your 20-Day Journey</h3>
+                                <p class="text-sm text-slate-500 mt-0.5">Drag destinations to plan each day</p>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-400"></span>Thailand</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-400"></span>Cambodia</span>
+                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-400"></span>Taiwan</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-5 gap-3" id="calendar-grid">
                             <!-- Populated by JS -->
                         </div>
                     </div>
 
                     <!-- Budget Summary -->
-                    <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
-                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center">
-                            <i class="fas fa-calculator mr-2 text-green-500"></i>
-                            Budget Estimate
+                    <div class="card p-5">
+                        <h3 class="font-semibold text-slate-800 mb-4">
+                            <i class="fas fa-chart-pie mr-2 text-sky-500"></i>Budget Estimate
                         </h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="budget-breakdown">
-                            <div class="bg-amber-50 rounded-lg p-4 text-center">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center">
                                 <div class="text-2xl font-bold text-amber-600" id="budget-thailand">$0</div>
-                                <div class="text-sm text-gray-600">Thailand</div>
+                                <div class="text-xs text-amber-600/70 font-medium mt-1">Thailand</div>
                             </div>
-                            <div class="bg-red-50 rounded-lg p-4 text-center">
-                                <div class="text-2xl font-bold text-red-600" id="budget-cambodia">$0</div>
-                                <div class="text-sm text-gray-600">Cambodia</div>
+                            <div class="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-4 text-center">
+                                <div class="text-2xl font-bold text-rose-600" id="budget-cambodia">$0</div>
+                                <div class="text-xs text-rose-600/70 font-medium mt-1">Cambodia</div>
                             </div>
-                            <div class="bg-emerald-50 rounded-lg p-4 text-center">
+                            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 text-center">
                                 <div class="text-2xl font-bold text-emerald-600" id="budget-taiwan">$0</div>
-                                <div class="text-sm text-gray-600">Taiwan</div>
+                                <div class="text-xs text-emerald-600/70 font-medium mt-1">Taiwan</div>
                             </div>
-                            <div class="bg-blue-50 rounded-lg p-4 text-center">
-                                <div class="text-2xl font-bold text-blue-600" id="budget-total">$0</div>
-                                <div class="text-sm text-gray-600">Total Est.</div>
+                            <div class="bg-gradient-to-br from-sky-50 to-indigo-50 rounded-2xl p-4 text-center">
+                                <div class="text-2xl font-bold text-sky-600" id="budget-total">$0</div>
+                                <div class="text-xs text-sky-600/70 font-medium mt-1">Total</div>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500 mt-3">* Based on mid-range daily costs: Thailand $110/day, Cambodia $100/day, Taiwan $150/day</p>
+                        <p class="text-xs text-slate-400 mt-4 text-center">Based on mid-range daily costs: Thailand $110, Cambodia $100, Taiwan $150</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Destinations Tab -->
-        <div id="content-destinations" class="hidden">
-            <div class="mb-6 flex flex-wrap gap-3 items-center">
-                <button onclick="filterByCountry('all')" class="filter-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg font-medium" data-country="all">
-                    All
-                </button>
-                <button onclick="filterByCountry('thailand')" class="filter-btn bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg font-medium" data-country="thailand">
-                    <i class="fas fa-flag mr-1"></i>Thailand
-                </button>
-                <button onclick="filterByCountry('cambodia')" class="filter-btn bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-lg font-medium" data-country="cambodia">
-                    <i class="fas fa-flag mr-1"></i>Cambodia
-                </button>
-                <button onclick="filterByCountry('taiwan')" class="filter-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg font-medium" data-country="taiwan">
-                    <i class="fas fa-flag mr-1"></i>Taiwan
-                </button>
-                <input type="text" id="dest-search-full" placeholder="Search destinations..."
-                       class="ml-auto px-4 py-2 border rounded-lg w-64"
-                       oninput="filterDestinationsFull(this.value)">
+        <div id="content-destinations" class="hidden fade-in">
+            <!-- Filters -->
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <div class="flex bg-white rounded-xl p-1 shadow-sm">
+                    <button onclick="filterByCountry('all')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-700" data-country="all">All</button>
+                    <button onclick="filterByCountry('thailand')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="thailand">Thailand</button>
+                    <button onclick="filterByCountry('cambodia')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="cambodia">Cambodia</button>
+                    <button onclick="filterByCountry('taiwan')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="taiwan">Taiwan</button>
+                </div>
+                <div class="relative flex-1 max-w-xs ml-auto">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="dest-search-full" placeholder="Search destinations..."
+                           class="w-full pl-10 pr-4 py-2.5 bg-white rounded-xl text-sm shadow-sm focus:ring-2 focus:ring-sky-500 transition-all"
+                           oninput="filterDestinationsFull(this.value)">
+                </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="destinations-grid">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="destinations-grid">
                 <!-- Populated by JS -->
             </div>
         </div>
 
         <!-- Decisions Tab -->
-        <div id="content-decisions" class="hidden">
+        <div id="content-decisions" class="hidden fade-in">
             <!-- NYE Decision -->
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-fireworks mr-3 text-purple-500"></i>
-                    NYE Decision: Where to Ring in 2026?
-                </h3>
-                <p class="text-gray-600 mb-6">You arrive Dec 28. NYE is Dec 31. This gives you 3 days to position yourself.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="border-2 border-purple-300 bg-purple-50 rounded-xl p-5 relative">
-                        <div class="absolute -top-3 left-4 bg-purple-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
-                            RECOMMENDED
-                        </div>
-                        <h4 class="font-bold text-lg text-purple-800 mt-2">Chiang Mai Lantern Festival</h4>
-                        <div class="mt-3 space-y-2 text-sm">
-                            <p><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Experience:</strong> Once-in-a-lifetime</p>
-                            <p><i class="fas fa-users text-gray-500 mr-2"></i><strong>Crowds:</strong> Very High</p>
-                            <p><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Cost:</strong> $50-150 ticket</p>
-                            <p><i class="fas fa-heart text-pink-500 mr-2"></i><strong>Mood:</strong> Magical, spiritual</p>
-                        </div>
-                        <p class="mt-4 text-sm text-purple-700">Thousands of lanterns released into the night sky. Unforgettable.</p>
-                        <button onclick="selectNYE('chiang-mai')" class="mt-4 w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg font-medium transition">
-                            Select This
-                        </button>
+            <div class="card p-6 mb-6">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white flex-shrink-0">
+                        <i class="fas fa-sparkles text-lg"></i>
                     </div>
-
-                    <div class="border rounded-xl p-5 hover:border-blue-300 transition">
-                        <h4 class="font-bold text-lg text-gray-800">Bangkok Rooftop</h4>
-                        <div class="mt-3 space-y-2 text-sm">
-                            <p><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Experience:</strong> Great</p>
-                            <p><i class="fas fa-users text-gray-500 mr-2"></i><strong>Crowds:</strong> High</p>
-                            <p><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Cost:</strong> $30-100</p>
-                            <p><i class="fas fa-heart text-pink-500 mr-2"></i><strong>Mood:</strong> Party, cosmopolitan</p>
-                        </div>
-                        <p class="mt-4 text-sm text-gray-600">Fireworks over the city, rooftop bars, big city NYE.</p>
-                        <button onclick="selectNYE('bangkok')" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-medium transition">
-                            Select This
-                        </button>
-                    </div>
-
-                    <div class="border rounded-xl p-5 hover:border-blue-300 transition">
-                        <h4 class="font-bold text-lg text-gray-800">Koh Tao Beach</h4>
-                        <div class="mt-3 space-y-2 text-sm">
-                            <p><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Experience:</strong> Good</p>
-                            <p><i class="fas fa-users text-gray-500 mr-2"></i><strong>Crowds:</strong> Moderate</p>
-                            <p><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Cost:</strong> Budget</p>
-                            <p><i class="fas fa-heart text-pink-500 mr-2"></i><strong>Mood:</strong> Backpacker, chill</p>
-                        </div>
-                        <p class="mt-4 text-sm text-gray-600">Beach party vibes. Could start scuba on Jan 1.</p>
-                        <button onclick="selectNYE('koh-tao')" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-medium transition">
-                            Select This
-                        </button>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">Where will you ring in 2026?</h3>
+                        <p class="text-slate-500 mt-1">You arrive Dec 28. NYE is Dec 31 - just 3 days to position yourself.</p>
                     </div>
                 </div>
 
-                <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <p class="text-amber-800 text-sm">
-                        <i class="fas fa-lightbulb mr-2"></i>
-                        <strong>Timing Note:</strong> If you choose Chiang Mai for NYE, you'll start scuba in Koh Tao on Jan 2+.
-                        If you want to start scuba earlier, choose Bangkok or go straight to Koh Tao.
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Recommended Option -->
+                    <div class="relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 border-2 border-purple-200 cursor-pointer hover:border-purple-400 transition-all" onclick="selectNYE('chiang-mai')">
+                        <div class="absolute -top-3 left-4">
+                            <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">RECOMMENDED</span>
+                        </div>
+                        <h4 class="font-bold text-lg text-purple-800 mt-2 mb-3">Chiang Mai Lanterns</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-star text-amber-400 w-4"></i>
+                                <span class="text-slate-600">Once-in-a-lifetime experience</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-users text-slate-400 w-4"></i>
+                                <span class="text-slate-600">Very high crowds</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-dollar-sign text-emerald-500 w-4"></i>
+                                <span class="text-slate-600">$50-150 ticket</span>
+                            </div>
+                        </div>
+                        <p class="text-purple-700 text-sm mt-4">Thousands of lanterns released into the night sky. Magical and unforgettable.</p>
+                    </div>
+
+                    <!-- Bangkok -->
+                    <div class="bg-white rounded-2xl p-5 border-2 border-slate-100 cursor-pointer hover:border-sky-300 transition-all" onclick="selectNYE('bangkok')">
+                        <h4 class="font-bold text-lg text-slate-800 mb-3">Bangkok Rooftop</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-star text-amber-400 w-4"></i>
+                                <span class="text-slate-600">Great city experience</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-users text-slate-400 w-4"></i>
+                                <span class="text-slate-600">High crowds</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-dollar-sign text-emerald-500 w-4"></i>
+                                <span class="text-slate-600">$30-100</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-500 text-sm mt-4">Fireworks over the skyline, rooftop bars, classic big city NYE.</p>
+                    </div>
+
+                    <!-- Koh Tao -->
+                    <div class="bg-white rounded-2xl p-5 border-2 border-slate-100 cursor-pointer hover:border-sky-300 transition-all" onclick="selectNYE('koh-tao')">
+                        <h4 class="font-bold text-lg text-slate-800 mb-3">Koh Tao Beach</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-star text-amber-400 w-4"></i>
+                                <span class="text-slate-600">Chill beach vibes</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-users text-slate-400 w-4"></i>
+                                <span class="text-slate-600">Moderate crowds</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="fas fa-dollar-sign text-emerald-500 w-4"></i>
+                                <span class="text-slate-600">Budget-friendly</span>
+                            </div>
+                        </div>
+                        <p class="text-slate-500 text-sm mt-4">Beach party vibes. Could start scuba on Jan 1.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-amber-50 rounded-xl flex items-start gap-3">
+                    <i class="fas fa-lightbulb text-amber-500 mt-0.5"></i>
+                    <p class="text-sm text-amber-800">
+                        <strong>Timing note:</strong> If you choose Chiang Mai for NYE, scuba starts Jan 2+. For earlier scuba, pick Bangkok or Koh Tao.
                     </p>
                 </div>
             </div>
 
             <!-- Must-Do Checklist -->
-            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-check-double mr-3 text-green-500"></i>
+            <div class="card p-6 mb-6">
+                <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                        <i class="fas fa-check-double text-emerald-600"></i>
+                    </div>
                     Must-Do Checklist
                 </h3>
-                <div class="space-y-3">
-                    <label class="flex items-center gap-3 p-3 bg-red-50 rounded-lg border-2 border-red-200">
-                        <input type="checkbox" class="w-5 h-5 text-red-500" id="check-scuba">
-                        <span class="font-medium">Scuba Certification - Koh Tao (3-4 days)</span>
-                        <span class="ml-auto text-xs bg-red-200 text-red-800 px-2 py-1 rounded">NON-NEGOTIABLE</span>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-4 p-4 bg-red-50 rounded-xl cursor-pointer hover:bg-red-100 transition-colors border-2 border-red-200">
+                        <input type="checkbox" class="w-5 h-5 rounded-md text-red-500 focus:ring-red-500" id="check-scuba">
+                        <div class="flex-1">
+                            <span class="font-semibold text-slate-800">Scuba Certification - Koh Tao</span>
+                            <span class="text-sm text-slate-500 ml-2">(3-4 days)</span>
+                        </div>
+                        <span class="text-xs font-bold bg-red-500 text-white px-2 py-1 rounded-md">MUST DO</span>
                     </label>
-                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input type="checkbox" class="w-5 h-5" id="check-angkor">
-                        <span>Angkor Wat (if doing Cambodia)</span>
+                    <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                        <input type="checkbox" class="w-5 h-5 rounded-md text-sky-500 focus:ring-sky-500" id="check-angkor">
+                        <span class="font-medium text-slate-700">Angkor Wat (if doing Cambodia)</span>
                     </label>
-                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input type="checkbox" class="w-5 h-5" id="check-lantern">
-                        <span>Chiang Mai NYE Lantern Festival</span>
+                    <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                        <input type="checkbox" class="w-5 h-5 rounded-md text-sky-500 focus:ring-sky-500" id="check-lantern">
+                        <span class="font-medium text-slate-700">Chiang Mai NYE Lantern Festival</span>
                     </label>
-                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input type="checkbox" class="w-5 h-5" id="check-elephant">
-                        <span>Ethical Elephant Sanctuary</span>
+                    <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                        <input type="checkbox" class="w-5 h-5 rounded-md text-sky-500 focus:ring-sky-500" id="check-elephant">
+                        <span class="font-medium text-slate-700">Ethical Elephant Sanctuary</span>
                     </label>
-                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input type="checkbox" class="w-5 h-5" id="check-cooking">
-                        <span>Thai Cooking Class</span>
+                    <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                        <input type="checkbox" class="w-5 h-5 rounded-md text-sky-500 focus:ring-sky-500" id="check-cooking">
+                        <span class="font-medium text-slate-700">Thai Cooking Class</span>
                     </label>
-                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <input type="checkbox" class="w-5 h-5" id="check-climbing">
-                        <span>Rock Climbing at Railay</span>
+                    <label class="flex items-center gap-4 p-4 bg-slate-50 rounded-xl cursor-pointer hover:bg-slate-100 transition-colors">
+                        <input type="checkbox" class="w-5 h-5 rounded-md text-sky-500 focus:ring-sky-500" id="check-climbing">
+                        <span class="font-medium text-slate-700">Rock Climbing at Railay</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Itinerary Comparison -->
-            <div class="bg-white rounded-xl shadow-sm border p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                    <i class="fas fa-route mr-3 text-blue-500"></i>
-                    Itinerary Options Comparison
+            <!-- Comparison Table -->
+            <div class="card p-6 overflow-hidden">
+                <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
+                        <i class="fas fa-route text-sky-600"></i>
+                    </div>
+                    Compare Options
                 </h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
+                <div class="overflow-x-auto -mx-6 px-6">
+                    <table class="w-full text-sm min-w-[500px]">
                         <thead>
-                            <tr class="border-b">
-                                <th class="text-left py-3 px-4"></th>
-                                <th class="text-left py-3 px-4 bg-amber-50">Thailand Only</th>
-                                <th class="text-left py-3 px-4 bg-red-50">Thailand + Cambodia</th>
-                                <th class="text-left py-3 px-4 bg-emerald-50">All Three</th>
+                            <tr>
+                                <th class="text-left py-3 px-4 text-slate-500 font-medium"></th>
+                                <th class="text-left py-3 px-4 bg-amber-50 rounded-tl-lg font-semibold text-amber-700">Thailand Only</th>
+                                <th class="text-left py-3 px-4 bg-rose-50 font-semibold text-rose-700">+ Cambodia</th>
+                                <th class="text-left py-3 px-4 bg-emerald-50 rounded-tr-lg font-semibold text-emerald-700">All Three</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 font-medium">Pace</td>
-                                <td class="py-3 px-4 bg-amber-50"><span class="text-green-600">Relaxed</span></td>
-                                <td class="py-3 px-4 bg-red-50"><span class="text-amber-600">Moderate</span></td>
-                                <td class="py-3 px-4 bg-emerald-50"><span class="text-red-600">Fast</span></td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 font-medium">Angkor Wat</td>
-                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-times text-red-500"></i></td>
-                                <td class="py-3 px-4 bg-red-50"><i class="fas fa-check text-green-500"></i></td>
-                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-green-500"></i></td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 font-medium">Scuba</td>
-                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-check text-green-500"></i></td>
-                                <td class="py-3 px-4 bg-red-50"><i class="fas fa-check text-green-500"></i></td>
-                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-green-500"></i></td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 font-medium">Taiwan</td>
-                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-times text-red-500"></i></td>
-                                <td class="py-3 px-4 bg-red-50"><i class="fas fa-times text-red-500"></i></td>
-                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-green-500"></i> (limited)</td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 font-medium">Flights</td>
-                                <td class="py-3 px-4 bg-amber-50">3-4</td>
-                                <td class="py-3 px-4 bg-red-50">5-6</td>
-                                <td class="py-3 px-4 bg-emerald-50">7-8</td>
-                            </tr>
-                            <tr class="border-b">
-                                <td class="py-3 px-4 font-medium">Est. Budget</td>
-                                <td class="py-3 px-4 bg-amber-50">$2,200</td>
-                                <td class="py-3 px-4 bg-red-50">$2,400</td>
-                                <td class="py-3 px-4 bg-emerald-50">$3,000+</td>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr>
+                                <td class="py-3 px-4 font-medium text-slate-600">Pace</td>
+                                <td class="py-3 px-4 bg-amber-50"><span class="inline-flex items-center gap-1 text-emerald-600"><i class="fas fa-leaf"></i> Relaxed</span></td>
+                                <td class="py-3 px-4 bg-rose-50"><span class="inline-flex items-center gap-1 text-amber-600"><i class="fas fa-walking"></i> Moderate</span></td>
+                                <td class="py-3 px-4 bg-emerald-50"><span class="inline-flex items-center gap-1 text-red-600"><i class="fas fa-running"></i> Fast</span></td>
                             </tr>
                             <tr>
-                                <td class="py-3 px-4 font-medium">Best For</td>
-                                <td class="py-3 px-4 bg-amber-50">Relaxation seekers</td>
-                                <td class="py-3 px-4 bg-red-50">Balance seekers</td>
-                                <td class="py-3 px-4 bg-emerald-50">Adventure maximizers</td>
+                                <td class="py-3 px-4 font-medium text-slate-600">Angkor Wat</td>
+                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-times text-slate-300"></i></td>
+                                <td class="py-3 px-4 bg-rose-50"><i class="fas fa-check text-emerald-500"></i></td>
+                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-emerald-500"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium text-slate-600">Taiwan</td>
+                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-times text-slate-300"></i></td>
+                                <td class="py-3 px-4 bg-rose-50"><i class="fas fa-times text-slate-300"></i></td>
+                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-emerald-500"></i> <span class="text-xs text-slate-500">(limited)</span></td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium text-slate-600">Flights</td>
+                                <td class="py-3 px-4 bg-amber-50">3-4</td>
+                                <td class="py-3 px-4 bg-rose-50">5-6</td>
+                                <td class="py-3 px-4 bg-emerald-50">7-8</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium text-slate-600">Est. Budget</td>
+                                <td class="py-3 px-4 bg-amber-50 font-semibold">$2,200</td>
+                                <td class="py-3 px-4 bg-rose-50 font-semibold">$2,400</td>
+                                <td class="py-3 px-4 bg-emerald-50 font-semibold">$3,000+</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium text-slate-600">Best For</td>
+                                <td class="py-3 px-4 bg-amber-50 rounded-bl-lg text-slate-600">Relaxation seekers</td>
+                                <td class="py-3 px-4 bg-rose-50 text-slate-600">Balance seekers</td>
+                                <td class="py-3 px-4 bg-emerald-50 rounded-br-lg text-slate-600">Adventure maximizers</td>
                             </tr>
                         </tbody>
                     </table>
@@ -351,126 +511,142 @@
         </div>
 
         <!-- Logistics Tab -->
-        <div id="content-logistics" class="hidden">
+        <div id="content-logistics" class="hidden fade-in">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Visa Info -->
-                <div class="bg-white rounded-xl shadow-sm border p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-passport mr-3 text-blue-500"></i>
-                        Visa Requirements (US Citizens)
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center">
+                            <i class="fas fa-passport text-sky-600"></i>
+                        </div>
+                        Visa Requirements
                     </h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4 p-4 bg-amber-50 rounded-lg">
-                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-4 p-4 bg-amber-50 rounded-xl">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-emerald-600"></i>
+                            </div>
                             <div>
-                                <div class="font-semibold">Thailand</div>
-                                <div class="text-sm text-gray-600">Visa-free for 60 days. FREE.</div>
+                                <div class="font-semibold text-slate-800">Thailand</div>
+                                <div class="text-sm text-slate-600">Visa-free 60 days. FREE</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 p-4 bg-red-50 rounded-lg">
-                            <i class="fas fa-file-alt text-2xl text-amber-500"></i>
+                        <div class="flex items-center gap-4 p-4 bg-rose-50 rounded-xl">
+                            <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-file-alt text-amber-600"></i>
+                            </div>
                             <div>
-                                <div class="font-semibold">Cambodia</div>
-                                <div class="text-sm text-gray-600">e-Visa required. $36 USD. Apply at evisa.gov.kh</div>
+                                <div class="font-semibold text-slate-800">Cambodia</div>
+                                <div class="text-sm text-slate-600">e-Visa required. $36 at evisa.gov.kh</div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 p-4 bg-emerald-50 rounded-lg">
-                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                        <div class="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-check text-emerald-600"></i>
+                            </div>
                             <div>
-                                <div class="font-semibold">Taiwan</div>
-                                <div class="text-sm text-gray-600">Visa-free for 90 days. FREE.</div>
+                                <div class="font-semibold text-slate-800">Taiwan</div>
+                                <div class="text-sm text-slate-600">Visa-free 90 days. FREE</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Currency -->
-                <div class="bg-white rounded-xl shadow-sm border p-6">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-money-bill-wave mr-3 text-green-500"></i>
+                <div class="card p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                            <i class="fas fa-money-bill-wave text-emerald-600"></i>
+                        </div>
                         Currency & Tipping
                     </h3>
-                    <div class="space-y-4">
-                        <div class="p-4 bg-amber-50 rounded-lg">
-                            <div class="font-semibold flex justify-between">
+                    <div class="space-y-3">
+                        <div class="p-4 bg-amber-50 rounded-xl">
+                            <div class="flex justify-between font-semibold text-slate-800">
                                 <span>Thailand (THB)</span>
-                                <span class="text-gray-600">~35 THB = $1</span>
+                                <span class="text-slate-600">~35 = $1</span>
                             </div>
-                            <div class="text-sm text-gray-600 mt-1">Tip 20-50 THB or round up. Skip if service charge included.</div>
+                            <div class="text-sm text-slate-600 mt-1">Tip 20-50 THB or round up</div>
                         </div>
-                        <div class="p-4 bg-red-50 rounded-lg">
-                            <div class="font-semibold flex justify-between">
-                                <span>Cambodia (USD)</span>
-                                <span class="text-gray-600">USD accepted!</span>
+                        <div class="p-4 bg-rose-50 rounded-xl">
+                            <div class="flex justify-between font-semibold text-slate-800">
+                                <span>Cambodia</span>
+                                <span class="text-slate-600">USD accepted!</span>
                             </div>
-                            <div class="text-sm text-gray-600 mt-1">USD preferred. Round up $1. Guides: $5-10/day.</div>
+                            <div class="text-sm text-slate-600 mt-1">Round up $1. Guides: $5-10/day</div>
                         </div>
-                        <div class="p-4 bg-emerald-50 rounded-lg">
-                            <div class="font-semibold flex justify-between">
+                        <div class="p-4 bg-emerald-50 rounded-xl">
+                            <div class="flex justify-between font-semibold text-slate-800">
                                 <span>Taiwan (NT$)</span>
-                                <span class="text-gray-600">~32 NT$ = $1</span>
+                                <span class="text-slate-600">~32 = $1</span>
                             </div>
-                            <div class="text-sm text-gray-600 mt-1">NO TIPPING culture. Don't tip!</div>
+                            <div class="text-sm text-slate-600 mt-1">NO TIPPING - it's not customary</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Flights -->
-                <div class="bg-white rounded-xl shadow-sm border p-6 lg:col-span-2">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-plane mr-3 text-blue-500"></i>
+                <div class="card p-6 lg:col-span-2">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center">
+                            <i class="fas fa-plane text-violet-600"></i>
+                        </div>
                         Flight Connections
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <h4 class="font-semibold text-amber-700 mb-2">From Bangkok</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>→ Chiang Mai: 1h 15m, $30-60</li>
-                                <li>→ Krabi: 1h 25m, $35-70</li>
-                                <li>→ Siem Reap: 1h, $80-150</li>
-                                <li>→ Taipei: 3h 30m, $200-400</li>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <h4 class="font-semibold text-amber-700 mb-3">From Bangkok</h4>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li class="flex justify-between"><span>→ Chiang Mai</span><span class="font-medium">1h 15m, $30-60</span></li>
+                                <li class="flex justify-between"><span>→ Krabi</span><span class="font-medium">1h 25m, $35-70</span></li>
+                                <li class="flex justify-between"><span>→ Siem Reap</span><span class="font-medium">1h, $80-150</span></li>
+                                <li class="flex justify-between"><span>→ Taipei</span><span class="font-medium">3h 30m, $200-400</span></li>
                             </ul>
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-red-700 mb-2">From Siem Reap</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>→ Bangkok: 1h, $80-150</li>
-                                <li>→ Taipei: via BKK, $250-400</li>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <h4 class="font-semibold text-rose-700 mb-3">From Siem Reap</h4>
+                            <ul class="space-y-2 text-sm text-slate-600">
+                                <li class="flex justify-between"><span>→ Bangkok</span><span class="font-medium">1h, $80-150</span></li>
+                                <li class="flex justify-between"><span>→ Taipei</span><span class="font-medium">via BKK, $250-400</span></li>
                             </ul>
                         </div>
-                        <div>
-                            <h4 class="font-semibold text-emerald-700 mb-2">Koh Tao Access</h4>
-                            <ul class="text-sm space-y-1">
-                                <li>1. Fly to Surat Thani (1h, $40-70)</li>
-                                <li>2. Van to pier + catamaran (2-4h)</li>
-                                <li>Book: Lomprayah or Seatran</li>
-                            </ul>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <h4 class="font-semibold text-emerald-700 mb-3">Koh Tao Access</h4>
+                            <ol class="space-y-2 text-sm text-slate-600 list-decimal list-inside">
+                                <li>Fly to Surat Thani (1h, $40-70)</li>
+                                <li>Van to pier + catamaran (2-4h)</li>
+                                <li class="text-slate-500">Book: Lomprayah or Seatran</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
 
                 <!-- Important Notes -->
-                <div class="bg-white rounded-xl shadow-sm border p-6 lg:col-span-2">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-3 text-amber-500"></i>
+                <div class="card p-6 lg:col-span-2">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
+                            <i class="fas fa-exclamation-triangle text-amber-600"></i>
+                        </div>
                         Important Dec-Feb Notes
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                            <div class="font-semibold text-amber-800">Peak Season</div>
-                            <div class="text-sm text-gray-600">This is HIGH SEASON for all three countries. Book flights and accommodations early!</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                            <div class="font-semibold text-amber-800 mb-1">Peak Season</div>
+                            <div class="text-sm text-slate-600">HIGH SEASON for all three countries. Book flights and hotels early!</div>
                         </div>
-                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-                            <div class="font-semibold text-red-800">NYE Price Spike</div>
-                            <div class="text-sm text-gray-600">Dec 30 - Jan 2 prices spike everywhere. Book NYE accommodation NOW.</div>
+                        <div class="p-4 bg-rose-50 border border-rose-200 rounded-xl">
+                            <div class="font-semibold text-rose-800 mb-1">NYE Price Spike</div>
+                            <div class="text-sm text-slate-600">Dec 30 - Jan 2 prices spike everywhere. Book NYE accommodation NOW.</div>
                         </div>
-                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <div class="font-semibold text-blue-800">Weather</div>
-                            <div class="text-sm text-gray-600">Thailand & Cambodia: Dry, pleasant (best time!). Taiwan: Cool, occasional rain in north.</div>
+                        <div class="p-4 bg-sky-50 border border-sky-200 rounded-xl">
+                            <div class="font-semibold text-sky-800 mb-1">Weather</div>
+                            <div class="text-sm text-slate-600">Thailand & Cambodia: Dry, pleasant (best time!). Taiwan: Cool, occasional rain.</div>
                         </div>
-                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
-                            <div class="font-semibold text-red-800">⚠️ Taroko Gorge: SKIP IT</div>
-                            <div class="text-sm text-gray-600">Mostly closed (Dec 2025). April 2024 earthquake damage. 10+ year recovery. Highway restricted to 5 daily time windows. No buses. Most trails closed including Shakadang & Zhuilu. Not worth the hassle - do Sun Moon Lake or Alishan instead.</div>
+                        <div class="p-4 bg-red-100 border-2 border-red-300 rounded-xl">
+                            <div class="font-bold text-red-800 mb-1 flex items-center gap-2">
+                                <i class="fas fa-ban"></i> Taroko Gorge: SKIP IT
+                            </div>
+                            <div class="text-sm text-red-700">Mostly CLOSED (Dec 2025). April 2024 earthquake damage. 10+ year recovery. Highway restricted to 5 daily windows. No buses. Do Sun Moon Lake or Alishan instead.</div>
                         </div>
                     </div>
                 </div>
@@ -478,10 +654,32 @@
         </div>
     </main>
 
-    <!-- Destination Detail Modal -->
-    <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div class="p-6" id="modal-content">
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 bottom-nav z-50">
+        <div class="flex justify-around py-2">
+            <button onclick="showTab('planner')" id="mob-tab-planner" class="flex flex-col items-center py-2 px-4 text-sky-500">
+                <i class="fas fa-map-marked-alt text-lg"></i>
+                <span class="text-xs mt-1 font-medium">Plan</span>
+            </button>
+            <button onclick="showTab('destinations')" id="mob-tab-destinations" class="flex flex-col items-center py-2 px-4 text-slate-400">
+                <i class="fas fa-compass text-lg"></i>
+                <span class="text-xs mt-1 font-medium">Explore</span>
+            </button>
+            <button onclick="showTab('decisions')" id="mob-tab-decisions" class="flex flex-col items-center py-2 px-4 text-slate-400">
+                <i class="fas fa-lightbulb text-lg"></i>
+                <span class="text-xs mt-1 font-medium">Decide</span>
+            </button>
+            <button onclick="showTab('logistics')" id="mob-tab-logistics" class="flex flex-col items-center py-2 px-4 text-slate-400">
+                <i class="fas fa-info-circle text-lg"></i>
+                <span class="text-xs mt-1 font-medium">Info</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Detail Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl max-h-[85vh] overflow-hidden slide-up">
+            <div class="p-6 overflow-y-auto max-h-[85vh]" id="modal-content">
                 <!-- Populated by JS -->
             </div>
         </div>
@@ -610,9 +808,9 @@
             { id: 'beitou', name: 'Beitou Hot Springs', region: 'Taipei Area', country: 'taiwan', type: 'wellness', days: 0.5, cost: 20,
               desc: 'Metro-accessible hot spring district. Public baths from $1, private from $15.',
               tips: 'Just 40 min from central Taipei by MRT. Perfect rainy day activity.', crowds: 'MODERATE' },
-            { id: 'taroko', name: 'Taroko Gorge ⚠️', region: 'Hualien', country: 'taiwan', type: 'nature', days: 1, cost: 0, closed: true,
-              desc: '⚠️ MOSTLY CLOSED (Dec 2025). April 2024 earthquake caused catastrophic damage. Shakadang, Zhuilu, Swallow Grotto all CLOSED. Recovery: 10+ years. Highway access restricted to 5 time windows/day. No buses. SKIP for this trip.',
-              tips: 'NOT RECOMMENDED for Dec 2025. Access windows: 6:30-8am, 10-10:05am, 12-1pm, 3-3:05pm, 4:30-5:30pm only. Most trails closed. Consider Sun Moon Lake or Alishan instead.', crowds: 'N/A - Limited Access' },
+            { id: 'taroko', name: 'Taroko Gorge', region: 'Hualien', country: 'taiwan', type: 'nature', days: 1, cost: 0, closed: true,
+              desc: 'MOSTLY CLOSED (Dec 2025). April 2024 earthquake damage. Shakadang, Zhuilu, Swallow Grotto all CLOSED. Recovery: 10+ years.',
+              tips: 'NOT RECOMMENDED. Access windows: 6:30-8am, 10-10:05am, 12-1pm, 3-3:05pm, 4:30-5:30pm only. Consider Sun Moon Lake or Alishan instead.', crowds: 'N/A - Limited' },
             { id: 'alishan', name: 'Alishan Forest Railway', region: 'Chiayi', country: 'taiwan', type: 'nature', days: 1.5, cost: 50, highlight: true,
               desc: 'Historic narrow-gauge railway through mountains. Famous sunrise above clouds.',
               tips: 'Book sunrise train 2 weeks ahead - sells out! Bring warm clothes.', crowds: 'MODERATE' },
@@ -637,6 +835,7 @@
                 day: i + 1,
                 date: date,
                 dateStr: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                shortDate: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                 isNYE: date.getMonth() === 11 && date.getDate() === 31,
                 destinations: []
             });
@@ -644,6 +843,7 @@
 
         // Itinerary state
         let itinerary = JSON.parse(localStorage.getItem('asiaItinerary')) || {};
+        let currentCountryFilter = 'all';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -652,42 +852,85 @@
             renderDestinationsGrid();
             loadItinerary();
             updateBudget();
+            updateDestCount();
         });
 
         // Tab switching
         function showTab(tab) {
+            // Hide all content
             document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+            // Reset desktop tabs
             document.querySelectorAll('[id^="tab-"]').forEach(el => {
                 el.classList.remove('tab-active');
-                el.classList.add('text-gray-500');
+                el.classList.add('text-slate-500');
             });
-            document.getElementById(`content-${tab}`).classList.remove('hidden');
-            document.getElementById(`tab-${tab}`).classList.add('tab-active');
-            document.getElementById(`tab-${tab}`).classList.remove('text-gray-500');
+            // Reset mobile tabs
+            document.querySelectorAll('[id^="mob-tab-"]').forEach(el => {
+                el.classList.remove('text-sky-500');
+                el.classList.add('text-slate-400');
+            });
+
+            // Show selected content
+            const content = document.getElementById(`content-${tab}`);
+            content.classList.remove('hidden');
+            content.classList.add('fade-in');
+
+            // Activate desktop tab
+            const desktopTab = document.getElementById(`tab-${tab}`);
+            if (desktopTab) {
+                desktopTab.classList.add('tab-active');
+                desktopTab.classList.remove('text-slate-500');
+            }
+
+            // Activate mobile tab
+            const mobileTab = document.getElementById(`mob-tab-${tab}`);
+            if (mobileTab) {
+                mobileTab.classList.remove('text-slate-400');
+                mobileTab.classList.add('text-sky-500');
+            }
+        }
+
+        // Update destination count
+        function updateDestCount() {
+            document.getElementById('dest-count').textContent = `${destinations.length} places`;
         }
 
         // Render sidebar destination list
         function renderDestinationList() {
             const list = document.getElementById('destination-list');
-            const countries = ['thailand', 'cambodia', 'taiwan'];
+            const countries = [
+                { key: 'thailand', label: 'Thailand', color: 'amber' },
+                { key: 'cambodia', label: 'Cambodia', color: 'rose' },
+                { key: 'taiwan', label: 'Taiwan', color: 'emerald' }
+            ];
 
             let html = '';
-            countries.forEach(country => {
-                const countryDests = destinations.filter(d => d.country === country);
-                const countryName = country.charAt(0).toUpperCase() + country.slice(1);
-                const badgeClass = `badge-${country}`;
+            countries.forEach(({ key, label, color }) => {
+                const countryDests = destinations.filter(d => d.country === key);
 
-                html += `<div class="mb-3">
-                    <div class="text-xs font-semibold text-gray-500 uppercase mb-2">${countryName}</div>`;
+                html += `<div class="mb-2">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-${color}-500"></span>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">${label}</span>
+                        <span class="text-xs text-slate-400">(${countryDests.length})</span>
+                    </div>`;
 
                 countryDests.forEach(dest => {
+                    const closedClass = dest.closed ? 'opacity-50' : '';
                     html += `
-                        <div class="destination-card p-2 mb-1 rounded-lg border-l-4 country-${country} bg-white hover:bg-gray-50 text-sm cursor-grab"
+                        <div class="dest-card p-2.5 mb-1.5 rounded-xl bg-slate-50 hover:bg-white hover:shadow-sm accent-${key} ${closedClass}"
                              draggable="true"
                              ondragstart="dragStart(event, '${dest.id}')"
+                             ondragend="dragEnd(event)"
                              onclick="showDestinationDetail('${dest.id}')">
-                            <div class="font-medium truncate">${dest.name}</div>
-                            <div class="text-xs text-gray-500">${dest.region} · ${dest.days}d</div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-sm text-slate-800 truncate">${dest.name}</div>
+                                    <div class="text-xs text-slate-500">${dest.region}</div>
+                                </div>
+                                ${dest.highlight && !dest.closed ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : ''}
+                                ${dest.closed ? '<i class="fas fa-ban text-red-400 text-xs"></i>' : ''}
+                            </div>
                         </div>`;
                 });
                 html += '</div>';
@@ -701,19 +944,21 @@
             let html = '';
 
             tripDays.forEach(day => {
-                const nyeClass = day.isNYE ? 'border-2 border-purple-400 pulse-border' : 'border';
-                const nyeBadge = day.isNYE ? '<span class="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">NYE!</span>' : '';
+                const nyeClass = day.isNYE ? 'nye-glow' : '';
+                const nyeBadge = day.isNYE ? '<span class="absolute -top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">NYE</span>' : '';
 
                 html += `
-                    <div class="day-slot ${nyeClass} rounded-lg p-3 bg-gray-50 min-h-[120px] relative transition-colors"
+                    <div class="day-slot day-slot-empty rounded-xl p-3 min-h-[100px] relative transition-all ${nyeClass}"
                          ondragover="dragOver(event)"
                          ondragleave="dragLeave(event)"
                          ondrop="drop(event, ${day.day})"
                          data-day="${day.day}">
                         ${nyeBadge}
-                        <div class="text-xs text-gray-500 mb-1">Day ${day.day}</div>
-                        <div class="font-medium text-sm mb-2">${day.dateStr}</div>
-                        <div class="space-y-1 day-destinations" id="day-${day.day}-destinations"></div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-400">Day ${day.day}</span>
+                            <span class="text-xs text-slate-500">${day.shortDate}</span>
+                        </div>
+                        <div class="space-y-1.5 day-destinations" id="day-${day.day}-destinations"></div>
                     </div>`;
             });
             grid.innerHTML = html;
@@ -725,34 +970,36 @@
             let html = '';
 
             destinations.forEach(dest => {
-                const badge = dest.closed
-                    ? '<span class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i>CLOSED</span>'
-                    : (dest.highlight ? '<span class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-semibold"><i class="fas fa-star mr-1"></i>Must See</span>' : '');
-                const badgeClass = `badge-${dest.country}`;
                 const closedClass = dest.closed ? 'dest-closed' : '';
+                const badge = dest.closed
+                    ? '<span class="closed-badge"><i class="fas fa-ban mr-1"></i>Closed</span>'
+                    : (dest.highlight ? '<span class="highlight-badge"><i class="fas fa-star mr-1"></i>Must See</span>' : '');
+
+                const countryColors = {
+                    thailand: { bg: 'amber', text: 'amber' },
+                    cambodia: { bg: 'rose', text: 'rose' },
+                    taiwan: { bg: 'emerald', text: 'emerald' }
+                };
+                const c = countryColors[dest.country];
 
                 html += `
-                    <div class="destination-full-card bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition relative ${closedClass}"
-                         data-country="${dest.country}">
-                        ${badge}
-                        <div class="p-5">
-                            <div class="flex items-start justify-between mb-2">
-                                <h4 class="font-bold text-lg">${dest.name}</h4>
+                    <div class="card card-interactive p-5 ${closedClass}" data-country="${dest.country}" onclick="showDestinationDetail('${dest.id}')">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h4 class="font-bold text-slate-800">${dest.name}</h4>
+                                <p class="text-sm text-slate-500">${dest.region}</p>
                             </div>
-                            <div class="flex gap-2 mb-3">
-                                <span class="text-xs px-2 py-1 rounded-full ${badgeClass}">${dest.country}</span>
-                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100">${dest.region}</span>
-                                <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">${dest.type}</span>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-3">${dest.desc}</p>
-                            <div class="flex justify-between text-sm">
-                                <span><i class="fas fa-clock text-gray-400 mr-1"></i>${dest.days} day${dest.days !== 1 ? 's' : ''}</span>
-                                <span><i class="fas fa-dollar-sign text-gray-400 mr-1"></i>~$${dest.cost}</span>
-                                <span class="text-xs text-gray-500">${dest.crowds} crowds</span>
-                            </div>
-                            <div class="mt-3 text-xs text-amber-700 bg-amber-50 p-2 rounded">
-                                <i class="fas fa-lightbulb mr-1"></i>${dest.tips}
-                            </div>
+                            ${badge}
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 mb-3">
+                            <span class="badge-${dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>
+                            <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-lg">${dest.type}</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mb-4 line-clamp-2">${dest.desc}</p>
+                        <div class="flex items-center justify-between text-sm text-slate-500 pt-3 border-t border-slate-100">
+                            <span><i class="far fa-clock mr-1"></i>${dest.days}d</span>
+                            <span><i class="fas fa-dollar-sign mr-1"></i>${dest.cost}</span>
+                            <span class="text-xs">${dest.crowds}</span>
                         </div>
                     </div>`;
             });
@@ -763,6 +1010,10 @@
         function dragStart(e, destId) {
             e.dataTransfer.setData('destId', destId);
             e.target.classList.add('dragging');
+        }
+
+        function dragEnd(e) {
+            e.target.classList.remove('dragging');
         }
 
         function dragOver(e) {
@@ -788,16 +1039,27 @@
                 saveItinerary();
                 renderDayDestinations(dayNum);
                 updateBudget();
+                updateDaySlotStyle(dayNum);
             }
         }
 
-        function removeFromDay(destId, dayNum) {
+        function removeFromDay(destId, dayNum, e) {
+            e.stopPropagation();
             if (itinerary[dayNum]) {
                 itinerary[dayNum] = itinerary[dayNum].filter(id => id !== destId);
                 saveItinerary();
                 renderDayDestinations(dayNum);
                 updateBudget();
+                updateDaySlotStyle(dayNum);
             }
+        }
+
+        function updateDaySlotStyle(dayNum) {
+            const slot = document.querySelector(`[data-day="${dayNum}"]`);
+            if (!slot) return;
+            const hasDests = itinerary[dayNum] && itinerary[dayNum].length > 0;
+            slot.classList.toggle('day-slot-empty', !hasDests);
+            slot.classList.toggle('day-slot-filled', hasDests);
         }
 
         function renderDayDestinations(dayNum) {
@@ -807,24 +1069,32 @@
             const dayDests = itinerary[dayNum] || [];
             let html = '';
 
-            dayDests.forEach(destId => {
-                const dest = destinations.find(d => d.id === destId);
-                if (dest) {
-                    html += `
-                        <div class="flex items-center justify-between bg-white rounded px-2 py-1 text-xs border-l-2 country-${dest.country}">
-                            <span class="truncate">${dest.name}</span>
-                            <button onclick="removeFromDay('${destId}', ${dayNum})" class="text-gray-400 hover:text-red-500 ml-1">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>`;
-                }
-            });
+            if (dayDests.length === 0) {
+                html = '<p class="text-xs text-slate-400 text-center py-2">Drop here</p>';
+            } else {
+                dayDests.forEach(destId => {
+                    const dest = destinations.find(d => d.id === destId);
+                    if (dest) {
+                        const colors = { thailand: 'amber', cambodia: 'rose', taiwan: 'emerald' };
+                        html += `
+                            <div class="flex items-center gap-2 bg-${colors[dest.country]}-50 rounded-lg px-2 py-1.5 text-xs group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-${colors[dest.country]}-500 flex-shrink-0"></span>
+                                <span class="flex-1 truncate font-medium text-slate-700">${dest.name}</span>
+                                <button onclick="removeFromDay('${destId}', ${dayNum}, event)"
+                                        class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity">
+                                    <i class="fas fa-times text-[10px]"></i>
+                                </button>
+                            </div>`;
+                    }
+                });
+            }
             container.innerHTML = html;
         }
 
         function loadItinerary() {
             for (let i = 1; i <= 20; i++) {
                 renderDayDestinations(i);
+                updateDaySlotStyle(i);
             }
         }
 
@@ -849,13 +1119,10 @@
             Object.values(itinerary).forEach(dayDests => {
                 dayDests.forEach(destId => {
                     const dest = destinations.find(d => d.id === destId);
-                    if (dest) {
-                        activityCosts += dest.cost;
-                    }
+                    if (dest) activityCosts += dest.cost;
                 });
             });
 
-            // Count days per country based on planned destinations
             for (let i = 1; i <= 20; i++) {
                 const dayDests = itinerary[i] || [];
                 if (dayDests.length > 0) {
@@ -877,109 +1144,89 @@
             document.getElementById('budget-cambodia').textContent = `$${cambodiaCost}`;
             document.getElementById('budget-taiwan').textContent = `$${taiwanCost}`;
             document.getElementById('budget-total').textContent = `$${total}`;
-            document.getElementById('budget-display').innerHTML = `<i class="fas fa-dollar-sign mr-2"></i><span class="font-semibold">$${total} est.</span>`;
+            document.getElementById('budget-header').textContent = `$${total}`;
         }
 
         // Filter destinations
         function filterDestinations(query) {
-            const cards = document.querySelectorAll('#destination-list .destination-card');
+            const cards = document.querySelectorAll('#destination-list .dest-card');
+            const q = query.toLowerCase();
             cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+                card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
             });
         }
 
         function filterDestinationsFull(query) {
-            const cards = document.querySelectorAll('.destination-full-card');
+            const cards = document.querySelectorAll('#destinations-grid .card');
+            const q = query.toLowerCase();
             cards.forEach(card => {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+                const matchesSearch = card.textContent.toLowerCase().includes(q);
+                const matchesCountry = currentCountryFilter === 'all' || card.dataset.country === currentCountryFilter;
+                card.style.display = (matchesSearch && matchesCountry) ? '' : 'none';
             });
         }
 
         function filterByCountry(country) {
-            const cards = document.querySelectorAll('.destination-full-card');
+            currentCountryFilter = country;
+            const cards = document.querySelectorAll('#destinations-grid .card');
             cards.forEach(card => {
-                if (country === 'all' || card.dataset.country === country) {
-                    card.style.display = '';
+                card.style.display = (country === 'all' || card.dataset.country === country) ? '' : 'none';
+            });
+
+            // Update filter buttons
+            document.querySelectorAll('.country-filter').forEach(btn => {
+                if (btn.dataset.country === country) {
+                    btn.classList.add('bg-slate-100', 'text-slate-700');
+                    btn.classList.remove('text-slate-500');
                 } else {
-                    card.style.display = 'none';
+                    btn.classList.remove('bg-slate-100', 'text-slate-700');
+                    btn.classList.add('text-slate-500');
                 }
             });
         }
 
         // Load templates
         function loadTemplate(template) {
-            clearItinerary();
+            itinerary = {};
 
             if (template === 'thailand') {
                 itinerary = {
-                    1: ['wat-pho', 'grand-palace'],
-                    2: ['chinatown', 'jodd-fairs'],
-                    3: ['chatuchak', 'bkk-massage'],
-                    4: ['doi-suthep', 'cm-old-city'],
-                    5: ['khao-soi', 'night-bazaar'],
-                    6: ['elephant-sanctuary'],
-                    7: ['cooking-class', 'lantern-festival'],
-                    8: [], // Travel day
-                    9: ['koh-tao-scuba'],
-                    10: ['koh-tao-scuba'],
-                    11: ['koh-tao-scuba'],
-                    12: ['koh-tao-scuba'],
-                    13: ['big-buddha'],
-                    14: ['railay'],
-                    15: ['rock-climbing', 'phra-nang'],
-                    16: ['island-hopping'],
-                    17: ['khao-sok'],
-                    18: ['khao-sok'],
-                    19: ['phuket-old'],
-                    20: [] // Departure
+                    1: ['wat-pho', 'grand-palace'], 2: ['chinatown', 'jodd-fairs'],
+                    3: ['chatuchak', 'bkk-massage'], 4: ['doi-suthep', 'cm-old-city'],
+                    5: ['khao-soi', 'night-bazaar'], 6: ['elephant-sanctuary'],
+                    7: ['cooking-class', 'lantern-festival'], 8: [],
+                    9: ['koh-tao-scuba'], 10: ['koh-tao-scuba'],
+                    11: ['koh-tao-scuba'], 12: ['koh-tao-scuba'],
+                    13: ['big-buddha'], 14: ['railay'],
+                    15: ['rock-climbing', 'phra-nang'], 16: ['island-hopping'],
+                    17: ['khao-sok'], 18: ['khao-sok'],
+                    19: ['phuket-old'], 20: []
                 };
             } else if (template === 'thailand-cambodia') {
                 itinerary = {
-                    1: ['wat-pho', 'grand-palace'],
-                    2: ['chinatown'],
-                    3: ['angkor-wat'],
-                    4: ['angkor-wat', 'ta-prohm'],
-                    5: ['bayon', 'apsara'],
-                    6: ['doi-suthep', 'cm-old-city'],
-                    7: ['elephant-sanctuary'],
-                    8: ['cooking-class', 'lantern-festival'],
-                    9: [], // Travel
-                    10: ['koh-tao-scuba'],
-                    11: ['koh-tao-scuba'],
-                    12: ['koh-tao-scuba'],
-                    13: ['koh-tao-scuba'],
-                    14: ['big-buddha'],
-                    15: ['railay', 'rock-climbing'],
-                    16: ['island-hopping'],
-                    17: ['phra-nang'],
-                    18: ['chatuchak'],
-                    19: ['bkk-massage', 'sky-bar'],
-                    20: []
+                    1: ['wat-pho', 'grand-palace'], 2: ['chinatown'],
+                    3: ['angkor-wat'], 4: ['angkor-wat', 'ta-prohm'],
+                    5: ['bayon', 'apsara'], 6: ['doi-suthep', 'cm-old-city'],
+                    7: ['elephant-sanctuary'], 8: ['cooking-class', 'lantern-festival'],
+                    9: [], 10: ['koh-tao-scuba'],
+                    11: ['koh-tao-scuba'], 12: ['koh-tao-scuba'],
+                    13: ['koh-tao-scuba'], 14: ['big-buddha'],
+                    15: ['railay', 'rock-climbing'], 16: ['island-hopping'],
+                    17: ['phra-nang'], 18: ['chatuchak'],
+                    19: ['bkk-massage', 'sky-bar'], 20: []
                 };
             } else if (template === 'all') {
                 itinerary = {
-                    1: ['wat-pho', 'chinatown'],
-                    2: ['grand-palace'],
-                    3: ['angkor-wat'],
-                    4: ['angkor-wat', 'ta-prohm'],
-                    5: [], // Travel
-                    6: ['koh-tao-scuba'],
-                    7: ['koh-tao-scuba'],
-                    8: ['koh-tao-scuba'],
-                    9: ['koh-tao-scuba'],
-                    10: ['railay'],
-                    11: ['rock-climbing', 'island-hopping'],
-                    12: ['doi-suthep'],
-                    13: ['cooking-class', 'lantern-festival'],
-                    14: [], // Fly to Taiwan
-                    15: ['jiufen', 'beitou'],
-                    16: ['sun-moon-lake'],
-                    17: ['alishan'],
-                    18: ['taichung-theater'],
-                    19: [], // Return to BKK
-                    20: []
+                    1: ['wat-pho', 'chinatown'], 2: ['grand-palace'],
+                    3: ['angkor-wat'], 4: ['angkor-wat', 'ta-prohm'],
+                    5: [], 6: ['koh-tao-scuba'],
+                    7: ['koh-tao-scuba'], 8: ['koh-tao-scuba'],
+                    9: ['koh-tao-scuba'], 10: ['railay'],
+                    11: ['rock-climbing', 'island-hopping'], 12: ['doi-suthep'],
+                    13: ['cooking-class', 'lantern-festival'], 14: [],
+                    15: ['jiufen', 'beitou'], 16: ['sun-moon-lake'],
+                    17: ['alishan'], 18: ['taichung-theater'],
+                    19: [], 20: []
                 };
             }
 
@@ -993,48 +1240,57 @@
             const dest = destinations.find(d => d.id === destId);
             if (!dest) return;
 
-            const badgeClass = `badge-${dest.country}`;
+            const colors = { thailand: 'amber', cambodia: 'rose', taiwan: 'emerald' };
+            const c = colors[dest.country];
             const modal = document.getElementById('modal');
             const content = document.getElementById('modal-content');
 
             content.innerHTML = `
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h2 class="text-2xl font-bold">${dest.name}</h2>
-                        <div class="flex gap-2 mt-2">
-                            <span class="text-xs px-2 py-1 rounded-full ${badgeClass}">${dest.country}</span>
-                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100">${dest.region}</span>
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="badge-${dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>
+                            <span class="text-xs text-slate-500">${dest.region}</span>
                         </div>
+                        <h2 class="text-xl font-bold text-slate-800">${dest.name}</h2>
                     </div>
-                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
-                        <i class="fas fa-times text-xl"></i>
+                    <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <p class="text-gray-600 mb-4">${dest.desc}</p>
-                <div class="grid grid-cols-3 gap-4 mb-4">
-                    <div class="bg-gray-50 rounded-lg p-3 text-center">
-                        <div class="text-2xl font-bold text-blue-600">${dest.days}</div>
-                        <div class="text-xs text-gray-500">Days</div>
+
+                ${dest.closed ? '<div class="bg-red-100 border border-red-200 rounded-xl p-3 mb-4 text-sm text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Currently Closed</strong> - Not recommended for this trip</div>' : ''}
+
+                <p class="text-slate-600 mb-5">${dest.desc}</p>
+
+                <div class="grid grid-cols-3 gap-3 mb-5">
+                    <div class="bg-slate-50 rounded-xl p-3 text-center">
+                        <div class="text-xl font-bold text-slate-800">${dest.days}</div>
+                        <div class="text-xs text-slate-500">Days</div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-3 text-center">
-                        <div class="text-2xl font-bold text-green-600">$${dest.cost}</div>
-                        <div class="text-xs text-gray-500">Est. Cost</div>
+                    <div class="bg-slate-50 rounded-xl p-3 text-center">
+                        <div class="text-xl font-bold text-emerald-600">$${dest.cost}</div>
+                        <div class="text-xs text-slate-500">Est. Cost</div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-3 text-center">
-                        <div class="text-lg font-bold text-amber-600">${dest.crowds}</div>
-                        <div class="text-xs text-gray-500">Crowds</div>
+                    <div class="bg-slate-50 rounded-xl p-3 text-center">
+                        <div class="text-sm font-bold text-amber-600">${dest.crowds}</div>
+                        <div class="text-xs text-slate-500">Crowds</div>
                     </div>
                 </div>
-                <div class="bg-amber-50 rounded-lg p-4 mb-4">
-                    <div class="font-semibold text-amber-800 mb-1"><i class="fas fa-lightbulb mr-2"></i>Tips</div>
+
+                <div class="bg-amber-50 rounded-xl p-4 mb-5">
+                    <div class="flex items-center gap-2 text-amber-800 font-semibold text-sm mb-1">
+                        <i class="fas fa-lightbulb"></i> Tips
+                    </div>
                     <p class="text-sm text-amber-700">${dest.tips}</p>
                 </div>
+
                 <div class="flex gap-3">
-                    <select id="add-to-day-select" class="flex-1 border rounded-lg px-3 py-2">
-                        ${tripDays.map(d => `<option value="${d.day}">Day ${d.day} - ${d.dateStr}</option>`).join('')}
+                    <select id="add-to-day-select" class="flex-1 bg-slate-50 border-0 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-sky-500">
+                        ${tripDays.map(d => `<option value="${d.day}">Day ${d.day} - ${d.dateStr}${d.isNYE ? ' (NYE!)' : ''}</option>`).join('')}
                     </select>
-                    <button onclick="addFromModal('${dest.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium">
-                        <i class="fas fa-plus mr-2"></i>Add to Day
+                    <button onclick="addFromModal('${dest.id}')" class="btn-primary">
+                        <i class="fas fa-plus mr-2"></i>Add
                     </button>
                 </div>
             `;
@@ -1057,13 +1313,36 @@
 
         // NYE selection
         function selectNYE(location) {
-            alert(`NYE location set to: ${location.replace('-', ' ').toUpperCase()}\n\nYour itinerary will be adjusted accordingly.`);
+            const names = { 'chiang-mai': 'Chiang Mai Lanterns', 'bangkok': 'Bangkok Rooftop', 'koh-tao': 'Koh Tao Beach' };
+            alert(`Great choice! NYE location set to: ${names[location]}\n\nYour itinerary templates will reflect this.`);
         }
 
         // Close modal on background click
         document.getElementById('modal').addEventListener('click', (e) => {
             if (e.target.id === 'modal') closeModal();
         });
+
+        // Touch support for drag
+        let touchDragId = null;
+        document.addEventListener('touchstart', (e) => {
+            const card = e.target.closest('.dest-card');
+            if (card) {
+                touchDragId = card.getAttribute('ondragstart')?.match(/'([^']+)'/)?.[1];
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            if (touchDragId) {
+                const touch = e.changedTouches[0];
+                const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+                const daySlot = elem?.closest('.day-slot');
+                if (daySlot) {
+                    const dayNum = parseInt(daySlot.dataset.day);
+                    addToDay(touchDragId, dayNum);
+                }
+                touchDragId = null;
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
