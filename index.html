@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asia Trip Planner 2025 | Sam & Carter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .destination-card { cursor: grab; }
+        .destination-card:active { cursor: grabbing; }
+        .day-slot.drag-over { background-color: #dbeafe; border-color: #3b82f6; }
+        .destination-card.dragging { opacity: 0.5; }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: #f1f5f9; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .gradient-header { background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 50%, #ec4899 100%); }
+        .country-thailand { border-left-color: #f59e0b; }
+        .country-cambodia { border-left-color: #ef4444; }
+        .country-taiwan { border-left-color: #10b981; }
+        .badge-thailand { background-color: #fef3c7; color: #92400e; }
+        .badge-cambodia { background-color: #fee2e2; color: #991b1b; }
+        .dest-closed { opacity: 0.6; background: repeating-linear-gradient(45deg, #fff, #fff 10px, #fee2e2 10px, #fee2e2 20px); }
+        .dest-closed-badge { background-color: #dc2626; color: white; }
+        .badge-taiwan { background-color: #d1fae5; color: #065f46; }
+        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+        @keyframes pulse-border { 0%, 100% { border-color: #3b82f6; } 50% { border-color: #93c5fd; } }
+        .pulse-border { animation: pulse-border 2s infinite; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-header text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold flex items-center gap-3">
+                        <i class="fas fa-plane-departure"></i>
+                        Asia Trip 2025
+                    </h1>
+                    <p class="text-blue-100 mt-1">Sam & Carter's Adventure Planner</p>
+                </div>
+                <div class="mt-4 md:mt-0 flex flex-wrap gap-4 text-sm">
+                    <div class="bg-white/20 rounded-lg px-4 py-2">
+                        <i class="fas fa-calendar-alt mr-2"></i>
+                        <span class="font-semibold">Dec 28 - Jan 16</span>
+                    </div>
+                    <div class="bg-white/20 rounded-lg px-4 py-2">
+                        <i class="fas fa-clock mr-2"></i>
+                        <span class="font-semibold">20 Days</span>
+                    </div>
+                    <div class="bg-white/20 rounded-lg px-4 py-2" id="budget-display">
+                        <i class="fas fa-dollar-sign mr-2"></i>
+                        <span class="font-semibold">$0 est.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex gap-8">
+                <button onclick="showTab('planner')" id="tab-planner" class="py-4 px-2 font-medium tab-active">
+                    <i class="fas fa-map-marked-alt mr-2"></i>Trip Planner
+                </button>
+                <button onclick="showTab('destinations')" id="tab-destinations" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-landmark mr-2"></i>All Destinations
+                </button>
+                <button onclick="showTab('decisions')" id="tab-decisions" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-balance-scale mr-2"></i>Decisions
+                </button>
+                <button onclick="showTab('logistics')" id="tab-logistics" class="py-4 px-2 font-medium text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-info-circle mr-2"></i>Logistics
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <!-- Planner Tab -->
+        <div id="content-planner">
+            <!-- Quick Actions -->
+            <div class="mb-6 flex flex-wrap gap-3">
+                <button onclick="loadTemplate('thailand')" class="bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg font-medium transition">
+                    <i class="fas fa-magic mr-2"></i>Load Thailand Only
+                </button>
+                <button onclick="loadTemplate('thailand-cambodia')" class="bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-lg font-medium transition">
+                    <i class="fas fa-magic mr-2"></i>Load Thailand + Cambodia
+                </button>
+                <button onclick="loadTemplate('all')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg font-medium transition">
+                    <i class="fas fa-magic mr-2"></i>Load All Three Countries
+                </button>
+                <button onclick="clearItinerary()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium transition ml-auto">
+                    <i class="fas fa-eraser mr-2"></i>Clear All
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Destinations Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-xl shadow-sm border p-4 sticky top-24">
+                        <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                            <i class="fas fa-list mr-2 text-blue-500"></i>
+                            Destinations
+                        </h3>
+                        <input type="text" id="destination-search" placeholder="Search..."
+                               class="w-full px-3 py-2 border rounded-lg mb-3 text-sm"
+                               oninput="filterDestinations(this.value)">
+
+                        <div class="space-y-2 max-h-96 overflow-y-auto scrollbar-thin" id="destination-list">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Grid -->
+                <div class="lg:col-span-3">
+                    <div class="bg-white rounded-xl shadow-sm border p-6">
+                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center justify-between">
+                            <span><i class="fas fa-calendar mr-2 text-blue-500"></i>20-Day Itinerary</span>
+                            <span class="text-sm font-normal text-gray-500">Drag destinations to days</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3" id="calendar-grid">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Budget Summary -->
+                    <div class="bg-white rounded-xl shadow-sm border p-6 mt-6">
+                        <h3 class="font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas fa-calculator mr-2 text-green-500"></i>
+                            Budget Estimate
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="budget-breakdown">
+                            <div class="bg-amber-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-amber-600" id="budget-thailand">$0</div>
+                                <div class="text-sm text-gray-600">Thailand</div>
+                            </div>
+                            <div class="bg-red-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-red-600" id="budget-cambodia">$0</div>
+                                <div class="text-sm text-gray-600">Cambodia</div>
+                            </div>
+                            <div class="bg-emerald-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-emerald-600" id="budget-taiwan">$0</div>
+                                <div class="text-sm text-gray-600">Taiwan</div>
+                            </div>
+                            <div class="bg-blue-50 rounded-lg p-4 text-center">
+                                <div class="text-2xl font-bold text-blue-600" id="budget-total">$0</div>
+                                <div class="text-sm text-gray-600">Total Est.</div>
+                            </div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-3">* Based on mid-range daily costs: Thailand $110/day, Cambodia $100/day, Taiwan $150/day</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Destinations Tab -->
+        <div id="content-destinations" class="hidden">
+            <div class="mb-6 flex flex-wrap gap-3 items-center">
+                <button onclick="filterByCountry('all')" class="filter-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg font-medium" data-country="all">
+                    All
+                </button>
+                <button onclick="filterByCountry('thailand')" class="filter-btn bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg font-medium" data-country="thailand">
+                    <i class="fas fa-flag mr-1"></i>Thailand
+                </button>
+                <button onclick="filterByCountry('cambodia')" class="filter-btn bg-red-100 hover:bg-red-200 text-red-800 px-4 py-2 rounded-lg font-medium" data-country="cambodia">
+                    <i class="fas fa-flag mr-1"></i>Cambodia
+                </button>
+                <button onclick="filterByCountry('taiwan')" class="filter-btn bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-lg font-medium" data-country="taiwan">
+                    <i class="fas fa-flag mr-1"></i>Taiwan
+                </button>
+                <input type="text" id="dest-search-full" placeholder="Search destinations..."
+                       class="ml-auto px-4 py-2 border rounded-lg w-64"
+                       oninput="filterDestinationsFull(this.value)">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="destinations-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Decisions Tab -->
+        <div id="content-decisions" class="hidden">
+            <!-- NYE Decision -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-fireworks mr-3 text-purple-500"></i>
+                    NYE Decision: Where to Ring in 2026?
+                </h3>
+                <p class="text-gray-600 mb-6">You arrive Dec 28. NYE is Dec 31. This gives you 3 days to position yourself.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="border-2 border-purple-300 bg-purple-50 rounded-xl p-5 relative">
+                        <div class="absolute -top-3 left-4 bg-purple-500 text-white text-xs px-3 py-1 rounded-full font-semibold">
+                            RECOMMENDED
+                        </div>
+                        <h4 class="font-bold text-lg text-purple-800 mt-2">Chiang Mai Lantern Festival</h4>
+                        <div class="mt-3 space-y-2 text-sm">
+                            <p><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Experience:</strong> Once-in-a-lifetime</p>
+                            <p><i class="fas fa-users text-gray-500 mr-2"></i><strong>Crowds:</strong> Very High</p>
+                            <p><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Cost:</strong> $50-150 ticket</p>
+                            <p><i class="fas fa-heart text-pink-500 mr-2"></i><strong>Mood:</strong> Magical, spiritual</p>
+                        </div>
+                        <p class="mt-4 text-sm text-purple-700">Thousands of lanterns released into the night sky. Unforgettable.</p>
+                        <button onclick="selectNYE('chiang-mai')" class="mt-4 w-full bg-purple-500 hover:bg-purple-600 text-white py-2 rounded-lg font-medium transition">
+                            Select This
+                        </button>
+                    </div>
+
+                    <div class="border rounded-xl p-5 hover:border-blue-300 transition">
+                        <h4 class="font-bold text-lg text-gray-800">Bangkok Rooftop</h4>
+                        <div class="mt-3 space-y-2 text-sm">
+                            <p><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Experience:</strong> Great</p>
+                            <p><i class="fas fa-users text-gray-500 mr-2"></i><strong>Crowds:</strong> High</p>
+                            <p><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Cost:</strong> $30-100</p>
+                            <p><i class="fas fa-heart text-pink-500 mr-2"></i><strong>Mood:</strong> Party, cosmopolitan</p>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-600">Fireworks over the city, rooftop bars, big city NYE.</p>
+                        <button onclick="selectNYE('bangkok')" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-medium transition">
+                            Select This
+                        </button>
+                    </div>
+
+                    <div class="border rounded-xl p-5 hover:border-blue-300 transition">
+                        <h4 class="font-bold text-lg text-gray-800">Koh Tao Beach</h4>
+                        <div class="mt-3 space-y-2 text-sm">
+                            <p><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Experience:</strong> Good</p>
+                            <p><i class="fas fa-users text-gray-500 mr-2"></i><strong>Crowds:</strong> Moderate</p>
+                            <p><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Cost:</strong> Budget</p>
+                            <p><i class="fas fa-heart text-pink-500 mr-2"></i><strong>Mood:</strong> Backpacker, chill</p>
+                        </div>
+                        <p class="mt-4 text-sm text-gray-600">Beach party vibes. Could start scuba on Jan 1.</p>
+                        <button onclick="selectNYE('koh-tao')" class="mt-4 w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg font-medium transition">
+                            Select This
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p class="text-amber-800 text-sm">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        <strong>Timing Note:</strong> If you choose Chiang Mai for NYE, you'll start scuba in Koh Tao on Jan 2+.
+                        If you want to start scuba earlier, choose Bangkok or go straight to Koh Tao.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Must-Do Checklist -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-check-double mr-3 text-green-500"></i>
+                    Must-Do Checklist
+                </h3>
+                <div class="space-y-3">
+                    <label class="flex items-center gap-3 p-3 bg-red-50 rounded-lg border-2 border-red-200">
+                        <input type="checkbox" class="w-5 h-5 text-red-500" id="check-scuba">
+                        <span class="font-medium">Scuba Certification - Koh Tao (3-4 days)</span>
+                        <span class="ml-auto text-xs bg-red-200 text-red-800 px-2 py-1 rounded">NON-NEGOTIABLE</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <input type="checkbox" class="w-5 h-5" id="check-angkor">
+                        <span>Angkor Wat (if doing Cambodia)</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <input type="checkbox" class="w-5 h-5" id="check-lantern">
+                        <span>Chiang Mai NYE Lantern Festival</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <input type="checkbox" class="w-5 h-5" id="check-elephant">
+                        <span>Ethical Elephant Sanctuary</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <input type="checkbox" class="w-5 h-5" id="check-cooking">
+                        <span>Thai Cooking Class</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <input type="checkbox" class="w-5 h-5" id="check-climbing">
+                        <span>Rock Climbing at Railay</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Itinerary Comparison -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-route mr-3 text-blue-500"></i>
+                    Itinerary Options Comparison
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b">
+                                <th class="text-left py-3 px-4"></th>
+                                <th class="text-left py-3 px-4 bg-amber-50">Thailand Only</th>
+                                <th class="text-left py-3 px-4 bg-red-50">Thailand + Cambodia</th>
+                                <th class="text-left py-3 px-4 bg-emerald-50">All Three</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 font-medium">Pace</td>
+                                <td class="py-3 px-4 bg-amber-50"><span class="text-green-600">Relaxed</span></td>
+                                <td class="py-3 px-4 bg-red-50"><span class="text-amber-600">Moderate</span></td>
+                                <td class="py-3 px-4 bg-emerald-50"><span class="text-red-600">Fast</span></td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 font-medium">Angkor Wat</td>
+                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="py-3 px-4 bg-red-50"><i class="fas fa-check text-green-500"></i></td>
+                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-green-500"></i></td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 font-medium">Scuba</td>
+                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-check text-green-500"></i></td>
+                                <td class="py-3 px-4 bg-red-50"><i class="fas fa-check text-green-500"></i></td>
+                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-green-500"></i></td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 font-medium">Taiwan</td>
+                                <td class="py-3 px-4 bg-amber-50"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="py-3 px-4 bg-red-50"><i class="fas fa-times text-red-500"></i></td>
+                                <td class="py-3 px-4 bg-emerald-50"><i class="fas fa-check text-green-500"></i> (limited)</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 font-medium">Flights</td>
+                                <td class="py-3 px-4 bg-amber-50">3-4</td>
+                                <td class="py-3 px-4 bg-red-50">5-6</td>
+                                <td class="py-3 px-4 bg-emerald-50">7-8</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="py-3 px-4 font-medium">Est. Budget</td>
+                                <td class="py-3 px-4 bg-amber-50">$2,200</td>
+                                <td class="py-3 px-4 bg-red-50">$2,400</td>
+                                <td class="py-3 px-4 bg-emerald-50">$3,000+</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-medium">Best For</td>
+                                <td class="py-3 px-4 bg-amber-50">Relaxation seekers</td>
+                                <td class="py-3 px-4 bg-red-50">Balance seekers</td>
+                                <td class="py-3 px-4 bg-emerald-50">Adventure maximizers</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logistics Tab -->
+        <div id="content-logistics" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Visa Info -->
+                <div class="bg-white rounded-xl shadow-sm border p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-passport mr-3 text-blue-500"></i>
+                        Visa Requirements (US Citizens)
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 p-4 bg-amber-50 rounded-lg">
+                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                            <div>
+                                <div class="font-semibold">Thailand</div>
+                                <div class="text-sm text-gray-600">Visa-free for 60 days. FREE.</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 bg-red-50 rounded-lg">
+                            <i class="fas fa-file-alt text-2xl text-amber-500"></i>
+                            <div>
+                                <div class="font-semibold">Cambodia</div>
+                                <div class="text-sm text-gray-600">e-Visa required. $36 USD. Apply at evisa.gov.kh</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 bg-emerald-50 rounded-lg">
+                            <i class="fas fa-check-circle text-2xl text-green-500"></i>
+                            <div>
+                                <div class="font-semibold">Taiwan</div>
+                                <div class="text-sm text-gray-600">Visa-free for 90 days. FREE.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Currency -->
+                <div class="bg-white rounded-xl shadow-sm border p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-3 text-green-500"></i>
+                        Currency & Tipping
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-amber-50 rounded-lg">
+                            <div class="font-semibold flex justify-between">
+                                <span>Thailand (THB)</span>
+                                <span class="text-gray-600">~35 THB = $1</span>
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">Tip 20-50 THB or round up. Skip if service charge included.</div>
+                        </div>
+                        <div class="p-4 bg-red-50 rounded-lg">
+                            <div class="font-semibold flex justify-between">
+                                <span>Cambodia (USD)</span>
+                                <span class="text-gray-600">USD accepted!</span>
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">USD preferred. Round up $1. Guides: $5-10/day.</div>
+                        </div>
+                        <div class="p-4 bg-emerald-50 rounded-lg">
+                            <div class="font-semibold flex justify-between">
+                                <span>Taiwan (NT$)</span>
+                                <span class="text-gray-600">~32 NT$ = $1</span>
+                            </div>
+                            <div class="text-sm text-gray-600 mt-1">NO TIPPING culture. Don't tip!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Flights -->
+                <div class="bg-white rounded-xl shadow-sm border p-6 lg:col-span-2">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-plane mr-3 text-blue-500"></i>
+                        Flight Connections
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <h4 class="font-semibold text-amber-700 mb-2">From Bangkok</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>→ Chiang Mai: 1h 15m, $30-60</li>
+                                <li>→ Krabi: 1h 25m, $35-70</li>
+                                <li>→ Siem Reap: 1h, $80-150</li>
+                                <li>→ Taipei: 3h 30m, $200-400</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-red-700 mb-2">From Siem Reap</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>→ Bangkok: 1h, $80-150</li>
+                                <li>→ Taipei: via BKK, $250-400</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-emerald-700 mb-2">Koh Tao Access</h4>
+                            <ul class="text-sm space-y-1">
+                                <li>1. Fly to Surat Thani (1h, $40-70)</li>
+                                <li>2. Van to pier + catamaran (2-4h)</li>
+                                <li>Book: Lomprayah or Seatran</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Important Notes -->
+                <div class="bg-white rounded-xl shadow-sm border p-6 lg:col-span-2">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-3 text-amber-500"></i>
+                        Important Dec-Feb Notes
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                            <div class="font-semibold text-amber-800">Peak Season</div>
+                            <div class="text-sm text-gray-600">This is HIGH SEASON for all three countries. Book flights and accommodations early!</div>
+                        </div>
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <div class="font-semibold text-red-800">NYE Price Spike</div>
+                            <div class="text-sm text-gray-600">Dec 30 - Jan 2 prices spike everywhere. Book NYE accommodation NOW.</div>
+                        </div>
+                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="font-semibold text-blue-800">Weather</div>
+                            <div class="text-sm text-gray-600">Thailand & Cambodia: Dry, pleasant (best time!). Taiwan: Cool, occasional rain in north.</div>
+                        </div>
+                        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                            <div class="font-semibold text-red-800">⚠️ Taroko Gorge: SKIP IT</div>
+                            <div class="text-sm text-gray-600">Mostly closed (Dec 2025). April 2024 earthquake damage. 10+ year recovery. Highway restricted to 5 daily time windows. No buses. Most trails closed including Shakadang & Zhuilu. Not worth the hassle - do Sun Moon Lake or Alishan instead.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Destination Detail Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6" id="modal-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Destination Data
+        const destinations = [
+            // THAILAND - BANGKOK
+            { id: 'wat-pho', name: 'Wat Pho', region: 'Bangkok', country: 'thailand', type: 'temple', days: 0.5, cost: 6, highlight: true,
+              desc: 'Temple of the Reclining Buddha - one of Bangkok\'s oldest and largest temples with a 46m golden Buddha.',
+              tips: 'Arrive at 8am opening to avoid crowds. Includes water bottle.', crowds: 'HIGH' },
+            { id: 'grand-palace', name: 'Grand Palace', region: 'Bangkok', country: 'thailand', type: 'temple', days: 0.5, cost: 15, highlight: true,
+              desc: 'Stunning palace complex with Wat Phra Kaew (Temple of the Emerald Buddha). The most famous landmark in Bangkok.',
+              tips: 'Dress code enforced - cover shoulders and knees. Go early morning.', crowds: 'VERY HIGH' },
+            { id: 'wat-arun', name: 'Wat Arun', region: 'Bangkok', country: 'thailand', type: 'temple', days: 0.5, cost: 3,
+              desc: 'Temple of Dawn - stunning riverside temple with intricate porcelain decoration. Beautiful at sunset.',
+              tips: 'Best photographed from across the river. Visit at sunset.', crowds: 'HIGH' },
+            { id: 'chinatown', name: 'Chinatown/Yaowarat', region: 'Bangkok', country: 'thailand', type: 'neighborhood', days: 0.5, cost: 20,
+              desc: 'Bangkok\'s vibrant Chinatown - endless street food stalls, gold shops, and chaotic energy.',
+              tips: 'Come hungry after 6pm when street food stalls open. Try pad thai, dim sum, roast duck.', crowds: 'HIGH' },
+            { id: 'chatuchak', name: 'Chatuchak Market', region: 'Bangkok', country: 'thailand', type: 'market', days: 0.5, cost: 30,
+              desc: 'One of world\'s largest weekend markets. 15,000+ stalls selling everything imaginable.',
+              tips: 'Only open Sat-Sun. Arrive early. Can negotiate 30-40% off.', crowds: 'VERY HIGH' },
+            { id: 'jodd-fairs', name: 'JODD Fairs Night Market', region: 'Bangkok', country: 'thailand', type: 'nightlife', days: 0.5, cost: 25,
+              desc: 'Trendy night market with amazing food, vintage shopping, and hip atmosphere.',
+              tips: 'Best visited 7-10pm. Great photo ops.', crowds: 'HIGH' },
+            { id: 'bkk-massage', name: 'Thai Massage', region: 'Bangkok', country: 'thailand', type: 'wellness', days: 0.25, cost: 15,
+              desc: 'Authentic Thai massage at fraction of Western prices. 300-350 THB per hour is reasonable.',
+              tips: 'Try Treasure Massage for scalp, Yunomori Onsen for Japanese-Thai fusion.', crowds: 'LOW' },
+            { id: 'sky-bar', name: 'Sky Bar at Lebua', region: 'Bangkok', country: 'thailand', type: 'nightlife', days: 0.25, cost: 40,
+              desc: 'Famous rooftop bar from The Hangover Part II. Spectacular city views.',
+              tips: 'Dress code enforced. Drinks $15-20 each. Go for sunset.', crowds: 'HIGH' },
+
+            // THAILAND - CHIANG MAI
+            { id: 'doi-suthep', name: 'Wat Phra That Doi Suthep', region: 'Chiang Mai', country: 'thailand', type: 'temple', days: 0.5, cost: 3, highlight: true,
+              desc: 'Sacred temple atop Doi Suthep mountain with golden chedi and panoramic city views.',
+              tips: '309 steps or take cable car. Best early morning for clear views.', crowds: 'HIGH' },
+            { id: 'cm-old-city', name: 'Old City Temples', region: 'Chiang Mai', country: 'thailand', type: 'temple', days: 0.5, cost: 5,
+              desc: 'Walkable area with ancient temples - Wat Chedi Luang, Wat Phra Singh, Wat Chiang Man.',
+              tips: 'Rent a bike to explore. Monk chats available at some temples.', crowds: 'MODERATE' },
+            { id: 'khao-soi', name: 'Khao Soi Tour', region: 'Chiang Mai', country: 'thailand', type: 'food', days: 0.25, cost: 10, highlight: true,
+              desc: 'Northern Thai coconut curry noodle soup - the signature Chiang Mai dish.',
+              tips: 'Try Khao Soi Maesai (budget, daytime) or Khao Soi Nimman (fancy, Michelin).', crowds: 'MODERATE' },
+            { id: 'night-bazaar', name: 'Night Bazaar', region: 'Chiang Mai', country: 'thailand', type: 'market', days: 0.5, cost: 25,
+              desc: 'Evening market with handicrafts, clothing, food, and massage shops.',
+              tips: 'Bargain! Start at 30-40% of asking price. Fah Lanna Spa is inside.', crowds: 'HIGH' },
+            { id: 'elephant-sanctuary', name: 'Ethical Elephant Sanctuary', region: 'Chiang Mai', country: 'thailand', type: 'nature', days: 1, cost: 85, highlight: true,
+              desc: 'No-riding elephant experiences at ethical sanctuaries. Feed, bathe, observe elephants.',
+              tips: 'Book ahead - sells out in peak season. Elephant Nature Park or similar.', crowds: 'MODERATE' },
+            { id: 'cooking-class', name: 'Thai Cooking Class', region: 'Chiang Mai', country: 'thailand', type: 'activity', days: 0.5, cost: 45, highlight: true,
+              desc: 'Learn to make pad thai, curries, and more. Usually includes market visit.',
+              tips: 'Thai Farm Cooking School is highly rated. Full day is more immersive.', crowds: 'LOW' },
+            { id: 'doi-inthanon', name: 'Doi Inthanon National Park', region: 'Chiang Mai', country: 'thailand', type: 'nature', days: 1, cost: 40,
+              desc: 'Thailand\'s highest peak with twin pagodas, waterfalls, and hill tribe villages.',
+              tips: 'Bring warm layers - it\'s cold at summit! Full day trip recommended.', crowds: 'MODERATE' },
+            { id: 'lantern-festival', name: 'NYE Lantern Festival', region: 'Chiang Mai', country: 'thailand', type: 'event', days: 1, cost: 100, highlight: true,
+              desc: 'CAD Khomloy Sky Lantern Festival on Dec 31. Thousands of lanterns released into night sky.',
+              tips: 'BOOK TICKETS NOW - sells out. Standard $50, VIP $100+. Once in a lifetime.', crowds: 'VERY HIGH' },
+            { id: 'muay-thai', name: 'Muay Thai Fight Night', region: 'Chiang Mai', country: 'thailand', type: 'activity', days: 0.25, cost: 20,
+              desc: 'Watch authentic Muay Thai boxing at local stadium.',
+              tips: 'Multiple stadiums - Thapae is most tourist-friendly. VIP ~$45.', crowds: 'MODERATE' },
+
+            // THAILAND - SOUTHERN
+            { id: 'koh-tao-scuba', name: 'Scuba Certification', region: 'Koh Tao', country: 'thailand', type: 'activity', days: 4, cost: 350, highlight: true,
+              desc: 'PADI Open Water certification at one of the world\'s best (and cheapest) places to learn.',
+              tips: 'Top schools: Big Blue Diving, Ban\'s Diving, Davey Jones Locker. Book ahead.', crowds: 'MODERATE' },
+            { id: 'shark-bay', name: 'Shark Bay Snorkeling', region: 'Koh Tao', country: 'thailand', type: 'nature', days: 0.5, cost: 15,
+              desc: 'Snorkeling spot famous for blacktip reef sharks. They\'re harmless!',
+              tips: 'Best 7-10am when sharks are feeding. Bring your own gear or rent.', crowds: 'MODERATE' },
+            { id: 'khao-sok', name: 'Khao Sok / Cheow Lan Lake', region: 'Khao Sok', country: 'thailand', type: 'nature', days: 2, cost: 150, highlight: true,
+              desc: 'Floating bungalows on stunning emerald lake surrounded by jungle and limestone cliffs.',
+              tips: 'Overnight on floating bungalow is the experience. Book 2-day tour.', crowds: 'LOW' },
+            { id: 'big-buddha', name: 'Big Buddha Temple', region: 'Ko Samui', country: 'thailand', type: 'temple', days: 0.25, cost: 0,
+              desc: 'Iconic 12m golden Buddha statue on Koh Samui. Lots of stairs!',
+              tips: 'Go at sunrise for photos and fewer crowds. Free entry.', crowds: 'MODERATE' },
+            { id: 'railay', name: 'Railay Beach', region: 'Krabi', country: 'thailand', type: 'beach', days: 2, cost: 60, highlight: true,
+              desc: 'Stunning peninsula only accessible by boat. Dramatic limestone cliffs, pristine beaches.',
+              tips: 'Long-tail boat from Ao Nang. Wet landing - wear appropriate shoes.', crowds: 'HIGH' },
+            { id: 'rock-climbing', name: 'Rock Climbing Railay', region: 'Krabi', country: 'thailand', type: 'activity', days: 0.5, cost: 35,
+              desc: 'World-class limestone climbing. Half-day courses available for beginners.',
+              tips: 'Multiple schools. No experience needed for intro course.', crowds: 'MODERATE' },
+            { id: 'island-hopping', name: 'Four Islands Tour', region: 'Krabi', country: 'thailand', type: 'nature', days: 1, cost: 35,
+              desc: 'Day trip to Hong Island, Poda, Chicken Island, and Tup. Snorkeling, beaches, lunch.',
+              tips: 'Speedboat faster but louder. Long-tail more scenic. Book ahead.', crowds: 'HIGH' },
+            { id: 'phra-nang', name: 'Phra Nang Cave Beach', region: 'Krabi', country: 'thailand', type: 'beach', days: 0.5, cost: 0,
+              desc: 'Small beach with sacred cave shrine filled with wooden phalluses (fertility offerings).',
+              tips: 'Walk from Railay East. Best for sunset. Very popular.', crowds: 'HIGH' },
+            { id: 'phuket-old', name: 'Phuket Old Town', region: 'Phuket', country: 'thailand', type: 'neighborhood', days: 0.5, cost: 20,
+              desc: 'Charming Sino-Portuguese architecture, street art, cafes, and Sunday walking street.',
+              tips: 'Sunday market is great. UNESCO City of Gastronomy.', crowds: 'MODERATE' },
+            { id: 'james-bond', name: 'James Bond Island', region: 'Phuket', country: 'thailand', type: 'nature', days: 1, cost: 80,
+              desc: 'Phang Nga Bay tour to the famous limestone karst from "The Man with the Golden Gun".',
+              tips: 'Very touristy but impressive. Combine with sea cave kayaking.', crowds: 'VERY HIGH' },
+
+            // CAMBODIA
+            { id: 'angkor-wat', name: 'Angkor Wat', region: 'Siem Reap', country: 'cambodia', type: 'temple', days: 2, cost: 75, highlight: true,
+              desc: 'World\'s largest religious monument. Absolutely stunning Khmer architecture.',
+              tips: 'Get 3-day pass ($62). Hire guide. Sunrise is magical but crowded.', crowds: 'VERY HIGH' },
+            { id: 'ta-prohm', name: 'Ta Prohm', region: 'Siem Reap', country: 'cambodia', type: 'temple', days: 0.5, cost: 0, highlight: true,
+              desc: '"Tomb Raider temple" - massive tree roots consuming ancient stone ruins.',
+              tips: 'Included in Angkor pass. Best late afternoon light.', crowds: 'HIGH' },
+            { id: 'bayon', name: 'Bayon Temple', region: 'Siem Reap', country: 'cambodia', type: 'temple', days: 0.5, cost: 0, highlight: true,
+              desc: '216 giant serene stone faces carved into towers. Mesmerizing.',
+              tips: 'Included in Angkor pass. Early morning or late afternoon best.', crowds: 'HIGH' },
+            { id: 'floating-village', name: 'Kompong Phluk Floating Village', region: 'Siem Reap', country: 'cambodia', type: 'nature', days: 0.5, cost: 40,
+              desc: 'Village on stilts on Tonle Sap lake. Unique glimpse into water-based life.',
+              tips: 'Afternoon tours best for sunset photos. Book ahead in peak season.', crowds: 'MODERATE' },
+            { id: 'apsara', name: 'Apsara Dance Show', region: 'Siem Reap', country: 'cambodia', type: 'activity', days: 0.25, cost: 30,
+              desc: 'Classical Khmer dance with elaborate costumes. Usually includes buffet dinner.',
+              tips: 'Book through hotel. Drinks usually extra.', crowds: 'LOW' },
+            { id: 'royal-palace-pp', name: 'Royal Palace', region: 'Phnom Penh', country: 'cambodia', type: 'temple', days: 0.5, cost: 10,
+              desc: 'Stunning palace complex where the King still lives. Silver Pagoda included.',
+              tips: 'CASH ONLY. Dress code enforced. Half day with nearby museum.', crowds: 'MODERATE' },
+            { id: 'tuol-sleng', name: 'Tuol Sleng Genocide Museum', region: 'Phnom Penh', country: 'cambodia', type: 'culture', days: 0.5, cost: 5,
+              desc: 'Former S-21 prison from Khmer Rouge era. Heavy but essential for understanding Cambodia.',
+              tips: 'Allow 2-3 hours. Often combined with Killing Fields.', crowds: 'MODERATE' },
+            { id: 'koh-rong', name: 'Koh Rong Island', region: 'Koh Rong', country: 'cambodia', type: 'beach', days: 2, cost: 80,
+              desc: 'Pristine beaches, bioluminescent plankton, tropical paradise.',
+              tips: 'Ferry from Sihanoukville. Stay at Long Set for quiet. Bioluminescence tour $6!', crowds: 'MODERATE' },
+
+            // TAIWAN
+            { id: 'jiufen', name: 'Jiufen', region: 'Taipei Area', country: 'taiwan', type: 'neighborhood', days: 0.5, cost: 15, highlight: true,
+              desc: '"Spirited Away" village - lantern-lit alleys, tea houses, ocean views.',
+              tips: 'Go late afternoon for lanterns lighting. Rainy weather adds atmosphere!', crowds: 'HIGH' },
+            { id: 'beitou', name: 'Beitou Hot Springs', region: 'Taipei Area', country: 'taiwan', type: 'wellness', days: 0.5, cost: 20,
+              desc: 'Metro-accessible hot spring district. Public baths from $1, private from $15.',
+              tips: 'Just 40 min from central Taipei by MRT. Perfect rainy day activity.', crowds: 'MODERATE' },
+            { id: 'taroko', name: 'Taroko Gorge ⚠️', region: 'Hualien', country: 'taiwan', type: 'nature', days: 1, cost: 0, closed: true,
+              desc: '⚠️ MOSTLY CLOSED (Dec 2025). April 2024 earthquake caused catastrophic damage. Shakadang, Zhuilu, Swallow Grotto all CLOSED. Recovery: 10+ years. Highway access restricted to 5 time windows/day. No buses. SKIP for this trip.',
+              tips: 'NOT RECOMMENDED for Dec 2025. Access windows: 6:30-8am, 10-10:05am, 12-1pm, 3-3:05pm, 4:30-5:30pm only. Most trails closed. Consider Sun Moon Lake or Alishan instead.', crowds: 'N/A - Limited Access' },
+            { id: 'alishan', name: 'Alishan Forest Railway', region: 'Chiayi', country: 'taiwan', type: 'nature', days: 1.5, cost: 50, highlight: true,
+              desc: 'Historic narrow-gauge railway through mountains. Famous sunrise above clouds.',
+              tips: 'Book sunrise train 2 weeks ahead - sells out! Bring warm clothes.', crowds: 'MODERATE' },
+            { id: 'sun-moon-lake', name: 'Sun Moon Lake', region: 'Taichung', country: 'taiwan', type: 'nature', days: 1, cost: 40, highlight: true,
+              desc: 'Taiwan\'s largest lake. CNN top 10 bike route. Cycling, boats, ropeway.',
+              tips: 'Rent electric bike for 29km loop. Stay overnight for sunrise.', crowds: 'MODERATE' },
+            { id: 'taichung-theater', name: 'National Taichung Theater', region: 'Taichung', country: 'taiwan', type: 'culture', days: 0.25, cost: 0,
+              desc: 'Stunning Toyo Ito architecture - no right angles. Free to explore.',
+              tips: 'Worth visiting even without a show. Rooftop garden has city views.', crowds: 'LOW' },
+            { id: 'kenting', name: 'Kenting National Park', region: 'Southern Taiwan', country: 'taiwan', type: 'beach', days: 1, cost: 5,
+              desc: 'Taiwan\'s Hawaii - tropical beaches, surfing, 2km night market.',
+              tips: 'Dec-Feb is off-peak (quieter but windy). Long trip from Taipei.', crowds: 'LOW' },
+        ];
+
+        // Trip dates
+        const tripDays = [];
+        const startDate = new Date('2025-12-28');
+        for (let i = 0; i < 20; i++) {
+            const date = new Date(startDate);
+            date.setDate(date.getDate() + i);
+            tripDays.push({
+                day: i + 1,
+                date: date,
+                dateStr: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+                isNYE: date.getMonth() === 11 && date.getDate() === 31,
+                destinations: []
+            });
+        }
+
+        // Itinerary state
+        let itinerary = JSON.parse(localStorage.getItem('asiaItinerary')) || {};
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDestinationList();
+            renderCalendar();
+            renderDestinationsGrid();
+            loadItinerary();
+            updateBudget();
+        });
+
+        // Tab switching
+        function showTab(tab) {
+            document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('tab-active');
+                el.classList.add('text-gray-500');
+            });
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            document.getElementById(`tab-${tab}`).classList.remove('text-gray-500');
+        }
+
+        // Render sidebar destination list
+        function renderDestinationList() {
+            const list = document.getElementById('destination-list');
+            const countries = ['thailand', 'cambodia', 'taiwan'];
+
+            let html = '';
+            countries.forEach(country => {
+                const countryDests = destinations.filter(d => d.country === country);
+                const countryName = country.charAt(0).toUpperCase() + country.slice(1);
+                const badgeClass = `badge-${country}`;
+
+                html += `<div class="mb-3">
+                    <div class="text-xs font-semibold text-gray-500 uppercase mb-2">${countryName}</div>`;
+
+                countryDests.forEach(dest => {
+                    html += `
+                        <div class="destination-card p-2 mb-1 rounded-lg border-l-4 country-${country} bg-white hover:bg-gray-50 text-sm cursor-grab"
+                             draggable="true"
+                             ondragstart="dragStart(event, '${dest.id}')"
+                             onclick="showDestinationDetail('${dest.id}')">
+                            <div class="font-medium truncate">${dest.name}</div>
+                            <div class="text-xs text-gray-500">${dest.region} · ${dest.days}d</div>
+                        </div>`;
+                });
+                html += '</div>';
+            });
+            list.innerHTML = html;
+        }
+
+        // Render calendar grid
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            let html = '';
+
+            tripDays.forEach(day => {
+                const nyeClass = day.isNYE ? 'border-2 border-purple-400 pulse-border' : 'border';
+                const nyeBadge = day.isNYE ? '<span class="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full">NYE!</span>' : '';
+
+                html += `
+                    <div class="day-slot ${nyeClass} rounded-lg p-3 bg-gray-50 min-h-[120px] relative transition-colors"
+                         ondragover="dragOver(event)"
+                         ondragleave="dragLeave(event)"
+                         ondrop="drop(event, ${day.day})"
+                         data-day="${day.day}">
+                        ${nyeBadge}
+                        <div class="text-xs text-gray-500 mb-1">Day ${day.day}</div>
+                        <div class="font-medium text-sm mb-2">${day.dateStr}</div>
+                        <div class="space-y-1 day-destinations" id="day-${day.day}-destinations"></div>
+                    </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        // Render full destinations grid
+        function renderDestinationsGrid() {
+            const grid = document.getElementById('destinations-grid');
+            let html = '';
+
+            destinations.forEach(dest => {
+                const badge = dest.closed
+                    ? '<span class="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i>CLOSED</span>'
+                    : (dest.highlight ? '<span class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-semibold"><i class="fas fa-star mr-1"></i>Must See</span>' : '');
+                const badgeClass = `badge-${dest.country}`;
+                const closedClass = dest.closed ? 'dest-closed' : '';
+
+                html += `
+                    <div class="destination-full-card bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition relative ${closedClass}"
+                         data-country="${dest.country}">
+                        ${badge}
+                        <div class="p-5">
+                            <div class="flex items-start justify-between mb-2">
+                                <h4 class="font-bold text-lg">${dest.name}</h4>
+                            </div>
+                            <div class="flex gap-2 mb-3">
+                                <span class="text-xs px-2 py-1 rounded-full ${badgeClass}">${dest.country}</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-gray-100">${dest.region}</span>
+                                <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">${dest.type}</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mb-3">${dest.desc}</p>
+                            <div class="flex justify-between text-sm">
+                                <span><i class="fas fa-clock text-gray-400 mr-1"></i>${dest.days} day${dest.days !== 1 ? 's' : ''}</span>
+                                <span><i class="fas fa-dollar-sign text-gray-400 mr-1"></i>~$${dest.cost}</span>
+                                <span class="text-xs text-gray-500">${dest.crowds} crowds</span>
+                            </div>
+                            <div class="mt-3 text-xs text-amber-700 bg-amber-50 p-2 rounded">
+                                <i class="fas fa-lightbulb mr-1"></i>${dest.tips}
+                            </div>
+                        </div>
+                    </div>`;
+            });
+            grid.innerHTML = html;
+        }
+
+        // Drag and drop
+        function dragStart(e, destId) {
+            e.dataTransfer.setData('destId', destId);
+            e.target.classList.add('dragging');
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function dragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function drop(e, dayNum) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const destId = e.dataTransfer.getData('destId');
+            addToDay(destId, dayNum);
+        }
+
+        function addToDay(destId, dayNum) {
+            if (!itinerary[dayNum]) itinerary[dayNum] = [];
+            if (!itinerary[dayNum].includes(destId)) {
+                itinerary[dayNum].push(destId);
+                saveItinerary();
+                renderDayDestinations(dayNum);
+                updateBudget();
+            }
+        }
+
+        function removeFromDay(destId, dayNum) {
+            if (itinerary[dayNum]) {
+                itinerary[dayNum] = itinerary[dayNum].filter(id => id !== destId);
+                saveItinerary();
+                renderDayDestinations(dayNum);
+                updateBudget();
+            }
+        }
+
+        function renderDayDestinations(dayNum) {
+            const container = document.getElementById(`day-${dayNum}-destinations`);
+            if (!container) return;
+
+            const dayDests = itinerary[dayNum] || [];
+            let html = '';
+
+            dayDests.forEach(destId => {
+                const dest = destinations.find(d => d.id === destId);
+                if (dest) {
+                    html += `
+                        <div class="flex items-center justify-between bg-white rounded px-2 py-1 text-xs border-l-2 country-${dest.country}">
+                            <span class="truncate">${dest.name}</span>
+                            <button onclick="removeFromDay('${destId}', ${dayNum})" class="text-gray-400 hover:text-red-500 ml-1">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>`;
+                }
+            });
+            container.innerHTML = html;
+        }
+
+        function loadItinerary() {
+            for (let i = 1; i <= 20; i++) {
+                renderDayDestinations(i);
+            }
+        }
+
+        function saveItinerary() {
+            localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
+        }
+
+        function clearItinerary() {
+            if (confirm('Clear all planned destinations?')) {
+                itinerary = {};
+                saveItinerary();
+                loadItinerary();
+                updateBudget();
+            }
+        }
+
+        // Budget calculation
+        function updateBudget() {
+            let thailandDays = 0, cambodiaDays = 0, taiwanDays = 0;
+            let activityCosts = 0;
+
+            Object.values(itinerary).forEach(dayDests => {
+                dayDests.forEach(destId => {
+                    const dest = destinations.find(d => d.id === destId);
+                    if (dest) {
+                        activityCosts += dest.cost;
+                    }
+                });
+            });
+
+            // Count days per country based on planned destinations
+            for (let i = 1; i <= 20; i++) {
+                const dayDests = itinerary[i] || [];
+                if (dayDests.length > 0) {
+                    const dest = destinations.find(d => d.id === dayDests[0]);
+                    if (dest) {
+                        if (dest.country === 'thailand') thailandDays++;
+                        else if (dest.country === 'cambodia') cambodiaDays++;
+                        else if (dest.country === 'taiwan') taiwanDays++;
+                    }
+                }
+            }
+
+            const thailandCost = thailandDays * 110;
+            const cambodiaCost = cambodiaDays * 100;
+            const taiwanCost = taiwanDays * 150;
+            const total = thailandCost + cambodiaCost + taiwanCost + activityCosts;
+
+            document.getElementById('budget-thailand').textContent = `$${thailandCost}`;
+            document.getElementById('budget-cambodia').textContent = `$${cambodiaCost}`;
+            document.getElementById('budget-taiwan').textContent = `$${taiwanCost}`;
+            document.getElementById('budget-total').textContent = `$${total}`;
+            document.getElementById('budget-display').innerHTML = `<i class="fas fa-dollar-sign mr-2"></i><span class="font-semibold">$${total} est.</span>`;
+        }
+
+        // Filter destinations
+        function filterDestinations(query) {
+            const cards = document.querySelectorAll('#destination-list .destination-card');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        function filterDestinationsFull(query) {
+            const cards = document.querySelectorAll('.destination-full-card');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        function filterByCountry(country) {
+            const cards = document.querySelectorAll('.destination-full-card');
+            cards.forEach(card => {
+                if (country === 'all' || card.dataset.country === country) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Load templates
+        function loadTemplate(template) {
+            clearItinerary();
+
+            if (template === 'thailand') {
+                itinerary = {
+                    1: ['wat-pho', 'grand-palace'],
+                    2: ['chinatown', 'jodd-fairs'],
+                    3: ['chatuchak', 'bkk-massage'],
+                    4: ['doi-suthep', 'cm-old-city'],
+                    5: ['khao-soi', 'night-bazaar'],
+                    6: ['elephant-sanctuary'],
+                    7: ['cooking-class', 'lantern-festival'],
+                    8: [], // Travel day
+                    9: ['koh-tao-scuba'],
+                    10: ['koh-tao-scuba'],
+                    11: ['koh-tao-scuba'],
+                    12: ['koh-tao-scuba'],
+                    13: ['big-buddha'],
+                    14: ['railay'],
+                    15: ['rock-climbing', 'phra-nang'],
+                    16: ['island-hopping'],
+                    17: ['khao-sok'],
+                    18: ['khao-sok'],
+                    19: ['phuket-old'],
+                    20: [] // Departure
+                };
+            } else if (template === 'thailand-cambodia') {
+                itinerary = {
+                    1: ['wat-pho', 'grand-palace'],
+                    2: ['chinatown'],
+                    3: ['angkor-wat'],
+                    4: ['angkor-wat', 'ta-prohm'],
+                    5: ['bayon', 'apsara'],
+                    6: ['doi-suthep', 'cm-old-city'],
+                    7: ['elephant-sanctuary'],
+                    8: ['cooking-class', 'lantern-festival'],
+                    9: [], // Travel
+                    10: ['koh-tao-scuba'],
+                    11: ['koh-tao-scuba'],
+                    12: ['koh-tao-scuba'],
+                    13: ['koh-tao-scuba'],
+                    14: ['big-buddha'],
+                    15: ['railay', 'rock-climbing'],
+                    16: ['island-hopping'],
+                    17: ['phra-nang'],
+                    18: ['chatuchak'],
+                    19: ['bkk-massage', 'sky-bar'],
+                    20: []
+                };
+            } else if (template === 'all') {
+                itinerary = {
+                    1: ['wat-pho', 'chinatown'],
+                    2: ['grand-palace'],
+                    3: ['angkor-wat'],
+                    4: ['angkor-wat', 'ta-prohm'],
+                    5: [], // Travel
+                    6: ['koh-tao-scuba'],
+                    7: ['koh-tao-scuba'],
+                    8: ['koh-tao-scuba'],
+                    9: ['koh-tao-scuba'],
+                    10: ['railay'],
+                    11: ['rock-climbing', 'island-hopping'],
+                    12: ['doi-suthep'],
+                    13: ['cooking-class', 'lantern-festival'],
+                    14: [], // Fly to Taiwan
+                    15: ['jiufen', 'beitou'],
+                    16: ['sun-moon-lake'],
+                    17: ['alishan'],
+                    18: ['taichung-theater'],
+                    19: [], // Return to BKK
+                    20: []
+                };
+            }
+
+            saveItinerary();
+            loadItinerary();
+            updateBudget();
+        }
+
+        // Destination detail modal
+        function showDestinationDetail(destId) {
+            const dest = destinations.find(d => d.id === destId);
+            if (!dest) return;
+
+            const badgeClass = `badge-${dest.country}`;
+            const modal = document.getElementById('modal');
+            const content = document.getElementById('modal-content');
+
+            content.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold">${dest.name}</h2>
+                        <div class="flex gap-2 mt-2">
+                            <span class="text-xs px-2 py-1 rounded-full ${badgeClass}">${dest.country}</span>
+                            <span class="text-xs px-2 py-1 rounded-full bg-gray-100">${dest.region}</span>
+                        </div>
+                    </div>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <p class="text-gray-600 mb-4">${dest.desc}</p>
+                <div class="grid grid-cols-3 gap-4 mb-4">
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-2xl font-bold text-blue-600">${dest.days}</div>
+                        <div class="text-xs text-gray-500">Days</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-2xl font-bold text-green-600">$${dest.cost}</div>
+                        <div class="text-xs text-gray-500">Est. Cost</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 text-center">
+                        <div class="text-lg font-bold text-amber-600">${dest.crowds}</div>
+                        <div class="text-xs text-gray-500">Crowds</div>
+                    </div>
+                </div>
+                <div class="bg-amber-50 rounded-lg p-4 mb-4">
+                    <div class="font-semibold text-amber-800 mb-1"><i class="fas fa-lightbulb mr-2"></i>Tips</div>
+                    <p class="text-sm text-amber-700">${dest.tips}</p>
+                </div>
+                <div class="flex gap-3">
+                    <select id="add-to-day-select" class="flex-1 border rounded-lg px-3 py-2">
+                        ${tripDays.map(d => `<option value="${d.day}">Day ${d.day} - ${d.dateStr}</option>`).join('')}
+                    </select>
+                    <button onclick="addFromModal('${dest.id}')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium">
+                        <i class="fas fa-plus mr-2"></i>Add to Day
+                    </button>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function addFromModal(destId) {
+            const dayNum = parseInt(document.getElementById('add-to-day-select').value);
+            addToDay(destId, dayNum);
+            closeModal();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // NYE selection
+        function selectNYE(location) {
+            alert(`NYE location set to: ${location.replace('-', ' ').toUpperCase()}\n\nYour itinerary will be adjusted accordingly.`);
+        }
+
+        // Close modal on background click
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+    </script>
+</body>
+</html>
