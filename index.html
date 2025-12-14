@@ -1040,6 +1040,8 @@
         let isCollaborating = false;
         let itineraryListener = null;
         let customActivitiesListener = null;
+        let isSyncingItinerary = false;
+        let isSyncingCustom = false;
         let membersListener = null;
 
         // Destination Data
@@ -2176,9 +2178,13 @@
 
             // Listen for itinerary changes
             itineraryListener = roomRef.child('itinerary').on('value', (snapshot) => {
+                // Skip if we're the one who just synced (prevents echo)
+                if (isSyncingItinerary) return;
+
                 const remoteItinerary = snapshot.val() || {};
 
                 if (JSON.stringify(remoteItinerary) !== JSON.stringify(itinerary)) {
+                    console.log('Received remote itinerary update');
                     itinerary = remoteItinerary;
                     localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
                     renderCalendar();
@@ -2188,9 +2194,13 @@
 
             // Listen for custom activities changes
             customActivitiesListener = roomRef.child('customActivities').on('value', (snapshot) => {
+                // Skip if we're the one who just synced (prevents echo)
+                if (isSyncingCustom) return;
+
                 const remoteCustom = snapshot.val() || [];
 
                 if (JSON.stringify(remoteCustom) !== JSON.stringify(customActivities)) {
+                    console.log('Received remote custom activities update');
                     customActivities = remoteCustom;
                     localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
                     renderDestinationList();
@@ -2230,13 +2240,17 @@
         // Sync itinerary to Firebase
         function syncItinerary() {
             if (isCollaborating && roomRef) {
+                isSyncingItinerary = true;
                 roomRef.child('itinerary').set(itinerary)
                     .then(() => {
                         roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
+                        // Clear flag after a short delay to ignore our own echo
+                        setTimeout(() => { isSyncingItinerary = false; }, 500);
                     })
                     .catch((error) => {
                         console.error('Sync error:', error);
                         showToast('Sync failed. Changes saved locally.', 'warning');
+                        isSyncingItinerary = false;
                     });
             }
         }
@@ -2244,12 +2258,15 @@
         // Sync custom activities to Firebase
         function syncCustomActivities() {
             if (isCollaborating && roomRef) {
+                isSyncingCustom = true;
                 roomRef.child('customActivities').set(customActivities)
                     .then(() => {
                         roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
+                        setTimeout(() => { isSyncingCustom = false; }, 500);
                     })
                     .catch((error) => {
                         console.error('Sync error:', error);
+                        isSyncingCustom = false;
                     });
             }
         }
