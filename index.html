@@ -237,6 +237,17 @@
                     <div class="flex items-center gap-2 bg-emerald-50 rounded-full px-4 py-2">
                         <span class="text-sm font-semibold text-emerald-700" id="budget-header">$0</span>
                     </div>
+                    <!-- Export Buttons -->
+                    <div class="hidden sm:flex items-center gap-1">
+                        <button onclick="exportCSV()" class="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors" title="Export as CSV">
+                            <i class="fas fa-file-csv"></i>
+                            <span>CSV</span>
+                        </button>
+                        <button onclick="exportICS()" class="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors" title="Export to Calendar">
+                            <i class="fas fa-calendar-plus"></i>
+                            <span>Cal</span>
+                        </button>
+                    </div>
                     <!-- Collaboration Status -->
                     <div id="collab-status" class="hidden flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 cursor-pointer hover:bg-purple-100 transition-colors" onclick="showCollabModal()">
                         <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
@@ -1951,6 +1962,148 @@
             document.getElementById('budget-taiwan').textContent = `$${taiwanCost}`;
             document.getElementById('budget-total').textContent = `$${total}`;
             document.getElementById('budget-header').textContent = `$${total}`;
+        }
+
+        // Export Functions
+        function getExportData() {
+            const data = [];
+            const allDests = getAllDestinations();
+
+            for (let dayNum = 1; dayNum <= 20; dayNum++) {
+                const dayInfo = tripDays[dayNum - 1];
+                const dateStr = dayInfo.date.toISOString().split('T')[0];
+
+                // Hotels starting this day
+                logistics.filter(l => l.type === 'hotel' && l.checkIn === dayNum).forEach(h => {
+                    data.push({ dayNum, date: dateStr, dateObj: dayInfo.date, type: 'hotel', ...h });
+                });
+
+                // Flights departing this day
+                logistics.filter(l => l.type === 'flight' && l.departureDate === dayNum).forEach(f => {
+                    data.push({ dayNum, date: dateStr, dateObj: dayInfo.date, type: 'flight', ...f });
+                });
+
+                // Activities
+                const dayDests = itinerary[dayNum] || [];
+                dayDests.forEach(destId => {
+                    const dest = allDests.find(d => d.id === destId);
+                    if (dest) {
+                        data.push({ dayNum, date: dateStr, dateObj: dayInfo.date, type: 'activity', ...dest });
+                    }
+                });
+            }
+
+            return data;
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportCSV() {
+            const data = getExportData();
+            if (data.length === 0) {
+                showToast('Nothing to export yet!', 'info');
+                return;
+            }
+
+            const rows = [['Day', 'Date', 'Type', 'Name', 'Location', 'Country', 'Time', 'Details']];
+
+            data.forEach(item => {
+                let name, location, time, details;
+
+                if (item.type === 'flight') {
+                    name = `${item.from} → ${item.to}`;
+                    location = `${item.from} to ${item.to}`;
+                    time = item.departureTime || '';
+                    details = [item.airline, item.flightNumber].filter(Boolean).join(' ');
+                } else if (item.type === 'hotel') {
+                    name = item.name;
+                    location = item.location;
+                    time = 'check-in';
+                    const nights = item.checkOut - item.checkIn;
+                    details = `${nights} night${nights > 1 ? 's' : ''}`;
+                } else {
+                    name = item.name;
+                    location = item.region;
+                    time = '';
+                    details = (item.desc || '').substring(0, 100).replace(/\n/g, ' ');
+                }
+
+                const dateDisplay = item.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                rows.push([item.dayNum, dateDisplay, item.type, name, location, item.country || '', time, details]);
+            });
+
+            const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+            downloadFile(csv, 'asia-trip-2025.csv', 'text/csv');
+            showToast('CSV exported!', 'success');
+        }
+
+        function exportICS() {
+            const data = getExportData();
+            if (data.length === 0) {
+                showToast('Nothing to export yet!', 'info');
+                return;
+            }
+
+            const now = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            let ics = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Asia Trip 2025//Sam & Carter//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'X-WR-CALNAME:Asia Trip 2025'
+            ];
+
+            data.forEach((item, idx) => {
+                const dateYMD = item.date.replace(/-/g, '');
+                const uid = `asia-trip-${item.type}-${idx}-${Date.now()}@samcarter`;
+
+                ics.push('BEGIN:VEVENT');
+                ics.push(`UID:${uid}`);
+                ics.push(`DTSTAMP:${now}`);
+
+                if (item.type === 'flight') {
+                    // Timed event for flight
+                    const time = (item.departureTime || '08:00').replace(':', '') + '00';
+                    ics.push(`DTSTART:${dateYMD}T${time}`);
+                    ics.push(`SUMMARY:✈️ ${item.from} → ${item.to}`);
+                    const flightDetails = [item.airline, item.flightNumber].filter(Boolean).join(' ');
+                    if (flightDetails) ics.push(`DESCRIPTION:${flightDetails}`);
+                } else if (item.type === 'hotel') {
+                    // Multi-day event for hotel
+                    const checkOutDay = tripDays[item.checkOut - 1];
+                    const checkOutYMD = checkOutDay.date.toISOString().split('T')[0].replace(/-/g, '');
+                    ics.push(`DTSTART;VALUE=DATE:${dateYMD}`);
+                    ics.push(`DTEND;VALUE=DATE:${checkOutYMD}`);
+                    ics.push(`SUMMARY:🏨 ${item.name}`);
+                    ics.push(`LOCATION:${item.location}`);
+                } else {
+                    // All-day event for activity
+                    ics.push(`DTSTART;VALUE=DATE:${dateYMD}`);
+                    ics.push(`SUMMARY:${item.name}`);
+                    ics.push(`LOCATION:${item.region}, ${(item.country || '').charAt(0).toUpperCase() + (item.country || '').slice(1)}`);
+                    if (item.desc) {
+                        const desc = item.desc.replace(/\n/g, '\\n').substring(0, 500);
+                        ics.push(`DESCRIPTION:${desc}`);
+                    }
+                }
+
+                ics.push('END:VEVENT');
+            });
+
+            ics.push('END:VCALENDAR');
+            downloadFile(ics.join('\r\n'), 'asia-trip-2025.ics', 'text/calendar');
+            showToast('Calendar exported!', 'success');
         }
 
         // Filter destinations
