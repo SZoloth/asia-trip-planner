@@ -2187,9 +2187,19 @@
                 }
 
                 const remoteItinerary = snapshot.val() || {};
+                const localItemCount = Object.values(itinerary).flat().length;
+                const remoteItemCount = Object.values(remoteItinerary).flat().length;
+
+                console.log(`Remote itinerary: ${remoteItemCount} items, Local: ${localItemCount} items`);
+
+                // Don't let empty remote data overwrite non-empty local data
+                if (remoteItemCount === 0 && localItemCount > 0) {
+                    console.log('Ignoring empty remote - local has data');
+                    return;
+                }
 
                 if (JSON.stringify(remoteItinerary) !== JSON.stringify(itinerary)) {
-                    console.log('Received remote itinerary update from collaborator');
+                    console.log('Applying remote itinerary update from collaborator');
                     itinerary = remoteItinerary;
                     localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
                     renderCalendar();
@@ -2208,8 +2218,16 @@
 
                 const remoteCustom = snapshot.val() || [];
 
+                console.log(`Remote custom activities: ${remoteCustom.length}, Local: ${customActivities.length}`);
+
+                // Don't let empty remote data overwrite non-empty local data
+                if (remoteCustom.length === 0 && customActivities.length > 0) {
+                    console.log('Ignoring empty remote custom - local has data');
+                    return;
+                }
+
                 if (JSON.stringify(remoteCustom) !== JSON.stringify(customActivities)) {
-                    console.log('Received remote custom activities update from collaborator');
+                    console.log('Applying remote custom activities update from collaborator');
                     customActivities = remoteCustom;
                     localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
                     renderDestinationList();
@@ -2256,12 +2274,15 @@
         // Sync itinerary to Firebase
         function syncItinerary() {
             if (isCollaborating && roomRef) {
+                const itemCount = Object.values(itinerary).flat().length;
+                console.log(`Syncing itinerary to Firebase: ${itemCount} items`);
                 isSyncingItinerary = true;
                 roomRef.child('itinerary').set(itinerary)
                     .then(() => {
+                        console.log('Itinerary synced successfully');
                         roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
-                        // Clear flag after a short delay to ignore our own echo
-                        setTimeout(() => { isSyncingItinerary = false; }, 500);
+                        // Clear flag after delay to ignore our own echo
+                        setTimeout(() => { isSyncingItinerary = false; }, 1000);
                     })
                     .catch((error) => {
                         console.error('Sync error:', error);
@@ -2274,11 +2295,13 @@
         // Sync custom activities to Firebase
         function syncCustomActivities() {
             if (isCollaborating && roomRef) {
+                console.log(`Syncing custom activities to Firebase: ${customActivities.length} items`);
                 isSyncingCustom = true;
                 roomRef.child('customActivities').set(customActivities)
                     .then(() => {
+                        console.log('Custom activities synced successfully');
                         roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
-                        setTimeout(() => { isSyncingCustom = false; }, 500);
+                        setTimeout(() => { isSyncingCustom = false; }, 1000);
                     })
                     .catch((error) => {
                         console.error('Sync error:', error);
