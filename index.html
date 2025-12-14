@@ -1432,17 +1432,22 @@
             e.preventDefault();
             e.currentTarget.classList.remove('drag-over');
             const destId = e.dataTransfer.getData('destId');
+            console.log(`DROP: destId="${destId}" to day ${dayNum}`);
             addToDay(destId, dayNum);
         }
 
         function addToDay(destId, dayNum) {
+            console.log(`addToDay: destId="${destId}", day=${dayNum}, already has: ${JSON.stringify(itinerary[dayNum] || [])}`);
             if (!itinerary[dayNum]) itinerary[dayNum] = [];
             if (!itinerary[dayNum].includes(destId)) {
                 itinerary[dayNum].push(destId);
+                console.log(`Added "${destId}" to day ${dayNum}. Now: ${JSON.stringify(itinerary[dayNum])}`);
                 saveItinerary();
                 renderDayDestinations(dayNum);
                 updateBudget();
                 updateDaySlotStyle(dayNum);
+            } else {
+                console.log(`"${destId}" already in day ${dayNum}, skipping`);
             }
         }
 
@@ -1504,6 +1509,8 @@
         }
 
         function saveItinerary() {
+            const itemCount = Object.values(itinerary).flat().length;
+            console.log(`saveItinerary: ${itemCount} total items, collaborating=${isCollaborating}`);
             localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
             syncItinerary(); // Sync to Firebase if collaborating
         }
