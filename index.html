@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Asia Trip 2025 | Sam & Carter</title>
 
     <!-- PWA Support -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0ea5e9">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Asia Trip">
     <link rel="apple-touch-icon" href="icons/icon-192.png">
     <meta name="description" content="Plan your 20-day adventure through Thailand, Cambodia, and Taiwan">
@@ -47,8 +47,40 @@
         }
     </script>
     <style>
-        * { -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        /* Native app polish */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        html {
+            overscroll-behavior: none; /* Prevent pull-to-refresh */
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        /* Allow text selection only in content areas */
+        .selectable, input, textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        /* Buttons & interactive elements */
+        button, .card-interactive, .dest-card, [role="button"] {
+            touch-action: manipulation; /* Disable double-tap zoom */
+            cursor: pointer;
+        }
+        /* Safe area for notched devices (iPhone X+) */
+        body {
+            padding-top: env(safe-area-inset-top);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        /* Standalone mode tweaks */
+        @media (display-mode: standalone) {
+            body { background: #f8fafc; }
+        }
 
         /* Smooth scrolling */
         html { scroll-behavior: smooth; }
