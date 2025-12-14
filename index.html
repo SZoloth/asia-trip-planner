@@ -793,19 +793,31 @@
                 </button>
             </div>
 
+            <!-- User status -->
+            <div id="collab-user" class="mb-4 p-3 bg-slate-50 rounded-xl flex items-center gap-3">
+                <div id="user-avatar" class="w-10 h-10 rounded-full bg-slate-300 flex items-center justify-center text-white">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="flex-1">
+                    <p id="user-name" class="font-medium text-slate-700">Not signed in</p>
+                    <p id="user-email" class="text-xs text-slate-500"></p>
+                </div>
+                <button id="sign-in-btn" onclick="signInWithGoogle()" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-sm hover:bg-slate-50 flex items-center gap-2">
+                    <img src="https://www.google.com/favicon.ico" class="w-4 h-4"> Sign in
+                </button>
+                <button id="sign-out-btn" onclick="signOut()" class="hidden px-3 py-1.5 text-slate-500 hover:text-slate-700 text-sm">
+                    Sign out
+                </button>
+            </div>
+
             <!-- Not collaborating state -->
             <div id="collab-start" class="space-y-4">
                 <div class="bg-purple-50 rounded-xl p-4">
                     <h3 class="font-semibold text-purple-800 mb-2">Create a Room</h3>
                     <p class="text-sm text-purple-600 mb-3">Start a session and share the code with Carter.</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="create-name" placeholder="Your name"
-                               class="flex-1 px-4 py-2 bg-white rounded-lg text-sm border border-purple-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-                               value="Sam">
-                        <button onclick="handleCreateRoom()" class="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium text-sm transition-colors">
-                            Create
-                        </button>
-                    </div>
+                    <button onclick="handleCreateRoom()" class="w-full px-4 py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium text-sm transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Create Room
+                    </button>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -816,19 +828,14 @@
 
                 <div class="bg-sky-50 rounded-xl p-4">
                     <h3 class="font-semibold text-sky-800 mb-2">Join a Room</h3>
-                    <p class="text-sm text-sky-600 mb-3">Enter the code Sam shared with you.</p>
-                    <div class="space-y-2">
+                    <p class="text-sm text-sky-600 mb-3">Enter the code shared with you.</p>
+                    <div class="flex gap-2">
                         <input type="text" id="join-code" placeholder="Enter 6-char code"
-                               class="w-full px-4 py-2 bg-white rounded-lg text-sm border border-sky-200 focus:ring-2 focus:ring-sky-500 uppercase tracking-widest font-mono text-center text-lg"
+                               class="flex-1 px-4 py-2 bg-white rounded-lg text-sm border border-sky-200 focus:ring-2 focus:ring-sky-500 uppercase tracking-widest font-mono text-center text-lg"
                                maxlength="6">
-                        <div class="flex gap-2">
-                            <input type="text" id="join-name" placeholder="Your name"
-                                   class="flex-1 px-4 py-2 bg-white rounded-lg text-sm border border-sky-200 focus:ring-2 focus:ring-sky-500"
-                                   value="Carter">
-                            <button onclick="handleJoinRoom()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-medium text-sm transition-colors">
-                                Join
-                            </button>
-                        </div>
+                        <button onclick="handleJoinRoom()" class="px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-medium text-sm transition-colors">
+                            Join
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1978,21 +1985,59 @@
 
         // Initialize Firebase Auth
         async function initializeAuth() {
-            try {
-                const result = await auth.signInAnonymously();
-                currentUser = result.user;
-                console.log('Authenticated as:', currentUser.uid);
+            return new Promise((resolve) => {
+                auth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        currentUser = user;
+                        console.log('Signed in as:', user.displayName || user.uid);
 
-                // Check URL for room code
-                const urlParams = new URLSearchParams(window.location.search);
-                const roomFromUrl = urlParams.get('room');
-                if (roomFromUrl) {
-                    setTimeout(() => joinRoom(roomFromUrl.toUpperCase()), 500);
-                }
+                        // Check URL for room code
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const roomFromUrl = urlParams.get('room');
+                        if (roomFromUrl) {
+                            await joinRoom(roomFromUrl.toUpperCase(), user.displayName || 'Guest');
+                        }
+                        resolve(user);
+                    } else {
+                        // Check if there's a room in URL - if so, prompt sign in
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const roomFromUrl = urlParams.get('room');
+                        if (roomFromUrl) {
+                            showToast('Sign in with Google to join the room', 'info');
+                            setTimeout(() => signInWithGoogle(), 1000);
+                        }
+                        resolve(null);
+                    }
+                });
+            });
+        }
+
+        // Sign in with Google
+        async function signInWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                const result = await auth.signInWithPopup(provider);
+                currentUser = result.user;
+                showToast(`Welcome, ${currentUser.displayName}!`, 'success');
+                return currentUser;
             } catch (error) {
-                console.error('Auth error:', error);
-                showToast('Failed to connect. Using offline mode.', 'error');
+                console.error('Google sign-in error:', error);
+                if (error.code === 'auth/popup-closed-by-user') {
+                    showToast('Sign-in cancelled', 'warning');
+                } else {
+                    showToast('Sign-in failed. Try again.', 'error');
+                }
+                return null;
             }
+        }
+
+        // Sign out
+        async function signOut() {
+            await auth.signOut();
+            currentUser = null;
+            await stopCollaboration();
+            showToast('Signed out', 'info');
+            updateCollaborationUI();
         }
 
         // Set up presence tracking
@@ -2018,18 +2063,20 @@
         }
 
         // Create a new room
-        async function createRoom(userName = 'Sam') {
+        async function createRoom() {
             if (!currentUser) {
-                await initializeAuth();
+                const user = await signInWithGoogle();
+                if (!user) return null;
             }
 
+            const userName = currentUser.displayName || 'Guest';
             const roomCode = generateRoomCode();
             const newRoomRef = database.ref(`rooms/${roomCode}`);
 
             // Check if code already exists
             const snapshot = await newRoomRef.once('value');
             if (snapshot.exists()) {
-                return createRoom(userName);
+                return createRoom();
             }
 
             // Create room with current data
@@ -2040,6 +2087,7 @@
                 members: {
                     [currentUser.uid]: {
                         name: userName,
+                        photoURL: currentUser.photoURL || null,
                         joinedAt: firebase.database.ServerValue.TIMESTAMP,
                         lastSeen: firebase.database.ServerValue.TIMESTAMP,
                         online: true
@@ -2063,12 +2111,13 @@
         }
 
         // Join an existing room
-        async function joinRoom(roomCode, userName = 'Carter') {
+        async function joinRoom(roomCode, userName = null) {
             if (!currentUser) {
-                await initializeAuth();
-                await new Promise(r => setTimeout(r, 500));
+                const user = await signInWithGoogle();
+                if (!user) return false;
             }
 
+            userName = userName || currentUser.displayName || 'Guest';
             roomCode = roomCode.toUpperCase().trim();
             const joinRoomRef = database.ref(`rooms/${roomCode}`);
 
@@ -2082,6 +2131,7 @@
             // Add self to members
             await joinRoomRef.child(`members/${currentUser.uid}`).set({
                 name: userName,
+                photoURL: currentUser.photoURL || null,
                 joinedAt: firebase.database.ServerValue.TIMESTAMP,
                 lastSeen: firebase.database.ServerValue.TIMESTAMP,
                 online: true
@@ -2209,6 +2259,8 @@
             const modal = document.getElementById('collab-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            updateUserDisplay();
+            updateCollaborationUI();
         }
 
         function closeCollabModal() {
@@ -2224,6 +2276,9 @@
             const roomCodeEl = document.getElementById('collab-room-code');
             const activeCodeEl = document.getElementById('active-room-code');
 
+            // Update user display in modal
+            updateUserDisplay();
+
             if (isCollaborating && currentRoomCode) {
                 statusEl?.classList.remove('hidden');
                 if (roomCodeEl) roomCodeEl.textContent = `Room: ${currentRoomCode}`;
@@ -2237,6 +2292,32 @@
             }
         }
 
+        function updateUserDisplay() {
+            const avatarEl = document.getElementById('user-avatar');
+            const nameEl = document.getElementById('user-name');
+            const emailEl = document.getElementById('user-email');
+            const signInBtn = document.getElementById('sign-in-btn');
+            const signOutBtn = document.getElementById('sign-out-btn');
+
+            if (currentUser) {
+                if (currentUser.photoURL) {
+                    avatarEl.innerHTML = `<img src="${currentUser.photoURL}" class="w-10 h-10 rounded-full">`;
+                } else {
+                    avatarEl.innerHTML = `<i class="fas fa-user"></i>`;
+                }
+                nameEl.textContent = currentUser.displayName || 'Guest';
+                emailEl.textContent = currentUser.email || '';
+                signInBtn?.classList.add('hidden');
+                signOutBtn?.classList.remove('hidden');
+            } else {
+                avatarEl.innerHTML = `<i class="fas fa-user"></i>`;
+                nameEl.textContent = 'Not signed in';
+                emailEl.textContent = '';
+                signInBtn?.classList.remove('hidden');
+                signOutBtn?.classList.add('hidden');
+            }
+        }
+
         function updateMembersUI(members) {
             const list = document.getElementById('members-list');
             if (!list) return;
@@ -2245,10 +2326,14 @@
             Object.entries(members).forEach(([uid, member]) => {
                 const isYou = uid === currentUser?.uid;
                 const onlineClass = member.online ? 'bg-emerald-500' : 'bg-slate-300';
+                const photoHtml = member.photoURL
+                    ? `<img src="${member.photoURL}" class="w-6 h-6 rounded-full">`
+                    : `<span class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs"><i class="fas fa-user"></i></span>`;
 
                 html += `
                     <div class="flex items-center gap-3 p-2 rounded-lg ${isYou ? 'bg-purple-100' : ''}">
                         <span class="w-2 h-2 rounded-full ${onlineClass}"></span>
+                        ${photoHtml}
                         <span class="flex-1 font-medium text-slate-700">${member.name}</span>
                         ${isYou ? '<span class="text-xs text-purple-600">(You)</span>' : ''}
                     </div>
@@ -2259,19 +2344,19 @@
         }
 
         async function handleCreateRoom() {
-            const name = document.getElementById('create-name')?.value || 'Sam';
-            await createRoom(name);
-            closeCollabModal();
+            const roomCode = await createRoom();
+            if (roomCode) {
+                closeCollabModal();
+            }
         }
 
         async function handleJoinRoom() {
             const code = document.getElementById('join-code')?.value;
-            const name = document.getElementById('join-name')?.value || 'Carter';
             if (!code || code.length !== 6) {
                 showToast('Enter a valid 6-character code', 'error');
                 return;
             }
-            const success = await joinRoom(code, name);
+            const success = await joinRoom(code);
             if (success) closeCollabModal();
         }
 
