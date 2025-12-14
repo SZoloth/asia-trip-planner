@@ -2164,20 +2164,20 @@
 
             console.log(`joinRoom: Firebase has ${firebaseItemCount} items, localStorage has ${localItemCount} items`);
 
-            // Use whichever has more data (protects against stale Firebase cache)
+            // Prefer localStorage unless Firebase has MORE data
+            // (localStorage is more recent on same device, Firebase cache can be stale)
             let needsSync = false;
-            if (localItemCount > firebaseItemCount) {
-                console.log('Using localStorage data (has more items) and syncing to Firebase');
+            if (firebaseItemCount > localItemCount) {
+                console.log('Using Firebase data (has more items than local)');
+                itinerary = firebaseItinerary;
+                customActivities = firebaseCustom;
+                localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
+                localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
+            } else {
+                console.log('Using localStorage data (same or more items) and syncing to Firebase');
                 itinerary = localItinerary;
                 customActivities = localCustom;
                 needsSync = true;
-            } else {
-                console.log('Using Firebase data');
-                itinerary = firebaseItinerary;
-                customActivities = firebaseCustom;
-                // Save to localStorage as backup
-                localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
-                localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
             }
 
             // Refresh UI
