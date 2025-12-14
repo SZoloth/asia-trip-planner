@@ -290,6 +290,16 @@
                             <span>Cal</span>
                         </button>
                     </div>
+                    <!-- Network Status -->
+                    <div id="network-status" class="hidden items-center gap-2 bg-amber-50 rounded-full px-3 py-2">
+                        <i class="fas fa-wifi-slash text-amber-600 text-xs"></i>
+                        <span class="text-xs font-medium text-amber-700">Offline</span>
+                    </div>
+                    <!-- Sync Status -->
+                    <div id="sync-status" class="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 cursor-help" title="Last synced with cloud">
+                        <i class="fas fa-cloud-check"></i>
+                        <span id="sync-time">Synced</span>
+                    </div>
                     <!-- Collaboration Status -->
                     <div id="collab-status" class="hidden flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 cursor-pointer hover:bg-purple-100 transition-colors" onclick="showCollabModal()">
                         <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
@@ -1950,11 +1960,13 @@
         function saveItinerary() {
             localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
             syncItinerary(); // Sync to Firebase if collaborating
+            if (typeof updateSyncTime === 'function') updateSyncTime();
         }
 
         function saveLogistics() {
             localStorage.setItem('asiaLogistics', JSON.stringify(logistics));
             syncLogistics(); // Sync to Firebase if collaborating
+            if (typeof updateSyncTime === 'function') updateSyncTime();
             renderHotelBanners();
             renderCalendar();
             loadItinerary(); // Re-render day content including flights/hotels
@@ -3213,6 +3225,78 @@
 
         // Initialize Firebase auth on page load
         initializeAuth();
+
+        // ============================================
+        // OFFLINE UX - Network Status & Sync Tracking
+        // ============================================
+        let lastSyncTime = null;
+
+        function updateNetworkStatus() {
+            const statusEl = document.getElementById('network-status');
+            const syncEl = document.getElementById('sync-status');
+
+            if (navigator.onLine) {
+                statusEl.classList.add('hidden');
+                statusEl.classList.remove('flex');
+                syncEl.classList.remove('hidden');
+            } else {
+                statusEl.classList.remove('hidden');
+                statusEl.classList.add('flex');
+                syncEl.classList.add('hidden');
+            }
+        }
+
+        function updateSyncTime() {
+            lastSyncTime = new Date();
+            const syncTimeEl = document.getElementById('sync-time');
+            if (syncTimeEl) {
+                syncTimeEl.textContent = 'Just now';
+            }
+            // Update the displayed time periodically
+            updateSyncDisplay();
+        }
+
+        function updateSyncDisplay() {
+            if (!lastSyncTime) return;
+            const syncTimeEl = document.getElementById('sync-time');
+            if (!syncTimeEl) return;
+
+            const now = new Date();
+            const diffMs = now - lastSyncTime;
+            const diffMins = Math.floor(diffMs / 60000);
+
+            if (diffMins < 1) {
+                syncTimeEl.textContent = 'Just now';
+            } else if (diffMins < 60) {
+                syncTimeEl.textContent = `${diffMins}m ago`;
+            } else {
+                const diffHours = Math.floor(diffMins / 60);
+                syncTimeEl.textContent = `${diffHours}h ago`;
+            }
+        }
+
+        // Update sync display every minute
+        setInterval(updateSyncDisplay, 60000);
+
+        // Network event listeners
+        window.addEventListener('online', () => {
+            updateNetworkStatus();
+            showToast('Back online', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            updateNetworkStatus();
+            showToast('You\'re offline — changes saved locally', 'warning');
+        });
+
+        // Initialize network status on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNetworkStatus();
+            // If we have data in localStorage, consider it synced
+            if (localStorage.getItem('itinerary')) {
+                updateSyncTime();
+            }
+        });
 
         // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
