@@ -1432,22 +1432,17 @@
             e.preventDefault();
             e.currentTarget.classList.remove('drag-over');
             const destId = e.dataTransfer.getData('destId');
-            console.log(`DROP: destId="${destId}" to day ${dayNum}`);
             addToDay(destId, dayNum);
         }
 
         function addToDay(destId, dayNum) {
-            console.log(`addToDay: destId="${destId}", day=${dayNum}, already has: ${JSON.stringify(itinerary[dayNum] || [])}`);
             if (!itinerary[dayNum]) itinerary[dayNum] = [];
             if (!itinerary[dayNum].includes(destId)) {
                 itinerary[dayNum].push(destId);
-                console.log(`Added "${destId}" to day ${dayNum}. Now: ${JSON.stringify(itinerary[dayNum])}`);
                 saveItinerary();
                 renderDayDestinations(dayNum);
                 updateBudget();
                 updateDaySlotStyle(dayNum);
-            } else {
-                console.log(`"${destId}" already in day ${dayNum}, skipping`);
             }
         }
 
@@ -1509,12 +1504,6 @@
         }
 
         function saveItinerary() {
-            const itemCount = Object.values(itinerary).flat().length;
-            console.log(`saveItinerary: ${itemCount} total items, collaborating=${isCollaborating}`);
-            // Debug: trace who's calling with 0 items
-            if (itemCount === 0) {
-                console.trace('saveItinerary called with 0 items - stack trace:');
-            }
             localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
             syncItinerary(); // Sync to Firebase if collaborating
         }
@@ -2003,7 +1992,6 @@
                 auth.onAuthStateChanged(async (user) => {
                     if (user) {
                         currentUser = user;
-                        console.log('Signed in as:', user.displayName || user.uid);
 
                         // Check URL for room code
                         const urlParams = new URLSearchParams(window.location.search);
@@ -2155,15 +2143,10 @@
 
             // LOCAL-FIRST: Don't overwrite itinerary - it's already loaded from localStorage
             // at script initialization. Just start collaboration and sync.
-            const localItemCount = Object.values(itinerary).flat().length;
-            console.log(`joinRoom: Local itinerary has ${localItemCount} items, starting collaboration`);
-
-            // Start collaboration listeners
             startCollaboration();
             updateCollaborationUI();
 
             // Sync local data to Firebase (our data is authoritative for this session)
-            console.log('Syncing local data to Firebase');
             syncItinerary();
             syncCustomActivities();
 
@@ -2185,27 +2168,17 @@
 
             // Listen for itinerary changes
             itineraryListener = roomRef.child('itinerary').on('value', (snapshot) => {
-                // Skip initial fire (we already loaded data in joinRoom)
-                // and skip if we're the one who just synced (prevents echo)
-                if (isInitialLoad || isSyncingItinerary) {
-                    console.log('Skipping itinerary update (initial or self-sync)');
-                    return;
-                }
+                // Skip initial fire and self-syncs (prevents echo)
+                if (isInitialLoad || isSyncingItinerary) return;
 
                 const remoteItinerary = snapshot.val() || {};
                 const localItemCount = Object.values(itinerary).flat().length;
                 const remoteItemCount = Object.values(remoteItinerary).flat().length;
 
-                console.log(`Remote itinerary: ${remoteItemCount} items, Local: ${localItemCount} items`);
-
                 // Don't let empty remote data overwrite non-empty local data
-                if (remoteItemCount === 0 && localItemCount > 0) {
-                    console.log('Ignoring empty remote - local has data');
-                    return;
-                }
+                if (remoteItemCount === 0 && localItemCount > 0) return;
 
                 if (JSON.stringify(remoteItinerary) !== JSON.stringify(itinerary)) {
-                    console.log('Applying remote itinerary update from collaborator');
                     itinerary = remoteItinerary;
                     localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
                     renderCalendar();
@@ -2216,24 +2189,15 @@
 
             // Listen for custom activities changes
             customActivitiesListener = roomRef.child('customActivities').on('value', (snapshot) => {
-                // Skip initial fire and self-syncs
-                if (isInitialLoad || isSyncingCustom) {
-                    console.log('Skipping custom activities update (initial or self-sync)');
-                    return;
-                }
+                // Skip initial fire and self-syncs (prevents echo)
+                if (isInitialLoad || isSyncingCustom) return;
 
                 const remoteCustom = snapshot.val() || [];
 
-                console.log(`Remote custom activities: ${remoteCustom.length}, Local: ${customActivities.length}`);
-
                 // Don't let empty remote data overwrite non-empty local data
-                if (remoteCustom.length === 0 && customActivities.length > 0) {
-                    console.log('Ignoring empty remote custom - local has data');
-                    return;
-                }
+                if (remoteCustom.length === 0 && customActivities.length > 0) return;
 
                 if (JSON.stringify(remoteCustom) !== JSON.stringify(customActivities)) {
-                    console.log('Applying remote custom activities update from collaborator');
                     customActivities = remoteCustom;
                     localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
                     renderDestinationList();
@@ -2245,7 +2209,6 @@
             // Clear initial load flag after listeners have fired once
             setTimeout(() => {
                 isInitialLoad = false;
-                console.log('Initial load complete, now listening for collaborator updates');
             }, 1000);
 
             // Listen for member changes
@@ -2280,12 +2243,9 @@
         // Sync itinerary to Firebase
         function syncItinerary() {
             if (isCollaborating && roomRef) {
-                const itemCount = Object.values(itinerary).flat().length;
-                console.log(`Syncing itinerary to Firebase: ${itemCount} items`);
                 isSyncingItinerary = true;
                 roomRef.child('itinerary').set(itinerary)
                     .then(() => {
-                        console.log('Itinerary synced successfully');
                         roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
                         // Clear flag after delay to ignore our own echo
                         setTimeout(() => { isSyncingItinerary = false; }, 1000);
@@ -2301,11 +2261,9 @@
         // Sync custom activities to Firebase
         function syncCustomActivities() {
             if (isCollaborating && roomRef) {
-                console.log(`Syncing custom activities to Firebase: ${customActivities.length} items`);
                 isSyncingCustom = true;
                 roomRef.child('customActivities').set(customActivities)
                     .then(() => {
-                        console.log('Custom activities synced successfully');
                         roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
                         setTimeout(() => { isSyncingCustom = false; }, 1000);
                     })
