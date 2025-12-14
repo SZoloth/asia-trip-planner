@@ -292,6 +292,8 @@
             color: #5C564D;
             font-weight: 500;
             letter-spacing: 0.02em;
+            min-width: 0;
+            overflow: hidden;
         }
         .flight-departure { border-left: 2px solid #C4A35A; }
         .flight-arrival { border-left: 2px solid #7D9B84; }
@@ -391,6 +393,186 @@
         /* Mobile bottom nav */
         @media (max-width: 768px) {
             .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+        }
+
+        /* Mobile horizontal calendar */
+        @media (max-width: 640px) {
+            .mobile-calendar-scroll {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+                padding: 4px 0;
+                width: 100%;
+            }
+            .mobile-calendar-day {
+                min-height: 70px !important;
+                padding: 8px !important;
+                overflow: hidden;
+                min-width: 0;
+            }
+            .mobile-calendar-day .text-\[10px\] {
+                font-size: 9px;
+            }
+            /* Ensure destination chips truncate properly */
+            .mobile-calendar-day .truncate {
+                max-width: 100%;
+            }
+            .mobile-week-indicator {
+                display: flex;
+                justify-content: center;
+                gap: 6px;
+                padding: 8px 0 4px;
+            }
+            .mobile-week-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: #D9CFC0;
+                transition: all 0.2s ease;
+            }
+            .mobile-week-dot.active {
+                width: 18px;
+                border-radius: 3px;
+                background: #5C564D;
+            }
+        }
+
+        /* Touch feedback for mobile */
+        .touch-feedback {
+            transition: transform 0.1s ease, opacity 0.1s ease;
+        }
+        .touch-feedback:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        /* Success pulse animation for adding items */
+        @keyframes successPulse {
+            0% { box-shadow: 0 0 0 0 rgba(122, 155, 132, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(122, 155, 132, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(122, 155, 132, 0); }
+        }
+        .success-pulse {
+            animation: successPulse 0.4s ease-out;
+        }
+
+        /* Swipe hint for mobile calendar */
+        @keyframes swipeHint {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-8px); }
+        }
+        .swipe-hint {
+            animation: swipeHint 1.5s ease-in-out 2;
+        }
+
+        /* Mobile destination picker bottom sheet */
+        .mobile-picker-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #FDFCFA;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            max-height: 70vh;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 110;
+            box-shadow: 0 -4px 24px rgba(61,56,51,0.15);
+        }
+        .mobile-picker-sheet.open {
+            transform: translateY(0);
+        }
+        .mobile-picker-handle {
+            width: 36px;
+            height: 4px;
+            background: #D9CFC0;
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+
+        /* Picker tabs */
+        .picker-tab {
+            flex: 1;
+            padding: 12px 8px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            color: #8B8579;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .picker-tab.active {
+            color: #3D3833;
+            border-bottom-color: #3D3833;
+        }
+
+        /* Picker country sections */
+        .picker-section {
+            margin-bottom: 16px;
+        }
+        .picker-section-header {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .picker-section-header.thailand {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+        .picker-section-header.cambodia {
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #991b1b;
+        }
+        .picker-section-header.taiwan {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+        }
+
+        /* Picker items */
+        .picker-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border-left: 4px solid;
+            transition: all 0.15s ease;
+        }
+        .picker-item.thailand {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+        .picker-item.cambodia {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+        .picker-item.taiwan {
+            background: #ecfdf5;
+            border-left-color: #10b981;
+        }
+        .picker-item.custom {
+            background: #eef2ff;
+            border-left-color: #6366f1;
+        }
+        .picker-item-added {
+            opacity: 0.6;
+        }
+        .picker-item-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
         }
 
         /* Animations */
@@ -523,33 +705,9 @@
     <main class="max-w-6xl mx-auto px-4 py-8">
         <!-- Planner Tab -->
         <div id="content-planner" class="fade-in">
-            <!-- Quick Templates - Editorial section -->
-            <div class="mb-8">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-xs font-medium text-ink-400 uppercase tracking-[0.15em]">Quick Start</h2>
-                    <button onclick="clearItinerary()" class="text-xs text-ink-300 hover:text-cambodia-text transition-colors">
-                        Clear all
-                    </button>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="loadTemplate('thailand')" class="inline-flex items-center gap-2 px-4 py-2 bg-thailand-bg border border-thailand-border hover:border-thailand-accent text-thailand-text font-medium text-sm transition-all hover:shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-thailand-border"></span>
-                        Thailand Only
-                    </button>
-                    <button onclick="loadTemplate('thailand-cambodia')" class="inline-flex items-center gap-2 px-4 py-2 bg-cambodia-bg border border-cambodia-border hover:border-cambodia-accent text-cambodia-text font-medium text-sm transition-all hover:shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cambodia-border"></span>
-                        + Cambodia
-                    </button>
-                    <button onclick="loadTemplate('all')" class="inline-flex items-center gap-2 px-4 py-2 bg-taiwan-bg border border-taiwan-border hover:border-taiwan-accent text-taiwan-text font-medium text-sm transition-all hover:shadow-sm">
-                        <span class="w-1.5 h-1.5 rounded-full bg-taiwan-border"></span>
-                        All Three
-                    </button>
-                </div>
-            </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Sidebar - Destinations -->
-                <div class="lg:col-span-3">
+                <!-- Sidebar - Destinations (hidden on mobile, use picker instead) -->
+                <div class="hidden sm:block lg:col-span-3">
                     <div class="card p-5 sticky top-32">
                         <div class="flex items-center justify-between mb-5">
                             <h3 class="font-display text-lg text-ink-700">Destinations</h3>
@@ -586,25 +744,52 @@
                                    oninput="filterDestinations(this.value)">
                         </div>
 
-                        <div class="space-y-4 max-h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin pr-1" id="destination-list">
+                        <!-- Mobile: Show limited destinations with expand -->
+                        <div class="sm:hidden">
+                            <div class="space-y-3" id="destination-list-mobile">
+                                <!-- Populated by JS - max 3 items -->
+                            </div>
+                            <div class="flex justify-center gap-4 mt-3">
+                                <button id="show-more-dests" onclick="showMoreDestinations()" class="py-2 text-xs text-ink-400 hover:text-ink-600 transition-colors hidden">
+                                    <span id="show-more-text">Show 10 more</span>
+                                    <i class="fas fa-chevron-down ml-1"></i>
+                                </button>
+                                <button id="show-less-dests" onclick="showLessDestinations()" class="py-2 text-xs text-ink-400 hover:text-ink-600 transition-colors hidden">
+                                    <span>Show less</span>
+                                    <i class="fas fa-chevron-up ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Desktop: Full list -->
+                        <div class="hidden sm:block space-y-4 max-h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin pr-1" id="destination-list">
                             <!-- Populated by JS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Calendar Grid -->
-                <div class="lg:col-span-9">
-                    <div class="card p-5 mb-6">
-                        <div class="flex items-center justify-between mb-5">
+                <!-- Calendar Grid (full width on mobile) -->
+                <div class="col-span-1 lg:col-span-9">
+                    <div class="card p-4 sm:p-5 mb-6">
+                        <!-- Mobile Header -->
+                        <div class="flex items-center justify-between mb-4 sm:mb-5">
                             <div>
-                                <h3 class="font-semibold text-slate-800">Your 20-Day Journey</h3>
-                                <p class="text-sm text-slate-500 mt-0.5">Drag destinations to plan each day</p>
+                                <h3 class="font-display text-lg sm:text-xl text-ink-700">Your Journey</h3>
+                                <p class="text-xs text-ink-400 mt-0.5 hidden sm:block">Drag destinations to plan each day</p>
+                                <p class="text-xs text-ink-400 mt-0.5 sm:hidden">Tap any day to add</p>
                             </div>
-                            <div class="flex items-center gap-2 text-xs">
-                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-amber-400"></span>Thailand</span>
-                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-400"></span>Cambodia</span>
-                                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-400"></span>Taiwan</span>
+                            <!-- Mobile: Compact legend -->
+                            <div class="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-3 sm:h-3 bg-thailand-accent"></span><span class="hidden sm:inline">Thailand</span><span class="sm:hidden">TH</span></span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-3 sm:h-3 bg-cambodia-accent"></span><span class="hidden sm:inline">Cambodia</span><span class="sm:hidden">KH</span></span>
+                                <span class="flex items-center gap-1"><span class="w-2 h-2 sm:w-3 sm:h-3 bg-taiwan-accent"></span><span class="hidden sm:inline">Taiwan</span><span class="sm:hidden">TW</span></span>
                             </div>
+                        </div>
+
+                        <!-- Mobile Week Indicator (hidden since using grid now) -->
+                        <div class="mobile-week-indicator hidden" id="week-indicator">
+                            <div class="mobile-week-dot active" data-week="1"></div>
+                            <div class="mobile-week-dot" data-week="2"></div>
+                            <div class="mobile-week-dot" data-week="3"></div>
                         </div>
 
                         <!-- Hotel Banners -->
@@ -612,35 +797,43 @@
                             <!-- Populated by JS -->
                         </div>
 
-                        <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-5 gap-3" id="calendar-grid">
+                        <!-- Calendar: Horizontal scroll on mobile, grid on desktop -->
+                        <div class="mobile-calendar-scroll sm:grid sm:grid-cols-4 xl:grid-cols-5 sm:gap-3" id="calendar-grid">
                             <!-- Populated by JS -->
                         </div>
                     </div>
 
-                    <!-- Budget Summary -->
-                    <div class="card p-5">
-                        <h3 class="font-semibold text-slate-800 mb-4">
-                            <i class="fas fa-chart-pie mr-2 text-sky-500"></i>Budget Estimate
-                        </h3>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-4 text-center">
-                                <div class="text-2xl font-bold text-amber-600" id="budget-thailand">$0</div>
-                                <div class="text-xs text-amber-600/70 font-medium mt-1">Thailand</div>
+                    <!-- Budget Summary - Collapsible on Mobile -->
+                    <div class="card p-4 sm:p-5">
+                        <button onclick="toggleBudget()" class="w-full flex items-center justify-between sm:pointer-events-none">
+                            <h3 class="font-display text-base sm:text-lg text-ink-700 flex items-center gap-2">
+                                <i class="fas fa-chart-pie text-accent-sage"></i>
+                                <span>Budget</span>
+                                <span class="sm:hidden text-ink-400 font-sans text-sm" id="budget-total-inline">$0</span>
+                            </h3>
+                            <i id="budget-toggle-icon" class="fas fa-chevron-down text-ink-300 sm:hidden transition-transform"></i>
+                        </button>
+                        <div id="budget-details" class="hidden sm:block mt-4">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                                <div class="bg-thailand-bg p-3 sm:p-4 text-center" style="border-radius: 4px;">
+                                    <div class="text-xl sm:text-2xl font-bold text-thailand-text" id="budget-thailand">$0</div>
+                                    <div class="text-[10px] sm:text-xs text-thailand-text/70 font-medium mt-0.5">Thailand</div>
+                                </div>
+                                <div class="bg-cambodia-bg p-3 sm:p-4 text-center" style="border-radius: 4px;">
+                                    <div class="text-xl sm:text-2xl font-bold text-cambodia-text" id="budget-cambodia">$0</div>
+                                    <div class="text-[10px] sm:text-xs text-cambodia-text/70 font-medium mt-0.5">Cambodia</div>
+                                </div>
+                                <div class="bg-taiwan-bg p-3 sm:p-4 text-center" style="border-radius: 4px;">
+                                    <div class="text-xl sm:text-2xl font-bold text-taiwan-text" id="budget-taiwan">$0</div>
+                                    <div class="text-[10px] sm:text-xs text-taiwan-text/70 font-medium mt-0.5">Taiwan</div>
+                                </div>
+                                <div class="bg-paper-200 p-3 sm:p-4 text-center" style="border-radius: 4px;">
+                                    <div class="text-xl sm:text-2xl font-bold text-ink-600" id="budget-total">$0</div>
+                                    <div class="text-[10px] sm:text-xs text-ink-400 font-medium mt-0.5">Total</div>
+                                </div>
                             </div>
-                            <div class="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-4 text-center">
-                                <div class="text-2xl font-bold text-rose-600" id="budget-cambodia">$0</div>
-                                <div class="text-xs text-rose-600/70 font-medium mt-1">Cambodia</div>
-                            </div>
-                            <div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 text-center">
-                                <div class="text-2xl font-bold text-emerald-600" id="budget-taiwan">$0</div>
-                                <div class="text-xs text-emerald-600/70 font-medium mt-1">Taiwan</div>
-                            </div>
-                            <div class="bg-gradient-to-br from-sky-50 to-indigo-50 rounded-2xl p-4 text-center">
-                                <div class="text-2xl font-bold text-sky-600" id="budget-total">$0</div>
-                                <div class="text-xs text-sky-600/70 font-medium mt-1">Total</div>
-                            </div>
+                            <p class="text-[10px] sm:text-xs text-ink-300 mt-3 text-center">Based on mid-range daily costs: Thailand $110, Cambodia $100, Taiwan $150</p>
                         </div>
-                        <p class="text-xs text-slate-400 mt-4 text-center">Based on mid-range daily costs: Thailand $110, Cambodia $100, Taiwan $150</p>
                     </div>
                 </div>
             </div>
@@ -1074,39 +1267,41 @@
         </div>
     </main>
 
-    <!-- Mobile Bottom Navigation -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 bottom-nav z-50">
-        <div class="flex justify-around py-2">
-            <button onclick="showTab('planner')" id="mob-tab-planner" class="flex flex-col items-center py-2 px-4 text-sky-500">
-                <i class="fas fa-map-marked-alt text-lg"></i>
-                <span class="text-xs mt-1 font-medium">Plan</span>
+    <!-- Mobile Bottom Navigation - Editorial Style -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-paper-50 border-t border-paper-300 bottom-nav z-50">
+        <div class="flex justify-around py-1.5">
+            <button onclick="showTab('planner')" id="mob-tab-planner" class="flex flex-col items-center py-2 px-4 text-ink-700 relative mobile-tab-active">
+                <i class="fas fa-map-marked-alt text-base"></i>
+                <span class="text-[10px] mt-1 font-medium tracking-wide uppercase">Plan</span>
+                <span class="absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-ink-700 mobile-tab-indicator"></span>
             </button>
-            <button onclick="showTab('destinations')" id="mob-tab-destinations" class="flex flex-col items-center py-2 px-4 text-slate-400">
-                <i class="fas fa-compass text-lg"></i>
-                <span class="text-xs mt-1 font-medium">Explore</span>
+            <button onclick="showTab('destinations')" id="mob-tab-destinations" class="flex flex-col items-center py-2 px-4 text-ink-300 relative">
+                <i class="fas fa-compass text-base"></i>
+                <span class="text-[10px] mt-1 font-medium tracking-wide uppercase">Explore</span>
             </button>
-            <button onclick="showTab('decisions')" id="mob-tab-decisions" class="flex flex-col items-center py-2 px-4 text-slate-400">
-                <i class="fas fa-lightbulb text-lg"></i>
-                <span class="text-xs mt-1 font-medium">Decide</span>
+            <button onclick="showTab('decisions')" id="mob-tab-decisions" class="flex flex-col items-center py-2 px-4 text-ink-300 relative">
+                <i class="fas fa-lightbulb text-base"></i>
+                <span class="text-[10px] mt-1 font-medium tracking-wide uppercase">Decide</span>
             </button>
-            <button onclick="showTab('logistics')" id="mob-tab-logistics" class="flex flex-col items-center py-2 px-4 text-slate-400">
-                <i class="fas fa-info-circle text-lg"></i>
-                <span class="text-xs mt-1 font-medium">Info</span>
+            <button onclick="showTab('logistics')" id="mob-tab-logistics" class="flex flex-col items-center py-2 px-4 text-ink-300 relative">
+                <i class="fas fa-suitcase text-base"></i>
+                <span class="text-[10px] mt-1 font-medium tracking-wide uppercase">Info</span>
             </button>
         </div>
     </nav>
 
-    <!-- Collaboration Floating Button -->
+    <!-- Collaboration Floating Button - Editorial Style -->
     <div class="fixed bottom-24 md:bottom-8 right-4 z-50">
         <button onclick="showCollabModal()"
-                class="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center">
-            <i class="fas fa-users text-lg"></i>
+                class="w-12 h-12 bg-ink-700 text-paper-50 shadow-md hover:shadow-lg hover:bg-ink-800 transition-all flex items-center justify-center border border-ink-600"
+                style="border-radius: 4px;">
+            <i class="fas fa-users text-sm"></i>
         </button>
     </div>
 
-    <!-- Collaboration Modal -->
-    <div id="collab-modal" class="fixed inset-0 bg-black/50 z-[60] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 slide-up">
+    <!-- Collaboration Modal - Editorial Style -->
+    <div id="collab-modal" class="fixed inset-0 bg-ink-900/60 z-[60] hidden items-center justify-center p-4">
+        <div class="bg-paper-50 shadow-2xl w-full max-w-md p-6 slide-up" style="border-radius: 4px;">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold text-slate-800">
                     <i class="fas fa-users mr-2 text-purple-500"></i>Collaborate
@@ -1189,18 +1384,18 @@
         </div>
     </div>
 
-    <!-- Detail Modal -->
-    <div id="modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
-        <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl max-h-[85vh] overflow-hidden slide-up">
+    <!-- Detail Modal - Editorial Style -->
+    <div id="modal" class="fixed inset-0 bg-ink-900/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-paper-50 w-full md:max-w-lg max-h-[85vh] overflow-hidden slide-up rounded-t-2xl md:rounded" style="--tw-rounded: 4px;">
             <div class="p-6 overflow-y-auto max-h-[85vh]" id="modal-content">
                 <!-- Populated by JS -->
             </div>
         </div>
     </div>
 
-    <!-- Create Custom Modal -->
-    <div id="custom-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
-        <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden slide-up">
+    <!-- Create Custom Modal - Editorial Style -->
+    <div id="custom-modal" class="fixed inset-0 bg-ink-900/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-paper-50 w-full md:max-w-lg max-h-[90vh] overflow-hidden slide-up rounded-t-2xl md:rounded" style="--tw-rounded: 4px;">
             <div class="p-6 overflow-y-auto max-h-[90vh]">
                 <div class="flex items-start justify-between mb-5">
                     <div>
@@ -1339,9 +1534,9 @@
         </div>
     </div>
 
-    <!-- Flight Modal -->
-    <div id="flight-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
-        <div class="bg-white w-full md:max-w-md md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden slide-up">
+    <!-- Flight Modal - Editorial Style -->
+    <div id="flight-modal" class="fixed inset-0 bg-ink-900/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-paper-50 w-full md:max-w-md max-h-[90vh] overflow-hidden slide-up rounded-t-2xl md:rounded" style="--tw-rounded: 4px;">
             <div class="p-6 overflow-y-auto max-h-[90vh]">
                 <div class="flex items-start justify-between mb-5">
                     <div>
@@ -1427,9 +1622,9 @@
         </div>
     </div>
 
-    <!-- Hotel Modal -->
-    <div id="hotel-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
-        <div class="bg-white w-full md:max-w-md md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden slide-up">
+    <!-- Hotel Modal - Editorial Style -->
+    <div id="hotel-modal" class="fixed inset-0 bg-ink-900/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-paper-50 w-full md:max-w-md max-h-[90vh] overflow-hidden slide-up rounded-t-2xl md:rounded" style="--tw-rounded: 4px;">
             <div class="p-6 overflow-y-auto max-h-[90vh]">
                 <div class="flex items-start justify-between mb-5">
                     <div>
@@ -1494,6 +1689,167 @@
                     </div>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <!-- Mobile Destination Picker (Bottom Sheet) - Enhanced with tabs -->
+    <div id="mobile-picker-overlay" class="fixed inset-0 bg-ink-900/40 z-[105] hidden" onclick="closeMobileDestinationPicker()"></div>
+    <div id="mobile-picker" class="mobile-picker-sheet sm:hidden">
+        <div class="mobile-picker-handle"></div>
+
+        <!-- Header with day selector -->
+        <div class="px-4 pb-3 border-b border-paper-200">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium text-ink-500">Add to</span>
+                    <select id="picker-day-select" onchange="onPickerDayChange()"
+                            class="bg-paper-100 border border-paper-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-ink-700 focus:ring-1 focus:ring-ink-400">
+                        <!-- Days populated by JS -->
+                    </select>
+                </div>
+                <button onclick="closeMobileDestinationPicker()" class="w-8 h-8 flex items-center justify-center text-ink-400 hover:text-ink-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab bar -->
+        <div class="flex border-b border-paper-200">
+            <button class="picker-tab active" data-tab="destinations" onclick="switchPickerTab('destinations')">
+                <i class="fas fa-map-marker-alt mr-1.5"></i>Places
+            </button>
+            <button class="picker-tab" data-tab="custom" onclick="switchPickerTab('custom')">
+                <i class="fas fa-plus-circle mr-1.5"></i>Custom
+            </button>
+            <button class="picker-tab" data-tab="travel" onclick="switchPickerTab('travel')">
+                <i class="fas fa-plane mr-1.5"></i>Travel
+            </button>
+        </div>
+
+        <!-- Tab content -->
+        <div class="overflow-y-auto" style="max-height: calc(70vh - 180px);">
+            <!-- Destinations tab -->
+            <div id="picker-tab-destinations" class="p-4">
+                <div class="relative mb-4">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-ink-300 text-sm"></i>
+                    <input type="text" id="mobile-picker-search" placeholder="Search destinations..."
+                           class="w-full pl-9 pr-4 py-2.5 bg-paper-100 border border-paper-200 text-sm focus:ring-1 focus:ring-ink-400 transition-all"
+                           style="border-radius: 8px;"
+                           oninput="filterMobilePickerDestinations(this.value)">
+                </div>
+                <div id="mobile-picker-list">
+                    <!-- Populated by JS with country sections -->
+                </div>
+            </div>
+
+            <!-- Custom tab -->
+            <div id="picker-tab-custom" class="p-4 hidden">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-ink-500 mb-1.5">Activity Name</label>
+                        <input type="text" id="custom-name" placeholder="e.g., Cooking class, Temple visit..."
+                               class="w-full px-3 py-2.5 bg-paper-100 border border-paper-200 text-sm rounded-lg focus:ring-1 focus:ring-ink-400">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-ink-500 mb-2">Country</label>
+                        <div class="flex gap-2">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="custom-country" value="thailand" class="sr-only peer" checked>
+                                <div class="py-2.5 px-3 text-center text-sm font-medium rounded-lg border-2 transition-all
+                                            peer-checked:bg-amber-100 peer-checked:border-amber-400 peer-checked:text-amber-800
+                                            bg-paper-50 border-paper-200 text-ink-500">
+                                    Thailand
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="custom-country" value="cambodia" class="sr-only peer">
+                                <div class="py-2.5 px-3 text-center text-sm font-medium rounded-lg border-2 transition-all
+                                            peer-checked:bg-rose-100 peer-checked:border-rose-400 peer-checked:text-rose-800
+                                            bg-paper-50 border-paper-200 text-ink-500">
+                                    Cambodia
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="custom-country" value="taiwan" class="sr-only peer">
+                                <div class="py-2.5 px-3 text-center text-sm font-medium rounded-lg border-2 transition-all
+                                            peer-checked:bg-emerald-100 peer-checked:border-emerald-400 peer-checked:text-emerald-800
+                                            bg-paper-50 border-paper-200 text-ink-500">
+                                    Taiwan
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <button onclick="addCustomFromPicker()"
+                            class="w-full py-3 bg-ink-700 text-paper-50 text-sm font-semibold rounded-lg hover:bg-ink-800 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add Custom Activity
+                    </button>
+                </div>
+
+                <!-- Recently added custom items -->
+                <div id="custom-items-list" class="mt-6 hidden">
+                    <h4 class="text-xs font-medium text-ink-500 uppercase tracking-wide mb-2">Your Custom Items</h4>
+                    <div id="custom-items-container" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Travel tab -->
+            <div id="picker-tab-travel" class="p-4 hidden">
+                <!-- Flight section -->
+                <div class="mb-6">
+                    <h4 class="text-xs font-medium text-ink-500 uppercase tracking-wide mb-3">
+                        <i class="fas fa-plane mr-1.5"></i>Add Flight
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="flex gap-2">
+                            <input type="text" id="flight-from" placeholder="From (e.g., BKK)"
+                                   class="flex-1 px-3 py-2.5 bg-paper-100 border border-paper-200 text-sm rounded-lg focus:ring-1 focus:ring-ink-400 uppercase"
+                                   maxlength="3">
+                            <span class="flex items-center text-ink-300"><i class="fas fa-arrow-right"></i></span>
+                            <input type="text" id="flight-to" placeholder="To (e.g., REP)"
+                                   class="flex-1 px-3 py-2.5 bg-paper-100 border border-paper-200 text-sm rounded-lg focus:ring-1 focus:ring-ink-400 uppercase"
+                                   maxlength="3">
+                        </div>
+                        <button onclick="addFlightFromPicker()"
+                                class="w-full py-2.5 bg-sky-500 text-white text-sm font-semibold rounded-lg hover:bg-sky-600 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>Add Flight
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hotel section -->
+                <div>
+                    <h4 class="text-xs font-medium text-ink-500 uppercase tracking-wide mb-3">
+                        <i class="fas fa-hotel mr-1.5"></i>Add Hotel
+                    </h4>
+                    <div class="space-y-3">
+                        <input type="text" id="hotel-name" placeholder="Hotel name"
+                               class="w-full px-3 py-2.5 bg-paper-100 border border-paper-200 text-sm rounded-lg focus:ring-1 focus:ring-ink-400">
+                        <div class="flex gap-2">
+                            <select id="hotel-country" class="flex-1 px-3 py-2.5 bg-paper-100 border border-paper-200 text-sm rounded-lg">
+                                <option value="thailand">Thailand</option>
+                                <option value="cambodia">Cambodia</option>
+                                <option value="taiwan">Taiwan</option>
+                            </select>
+                            <input type="number" id="hotel-nights" placeholder="Nights" min="1" max="10" value="1"
+                                   class="w-20 px-3 py-2.5 bg-paper-100 border border-paper-200 text-sm rounded-lg text-center">
+                        </div>
+                        <button onclick="addHotelFromPicker()"
+                                class="w-full py-2.5 bg-violet-500 text-white text-sm font-semibold rounded-lg hover:bg-violet-600 transition-colors">
+                            <i class="fas fa-plus mr-2"></i>Add Hotel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer with Done button -->
+        <div class="sticky bottom-0 p-4 bg-paper-50 border-t border-paper-200" style="padding-bottom: max(16px, env(safe-area-inset-bottom));">
+            <button onclick="closeMobileDestinationPicker()"
+                    class="w-full py-3 bg-ink-700 text-paper-50 text-sm font-semibold rounded-lg hover:bg-ink-800 transition-colors">
+                Done <span id="picker-count" class="ml-1 opacity-70"></span>
+            </button>
         </div>
     </div>
 
@@ -1708,6 +2064,18 @@
             updateDestCount();
             renderLogisticsList();
             renderHotelBanners();
+
+            // Mobile swipe hint on first visit
+            if (window.innerWidth < 640 && !localStorage.getItem('swipeHintShown')) {
+                setTimeout(() => {
+                    const grid = document.getElementById('calendar-grid');
+                    if (grid) {
+                        grid.classList.add('swipe-hint');
+                        setTimeout(() => grid.classList.remove('swipe-hint'), 3000);
+                    }
+                    localStorage.setItem('swipeHintShown', 'true');
+                }, 1000);
+            }
         });
 
         // Tab switching
@@ -1722,8 +2090,11 @@
             });
             // Reset mobile tabs
             document.querySelectorAll('[id^="mob-tab-"]').forEach(el => {
-                el.classList.remove('text-sky-500');
-                el.classList.add('text-slate-400');
+                el.classList.remove('text-ink-700');
+                el.classList.add('text-ink-300');
+                // Remove indicator
+                const indicator = el.querySelector('.mobile-tab-indicator');
+                if (indicator) indicator.remove();
             });
 
             // Show selected content
@@ -1741,8 +2112,14 @@
             // Activate mobile tab
             const mobileTab = document.getElementById(`mob-tab-${tab}`);
             if (mobileTab) {
-                mobileTab.classList.remove('text-slate-400');
-                mobileTab.classList.add('text-sky-500');
+                mobileTab.classList.remove('text-ink-300');
+                mobileTab.classList.add('text-ink-700');
+                // Add indicator line
+                if (!mobileTab.querySelector('.mobile-tab-indicator')) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'absolute -top-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-ink-700 mobile-tab-indicator';
+                    mobileTab.appendChild(indicator);
+                }
             }
         }
 
@@ -1885,6 +2262,69 @@
                 html += '</div>';
             });
             list.innerHTML = html;
+
+            // Also render mobile destination list (max 3 items)
+            renderMobileDestinationList();
+        }
+
+        // Mobile destination list with incremental loading
+        let mobileDestsShown = 3;
+
+        function renderMobileDestinationList() {
+            const mobileList = document.getElementById('destination-list-mobile');
+            if (!mobileList) return;
+
+            const allDests = getAllDestinations().filter(d => !d.closed);
+            const toShow = allDests.slice(0, mobileDestsShown);
+
+            let html = '';
+            toShow.forEach(dest => {
+                const countryColor = dest.country === 'Thailand' || dest.country === 'thailand' ? 'thailand' :
+                                     dest.country === 'Cambodia' || dest.country === 'cambodia' ? 'cambodia' : 'taiwan';
+                const isCustom = dest.isCustom;
+                html += '<div class="flex items-center justify-between py-2 border-b border-paper-200 touch-feedback" ' +
+                    'draggable="true" ondragstart="dragStart(event, \'' + dest.id + '\')" ondragend="dragEnd(event)" ' +
+                    'onclick="showDestinationDetail(\'' + dest.id + '\')">' +
+                    '<div class="flex-1 min-w-0">' +
+                        '<div class="font-medium text-ink-700 text-sm truncate">' + dest.name + '</div>' +
+                        '<div class="text-xs text-ink-400">' + (dest.region || dest.country) + '</div>' +
+                    '</div>' +
+                    '<div class="ml-2 flex items-center gap-2">' +
+                        '<span class="w-2 h-2 bg-' + countryColor + '-accent rounded-full"></span>' +
+                        (dest.highlight ? '<i class="fas fa-star text-accent-gold text-xs"></i>' : '') +
+                    '</div>' +
+                '</div>';
+            });
+            mobileList.innerHTML = html;
+
+            // Show/hide buttons
+            const remaining = allDests.length - mobileDestsShown;
+            const showMoreBtn = document.getElementById('show-more-dests');
+            const showLessBtn = document.getElementById('show-less-dests');
+
+            if (remaining > 0) {
+                showMoreBtn.classList.remove('hidden');
+                const showCount = Math.min(10, remaining);
+                document.getElementById('show-more-text').textContent = 'Show ' + showCount + ' more';
+            } else {
+                showMoreBtn.classList.add('hidden');
+            }
+
+            if (mobileDestsShown > 3) {
+                showLessBtn.classList.remove('hidden');
+            } else {
+                showLessBtn.classList.add('hidden');
+            }
+        }
+
+        function showMoreDestinations() {
+            mobileDestsShown += 10;
+            renderMobileDestinationList();
+        }
+
+        function showLessDestinations() {
+            mobileDestsShown = 3;
+            renderMobileDestinationList();
         }
 
         // Render calendar grid
@@ -1894,23 +2334,54 @@
 
             tripDays.forEach(day => {
                 const nyeClass = day.isNYE ? 'nye-glow' : '';
-                const nyeBadge = day.isNYE ? '<span class="absolute -top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">NYE</span>' : '';
+                const nyeBadge = day.isNYE ? '<span class="absolute -top-1 right-1 sm:-top-2 sm:right-2 bg-accent-terracotta text-paper-50 text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 shadow-sm" style="border-radius: 2px;">NYE</span>' : '';
 
                 html += `
-                    <div class="day-slot day-slot-empty rounded-xl p-3 min-h-[100px] relative transition-all ${nyeClass}"
+                    <div class="day-slot day-slot-empty p-2.5 sm:p-3 min-h-[90px] sm:min-h-[100px] relative transition-all touch-feedback mobile-calendar-day ${nyeClass}"
                          ondragover="dragOver(event)"
                          ondragleave="dragLeave(event)"
                          ondrop="drop(event, ${day.day})"
-                         data-day="${day.day}">
+                         onclick="handleDayTap(event, ${day.day})"
+                         data-day="${day.day}"
+                         style="border-radius: 4px;">
                         ${nyeBadge}
                         <div class="flex items-center justify-between mb-2">
-                            <span class="text-xs font-bold text-slate-400">Day ${day.day}</span>
-                            <span class="text-xs text-slate-500">${day.shortDate}</span>
+                            <span class="text-[10px] sm:text-xs font-bold text-ink-400">Day ${day.day}</span>
+                            <span class="text-[10px] sm:text-xs text-ink-300">${day.shortDate}</span>
                         </div>
-                        <div class="space-y-1.5 day-destinations" id="day-${day.day}-destinations"></div>
+                        <div class="space-y-1 sm:space-y-1.5 day-destinations" id="day-${day.day}-destinations"></div>
                     </div>`;
             });
             grid.innerHTML = html;
+
+            // Setup mobile scroll indicator
+            setupMobileScrollIndicator();
+        }
+
+        // Mobile day tap handler - opens picker on mobile
+        function handleDayTap(e, dayNum) {
+            if (window.innerWidth >= 640) return;
+            if (e.target.closest('.dest-chip')) return;
+            openMobileDestinationPicker(dayNum);
+        }
+
+        // Setup scroll indicator for mobile calendar
+        function setupMobileScrollIndicator() {
+            const grid = document.getElementById('calendar-grid');
+            const indicator = document.getElementById('week-indicator');
+            if (!grid || !indicator || window.innerWidth >= 640) return;
+
+            grid.addEventListener('scroll', () => {
+                const scrollLeft = grid.scrollLeft;
+                const itemWidth = grid.firstElementChild?.offsetWidth || 150;
+                const currentDay = Math.floor(scrollLeft / itemWidth) + 1;
+                const currentWeek = Math.ceil(currentDay / 7);
+
+                indicator.querySelectorAll('.mobile-week-dot').forEach(dot => {
+                    const week = parseInt(dot.dataset.week);
+                    dot.classList.toggle('active', week === currentWeek);
+                });
+            });
         }
 
         // Render full destinations grid
@@ -1989,6 +2460,13 @@
                 renderDayDestinations(dayNum);
                 updateBudget();
                 updateDaySlotStyle(dayNum);
+
+                // Success pulse animation on mobile
+                const daySlot = document.querySelector('[data-day="' + dayNum + '"]');
+                if (daySlot && window.innerWidth < 640) {
+                    daySlot.classList.add('success-pulse');
+                    setTimeout(() => daySlot.classList.remove('success-pulse'), 400);
+                }
             }
         }
 
@@ -2065,10 +2543,10 @@
                 const colorClass = countryColors[h.country] || 'bg-violet-100 border-violet-300 text-violet-800';
 
                 html += `
-                    <div class="flex items-center gap-1.5 ${colorClass} border rounded-md px-2 py-1 text-[11px] mb-1 group ${isFirstDay ? '' : 'opacity-50'}">
-                        <i class="fas fa-${isFirstDay ? 'hotel' : 'bed'} text-[9px]"></i>
+                    <div class="flex items-center gap-1.5 ${colorClass} border rounded-md px-2 py-1 text-[11px] mb-1 group min-w-0 overflow-hidden ${isFirstDay ? '' : 'opacity-50'}">
+                        <i class="fas fa-${isFirstDay ? 'hotel' : 'bed'} text-[9px] flex-shrink-0"></i>
                         <span class="font-medium truncate flex-1 cursor-pointer" onclick="showHotelModal('${h.id}')">${h.name}</span>
-                        <button onclick="deleteHotel('${h.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity">
+                        <button onclick="deleteHotel('${h.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity flex-shrink-0">
                             <i class="fas fa-times text-[9px]"></i>
                         </button>
                     </div>`;
@@ -2116,7 +2594,7 @@
 
             const hasLogistics = dayHotels.length > 0 || dayFlights.length > 0;
             if (dayDests.length === 0 && !hasLogistics) {
-                html = '<p class="text-xs text-slate-400 text-center py-2">Drop here</p>';
+                html = '<p class="text-xs text-slate-400 text-center py-2"><span class="hidden sm:inline">Drop here</span><span class="sm:hidden"><i class="fas fa-hand-pointer mr-1"></i>tap to add</span></p>';
             } else if (dayDests.length > 0) {
                 const allDests = getAllDestinations();
                 dayDests.forEach(destId => {
@@ -2125,11 +2603,11 @@
                         const colors = { thailand: 'amber', cambodia: 'rose', taiwan: 'emerald' };
                         const color = dest.isCustom ? 'indigo' : colors[dest.country];
                         html += `
-                            <div class="flex items-center gap-2 bg-${color}-50 rounded-lg px-2 py-1.5 text-xs group">
+                            <div class="flex items-center gap-2 bg-${color}-50 rounded-lg px-2 py-1.5 text-xs group min-w-0 overflow-hidden">
                                 <span class="w-1.5 h-1.5 rounded-full bg-${color}-500 flex-shrink-0"></span>
                                 <span class="flex-1 truncate font-medium text-slate-700">${dest.name}</span>
                                 <button onclick="removeFromDay('${destId}', ${dayNum}, event)"
-                                        class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity">
+                                        class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity flex-shrink-0">
                                     <i class="fas fa-times text-[10px]"></i>
                                 </button>
                             </div>`;
@@ -2204,7 +2682,25 @@
             document.getElementById('budget-cambodia').textContent = `$${cambodiaCost}`;
             document.getElementById('budget-taiwan').textContent = `$${taiwanCost}`;
             document.getElementById('budget-total').textContent = `$${total}`;
-            document.getElementById('budget-header').textContent = `$${total}`;
+            // Update inline total for mobile collapsed view
+            const inlineTotal = document.getElementById('budget-total-inline');
+            if (inlineTotal) inlineTotal.textContent = `$${total}`;
+        }
+
+        // Toggle budget details on mobile
+        let budgetExpanded = false;
+        function toggleBudget() {
+            if (window.innerWidth >= 640) return; // Only on mobile
+            budgetExpanded = !budgetExpanded;
+            const details = document.getElementById('budget-details');
+            const icon = document.getElementById('budget-toggle-icon');
+            if (budgetExpanded) {
+                details.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                details.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
         }
 
         // Export Functions
@@ -2360,6 +2856,315 @@
 
         function filterDestinationsFull(query) {
             applyAllFilters();
+        }
+
+        // Mobile Destination Picker - Enhanced with tabs and multi-add
+        let mobilePickerDayNum = null;
+        let pickerAddedCount = 0;
+
+        function openMobileDestinationPicker(dayNum) {
+            mobilePickerDayNum = dayNum;
+            pickerAddedCount = 0;
+
+            // Populate day selector
+            const select = document.getElementById('picker-day-select');
+            select.innerHTML = tripDays.map(d =>
+                '<option value="' + d.day + '"' + (d.day === dayNum ? ' selected' : '') + '>' +
+                'Day ' + d.day + ' - ' + d.shortDate + (d.isNYE ? ' (NYE!)' : '') +
+                '</option>'
+            ).join('');
+
+            // Reset to destinations tab
+            switchPickerTab('destinations');
+
+            // Clear search and render
+            document.getElementById('mobile-picker-search').value = '';
+            renderMobilePickerList('');
+            updatePickerCount();
+
+            // Show picker
+            document.getElementById('mobile-picker-overlay').classList.remove('hidden');
+            document.getElementById('mobile-picker').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMobileDestinationPicker() {
+            document.getElementById('mobile-picker-overlay').classList.add('hidden');
+            document.getElementById('mobile-picker').classList.remove('open');
+            document.body.style.overflow = '';
+            mobilePickerDayNum = null;
+            updateBudget();
+        }
+
+        function onPickerDayChange() {
+            mobilePickerDayNum = parseInt(document.getElementById('picker-day-select').value);
+            renderMobilePickerList(document.getElementById('mobile-picker-search').value);
+        }
+
+        function switchPickerTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.picker-tab').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+
+            // Show/hide content
+            document.getElementById('picker-tab-destinations').classList.toggle('hidden', tab !== 'destinations');
+            document.getElementById('picker-tab-custom').classList.toggle('hidden', tab !== 'custom');
+            document.getElementById('picker-tab-travel').classList.toggle('hidden', tab !== 'travel');
+
+            // Render custom items list if on custom tab
+            if (tab === 'custom') {
+                renderCustomItemsList();
+            }
+        }
+
+        function filterMobilePickerDestinations(query) {
+            renderMobilePickerList(query);
+        }
+
+        function renderMobilePickerList(query) {
+            const list = document.getElementById('mobile-picker-list');
+            const allDests = getAllDestinations();
+            const q = query.toLowerCase();
+
+            const filtered = allDests.filter(d => {
+                if (d.closed) return false;
+                if (!q) return true;
+                return d.name.toLowerCase().includes(q) ||
+                       d.country.toLowerCase().includes(q) ||
+                       (d.region && d.region.toLowerCase().includes(q));
+            });
+
+            // Group by country
+            const countries = ['thailand', 'cambodia', 'taiwan'];
+            const countryNames = { thailand: 'Thailand', cambodia: 'Cambodia', taiwan: 'Taiwan' };
+            const dayDests = itinerary[mobilePickerDayNum] || [];
+
+            let html = '';
+
+            countries.forEach(country => {
+                const countryDests = filtered.filter(d =>
+                    (d.country || '').toLowerCase() === country
+                );
+
+                if (countryDests.length === 0) return;
+
+                html += '<div class="picker-section">';
+                html += '<div class="picker-section-header ' + country + '">';
+                html += '<i class="fas fa-map-marker-alt mr-2"></i>' + countryNames[country];
+                html += '<span class="ml-auto text-xs font-normal opacity-70">' + countryDests.length + ' places</span>';
+                html += '</div>';
+                html += '<div class="space-y-1">';
+
+                countryDests.forEach(dest => {
+                    const isAdded = dayDests.includes(dest.id);
+                    const addedClass = isAdded ? ' picker-item-added' : '';
+
+                    html += '<div class="picker-item ' + country + addedClass + '" data-dest-id="' + dest.id + '">';
+                    html += '<div class="flex-1 min-w-0" onclick="togglePickerItem(\'' + dest.id + '\')">';
+                    html += '<div class="font-medium text-sm text-ink-700">' + dest.name + '</div>';
+                    html += '<div class="text-xs text-ink-400">' + (dest.region || country) + ' · ' + dest.days + 'd · $' + dest.cost + '</div>';
+                    html += '</div>';
+                    html += '<button onclick="togglePickerItem(\'' + dest.id + '\')" class="picker-item-btn ' +
+                            (isAdded ? 'bg-emerald-500 text-white' : 'bg-white text-ink-400 border border-paper-300') + '">';
+                    html += '<i class="fas ' + (isAdded ? 'fa-check' : 'fa-plus') + ' text-sm"></i>';
+                    html += '</button>';
+                    html += '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            if (html === '') {
+                html = '<div class="text-center py-8 text-ink-400 text-sm">No destinations found</div>';
+            }
+
+            list.innerHTML = html;
+        }
+
+        function togglePickerItem(destId) {
+            const dayNum = mobilePickerDayNum;
+            if (!itinerary[dayNum]) itinerary[dayNum] = [];
+
+            const index = itinerary[dayNum].indexOf(destId);
+            if (index > -1) {
+                // Remove
+                itinerary[dayNum].splice(index, 1);
+                pickerAddedCount = Math.max(0, pickerAddedCount - 1);
+            } else {
+                // Add
+                itinerary[dayNum].push(destId);
+                pickerAddedCount++;
+            }
+
+            saveItinerary();
+            renderDayDestinations(dayNum);
+            updateDaySlotStyle(dayNum);
+            renderMobilePickerList(document.getElementById('mobile-picker-search').value);
+            updatePickerCount();
+        }
+
+        function updatePickerCount() {
+            const badge = document.getElementById('picker-count');
+            badge.textContent = pickerAddedCount > 0 ? '(+' + pickerAddedCount + ')' : '';
+        }
+
+        // Custom items from picker
+        function addCustomFromPicker() {
+            const nameInput = document.getElementById('custom-name');
+            const name = nameInput.value.trim();
+            if (!name) {
+                nameInput.focus();
+                return;
+            }
+
+            const country = document.querySelector('input[name="custom-country"]:checked')?.value || 'thailand';
+
+            const customItem = {
+                id: 'custom-' + Date.now(),
+                name: name,
+                country: country.charAt(0).toUpperCase() + country.slice(1),
+                region: 'Custom',
+                days: 0.5,
+                cost: 0,
+                desc: 'Custom activity',
+                tips: '',
+                crowds: 'N/A',
+                isCustom: true
+            };
+
+            customActivities.push(customItem);
+            localStorage.setItem('customActivities', JSON.stringify(customActivities));
+
+            // Add to current day
+            const dayNum = mobilePickerDayNum;
+            addToDay(customItem.id, dayNum);
+            pickerAddedCount++;
+            updatePickerCount();
+
+            // Clear form
+            nameInput.value = '';
+
+            // Refresh lists
+            renderMobilePickerList('');
+            renderCustomItemsList();
+        }
+
+        function renderCustomItemsList() {
+            const container = document.getElementById('custom-items-container');
+            const listDiv = document.getElementById('custom-items-list');
+
+            if (customActivities.length === 0) {
+                listDiv.classList.add('hidden');
+                return;
+            }
+
+            listDiv.classList.remove('hidden');
+            let html = '';
+            customActivities.forEach(item => {
+                const country = (item.country || 'thailand').toLowerCase();
+                html += '<div class="picker-item ' + country + ' text-sm">';
+                html += '<span class="flex-1">' + item.name + '</span>';
+                html += '<button onclick="deleteCustomItem(\'' + item.id + '\')" class="text-ink-400 hover:text-red-500">';
+                html += '<i class="fas fa-trash text-xs"></i>';
+                html += '</button>';
+                html += '</div>';
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteCustomItem(itemId) {
+            customActivities = customActivities.filter(i => i.id !== itemId);
+            localStorage.setItem('customActivities', JSON.stringify(customActivities));
+            // Remove from all days
+            for (let day in itinerary) {
+                itinerary[day] = itinerary[day].filter(id => id !== itemId);
+            }
+            saveItinerary();
+            renderCustomItemsList();
+            renderMobilePickerList('');
+        }
+
+        // Flight from picker
+        function addFlightFromPicker() {
+            const from = document.getElementById('flight-from').value.trim().toUpperCase();
+            const to = document.getElementById('flight-to').value.trim().toUpperCase();
+
+            if (!from || !to) {
+                alert('Please enter both departure and arrival airports');
+                return;
+            }
+
+            const dayNum = mobilePickerDayNum;
+            const flightId = 'flight-' + Date.now();
+
+            // Detect country from airport code
+            const taiwanAirports = ['TPE', 'KHH', 'TNN', 'TSA', 'RMQ'];
+            const cambodiaAirports = ['PNH', 'REP'];
+            let country = 'thailand';
+            if (taiwanAirports.includes(to)) country = 'taiwan';
+            else if (cambodiaAirports.includes(to)) country = 'cambodia';
+
+            const flight = {
+                id: flightId,
+                type: 'flight',
+                from: from,
+                to: to,
+                departureDate: dayNum,
+                arrivalDate: dayNum,
+                departureTime: '',
+                arrivalTime: '',
+                country: country
+            };
+
+            logistics.push(flight);
+            saveLogistics();
+            renderDayDestinations(dayNum);
+            updateDaySlotStyle(dayNum);
+            pickerAddedCount++;
+            updatePickerCount();
+
+            // Clear form
+            document.getElementById('flight-from').value = '';
+            document.getElementById('flight-to').value = '';
+        }
+
+        // Hotel from picker
+        function addHotelFromPicker() {
+            const name = document.getElementById('hotel-name').value.trim();
+            if (!name) {
+                alert('Please enter a hotel name');
+                return;
+            }
+
+            const country = document.getElementById('hotel-country').value;
+            const nights = parseInt(document.getElementById('hotel-nights').value) || 1;
+            const dayNum = mobilePickerDayNum;
+            const hotelId = 'hotel-' + Date.now();
+
+            const hotel = {
+                id: hotelId,
+                type: 'hotel',
+                name: name,
+                country: country,
+                checkIn: dayNum,
+                checkOut: dayNum + nights
+            };
+
+            logistics.push(hotel);
+            saveLogistics();
+
+            // Render for all affected days
+            for (let d = dayNum; d < dayNum + nights && d <= 20; d++) {
+                renderDayDestinations(d);
+                updateDaySlotStyle(d);
+            }
+            pickerAddedCount++;
+            updatePickerCount();
+
+            // Clear form
+            document.getElementById('hotel-name').value = '';
+            document.getElementById('hotel-nights').value = '1';
         }
 
         function filterByCountry(country) {
