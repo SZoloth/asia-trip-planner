@@ -1557,46 +1557,10 @@
             container.innerHTML = html;
         }
 
-        // Render hotel banners above calendar
+        // Hotel banners now show directly on calendar days, so just clear this container
         function renderHotelBanners() {
             const container = document.getElementById('hotel-banners');
-            if (!container) return;
-
-            const hotels = logistics.filter(l => l.type === 'hotel');
-
-            if (hotels.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-
-            // Get the calendar grid to calculate positions
-            const calendarGrid = document.getElementById('calendar-grid');
-            if (!calendarGrid) return;
-
-            let html = '<div class="space-y-2">';
-
-            hotels.forEach(h => {
-                const nights = h.checkOut - h.checkIn;
-                const countryColors = {
-                    thailand: 'from-amber-50 to-orange-50 border-amber-200 text-amber-800',
-                    cambodia: 'from-rose-50 to-pink-50 border-rose-200 text-rose-800',
-                    taiwan: 'from-emerald-50 to-teal-50 border-emerald-200 text-emerald-800'
-                };
-                const colorClass = countryColors[h.country] || 'from-violet-50 to-purple-50 border-violet-200 text-violet-800';
-
-                html += `
-                    <div class="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r ${colorClass} border cursor-pointer hover:shadow-sm transition-shadow"
-                         onclick="showHotelModal('${h.id}')">
-                        <i class="fas fa-hotel text-sm"></i>
-                        <span class="font-medium text-sm">${h.name}</span>
-                        <span class="text-xs opacity-70">${h.location}</span>
-                        <span class="ml-auto text-xs font-medium">Day ${h.checkIn}-${h.checkOut - 1} (${nights} night${nights > 1 ? 's' : ''})</span>
-                    </div>
-                `;
-            });
-
-            html += '</div>';
-            container.innerHTML = html;
+            if (container) container.innerHTML = '';
         }
 
         function renderDestinationList() {
@@ -1837,6 +1801,27 @@
             const dayDests = itinerary[dayNum] || [];
             let html = '';
 
+            // Render hotel stays for this day (checkIn <= day < checkOut)
+            const dayHotels = logistics.filter(l => l.type === 'hotel' && dayNum >= l.checkIn && dayNum < l.checkOut);
+            dayHotels.forEach(h => {
+                const isFirstDay = dayNum === h.checkIn;
+                const countryColors = {
+                    thailand: 'bg-amber-100 border-amber-300 text-amber-800',
+                    cambodia: 'bg-rose-100 border-rose-300 text-rose-800',
+                    taiwan: 'bg-emerald-100 border-emerald-300 text-emerald-800'
+                };
+                const colorClass = countryColors[h.country] || 'bg-violet-100 border-violet-300 text-violet-800';
+
+                html += `
+                    <div class="flex items-center gap-1.5 ${colorClass} border rounded-md px-2 py-1 text-[11px] mb-1 group ${isFirstDay ? '' : 'opacity-50'}">
+                        <i class="fas fa-${isFirstDay ? 'hotel' : 'bed'} text-[9px]"></i>
+                        <span class="font-medium truncate flex-1 cursor-pointer" onclick="showHotelModal('${h.id}')">${h.name}</span>
+                        <button onclick="deleteHotel('${h.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity">
+                            <i class="fas fa-times text-[9px]"></i>
+                        </button>
+                    </div>`;
+            });
+
             // Render flight pills for this day
             const dayFlights = logistics.filter(l => l.type === 'flight' && (l.departureDate === dayNum || l.arrivalDate === dayNum));
             dayFlights.forEach(f => {
@@ -1845,32 +1830,40 @@
 
                 if (isDeparture) {
                     html += `
-                        <div class="flight-pill flight-departure mb-1">
+                        <div class="flight-pill flight-departure mb-1 group">
                             <i class="fas fa-plane-departure text-[10px]"></i>
-                            <span class="font-medium">${f.from}→${f.to}</span>
+                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${f.id}')">${f.from}→${f.to}</span>
                             <span class="text-sky-500">${f.departureTime}</span>
+                            <button onclick="deleteFlight('${f.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
+                                <i class="fas fa-times text-[9px]"></i>
+                            </button>
                         </div>`;
                 }
                 if (isArrival && f.arrivalDate !== f.departureDate) {
-                    // Only show arrival pill if arriving on a different day
                     html += `
-                        <div class="flight-pill flight-arrival mb-1">
+                        <div class="flight-pill flight-arrival mb-1 group">
                             <i class="fas fa-plane-arrival text-[10px]"></i>
-                            <span class="font-medium">ARR ${f.to}</span>
+                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${f.id}')">ARR ${f.to}</span>
                             <span class="text-sky-500">${f.arrivalTime}</span>
+                            <button onclick="deleteFlight('${f.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
+                                <i class="fas fa-times text-[9px]"></i>
+                            </button>
                         </div>`;
                 } else if (isArrival && f.arrivalDate === f.departureDate) {
-                    // Same day arrival - show combined arrival time
                     html += `
-                        <div class="flight-pill flight-arrival mb-1">
+                        <div class="flight-pill flight-arrival mb-1 group">
                             <i class="fas fa-plane-arrival text-[10px]"></i>
-                            <span class="font-medium">ARR ${f.to}</span>
+                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${f.id}')">ARR ${f.to}</span>
                             <span class="text-sky-500">${f.arrivalTime}</span>
+                            <button onclick="deleteFlight('${f.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
+                                <i class="fas fa-times text-[9px]"></i>
+                            </button>
                         </div>`;
                 }
             });
 
-            if (dayDests.length === 0 && dayFlights.length === 0) {
+            const hasLogistics = dayHotels.length > 0 || dayFlights.length > 0;
+            if (dayDests.length === 0 && !hasLogistics) {
                 html = '<p class="text-xs text-slate-400 text-center py-2">Drop here</p>';
             } else if (dayDests.length > 0) {
                 const allDests = getAllDestinations();
