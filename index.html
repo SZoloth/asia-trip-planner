@@ -2153,53 +2153,19 @@
 
             currentRoomCode = roomCode;
 
-            // Load room data from Firebase
-            const roomData = snapshot.val();
-            const firebaseItinerary = roomData.itinerary || {};
-            const firebaseCustom = roomData.customActivities || [];
+            // LOCAL-FIRST: Don't overwrite itinerary - it's already loaded from localStorage
+            // at script initialization. Just start collaboration and sync.
+            const localItemCount = Object.values(itinerary).flat().length;
+            console.log(`joinRoom: Local itinerary has ${localItemCount} items, starting collaboration`);
 
-            // Load local data
-            const localItinerary = JSON.parse(localStorage.getItem('asiaItinerary') || '{}');
-            const localCustom = JSON.parse(localStorage.getItem('asiaCustomActivities') || '[]');
-
-            // Count items
-            const firebaseItemCount = Object.values(firebaseItinerary).flat().length;
-            const localItemCount = Object.values(localItinerary).flat().length;
-
-            console.log(`joinRoom: Firebase has ${firebaseItemCount} items, localStorage has ${localItemCount} items`);
-
-            // Prefer localStorage unless Firebase has MORE data
-            // (localStorage is more recent on same device, Firebase cache can be stale)
-            let needsSync = false;
-            if (firebaseItemCount > localItemCount) {
-                console.log('Using Firebase data (has more items than local)');
-                itinerary = firebaseItinerary;
-                customActivities = firebaseCustom;
-                localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
-                localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
-            } else {
-                console.log('Using localStorage data (same or more items) and syncing to Firebase');
-                itinerary = localItinerary;
-                customActivities = localCustom;
-                needsSync = true;
-            }
-
-            // Refresh UI
-            renderDestinationList();
-            renderCalendar();
-            if (currentTab === 'destinations') renderDestinationsGrid();
-            updateBudget();
-            updateDestCount();
-
+            // Start collaboration listeners
             startCollaboration();
             updateCollaborationUI();
 
-            // Sync localStorage to Firebase if we used local data
-            if (needsSync) {
-                console.log('Syncing localStorage data to Firebase');
-                syncItinerary();
-                syncCustomActivities();
-            }
+            // Sync local data to Firebase (our data is authoritative for this session)
+            console.log('Syncing local data to Firebase');
+            syncItinerary();
+            syncCustomActivities();
 
             // Update URL
             const url = new URL(window.location);
