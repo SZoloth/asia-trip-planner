@@ -1511,6 +1511,10 @@
         function saveItinerary() {
             const itemCount = Object.values(itinerary).flat().length;
             console.log(`saveItinerary: ${itemCount} total items, collaborating=${isCollaborating}`);
+            // Debug: trace who's calling with 0 items
+            if (itemCount === 0) {
+                console.trace('saveItinerary called with 0 items - stack trace:');
+            }
             localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
             syncItinerary(); // Sync to Firebase if collaborating
         }
