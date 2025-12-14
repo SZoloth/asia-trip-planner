@@ -292,12 +292,12 @@
                     </div>
                     <!-- Network Status -->
                     <div id="network-status" class="hidden items-center gap-2 bg-amber-50 rounded-full px-3 py-2">
-                        <i class="fas fa-wifi-slash text-amber-600 text-xs"></i>
+                        <i class="fas fa-bolt text-amber-600 text-xs"></i>
                         <span class="text-xs font-medium text-amber-700">Offline</span>
                     </div>
                     <!-- Sync Status -->
                     <div id="sync-status" class="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 cursor-help" title="Last synced with cloud">
-                        <i class="fas fa-cloud-check"></i>
+                        <i class="fas fa-cloud"></i>
                         <span id="sync-time">Synced</span>
                     </div>
                     <!-- Collaboration Status -->
@@ -3236,13 +3236,17 @@
             const syncEl = document.getElementById('sync-status');
 
             if (navigator.onLine) {
+                // Hide offline indicator
                 statusEl.classList.add('hidden');
                 statusEl.classList.remove('flex');
-                syncEl.classList.remove('hidden');
+                // Show sync status on desktop only
+                syncEl.style.display = '';
             } else {
+                // Show offline indicator
                 statusEl.classList.remove('hidden');
                 statusEl.classList.add('flex');
-                syncEl.classList.add('hidden');
+                // Hide sync status
+                syncEl.style.display = 'none';
             }
         }
 
