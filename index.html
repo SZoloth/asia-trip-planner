@@ -1197,6 +1197,7 @@
         let currentDurationFilter = 'all';
         let currentCostFilter = 'all';
         let currentCrowdsFilter = 'all';
+        let currentTab = 'planner';
 
         // Get all destinations (built-in + custom)
         function getAllDestinations() {
@@ -1215,6 +1216,7 @@
 
         // Tab switching
         function showTab(tab) {
+            currentTab = tab;
             // Hide all content
             document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
             // Reset desktop tabs
@@ -1857,9 +1859,9 @@
                     document.getElementById('custom-country').value = activity.country;
                     document.getElementById('custom-region').value = activity.region;
                     document.getElementById('custom-type').value = activity.type;
-                    document.getElementById('custom-duration').value = activity.days;
+                    document.getElementById('custom-days').value = activity.days;
                     document.getElementById('custom-cost').value = activity.cost;
-                    document.getElementById('custom-crowds').value = activity.crowds;
+                    document.querySelector(`input[name="custom-crowds"][value="${activity.crowds}"]`).checked = true;
                     document.getElementById('custom-desc').value = activity.desc;
                     document.getElementById('custom-tips').value = activity.tips;
                     document.getElementById('custom-highlight').checked = activity.highlight || false;
@@ -1891,9 +1893,9 @@
                 country: document.getElementById('custom-country').value,
                 region: document.getElementById('custom-region').value,
                 type: document.getElementById('custom-type').value,
-                days: parseFloat(document.getElementById('custom-duration').value),
+                days: parseFloat(document.getElementById('custom-days').value),
                 cost: parseInt(document.getElementById('custom-cost').value) || 0,
-                crowds: document.getElementById('custom-crowds').value,
+                crowds: document.querySelector('input[name="custom-crowds"]:checked').value,
                 desc: document.getElementById('custom-desc').value,
                 tips: document.getElementById('custom-tips').value || 'Custom activity added by user',
                 highlight: document.getElementById('custom-highlight').checked,
@@ -1911,7 +1913,7 @@
             syncCustomActivities(); // Sync to Firebase if collaborating
             closeCustomModal();
             renderDestinationList();
-            if (currentTab === 'explore') renderDestinationsGrid();
+            if (currentTab === 'destinations') renderDestinationsGrid();
             updateDestCount();
         }
 
@@ -1930,8 +1932,8 @@
 
             closeModal();
             renderDestinationList();
-            if (currentTab === 'explore') renderDestinationsGrid();
-            if (currentTab === 'itinerary') renderItinerary();
+            if (currentTab === 'destinations') renderDestinationsGrid();
+            if (currentTab === 'planner') renderCalendar();
             updateDestCount();
         }
 
@@ -2098,8 +2100,8 @@
 
             // Refresh UI
             renderDestinationList();
-            renderItinerary();
-            if (currentTab === 'explore') renderDestinationsGrid();
+            renderCalendar();
+            if (currentTab === 'destinations') renderDestinationsGrid();
             updateBudget();
             updateDestCount();
 
@@ -2129,7 +2131,7 @@
                 if (JSON.stringify(remoteItinerary) !== JSON.stringify(itinerary)) {
                     itinerary = remoteItinerary;
                     localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
-                    renderItinerary();
+                    renderCalendar();
                     updateBudget();
                 }
             });
@@ -2142,7 +2144,7 @@
                     customActivities = remoteCustom;
                     localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
                     renderDestinationList();
-                    if (currentTab === 'explore') renderDestinationsGrid();
+                    if (currentTab === 'destinations') renderDestinationsGrid();
                     updateDestCount();
                 }
             });
