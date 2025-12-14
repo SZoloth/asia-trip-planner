@@ -71,11 +71,20 @@
         .badge-thailand { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
         .badge-cambodia { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
         .badge-taiwan { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
+        .badge-custom { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4338ca; }
 
         /* Country accents */
         .accent-thailand { border-left: 3px solid #f59e0b; }
         .accent-cambodia { border-left: 3px solid #ef4444; }
         .accent-taiwan { border-left: 3px solid #10b981; }
+        .accent-custom { border-left: 3px solid #6366f1; }
+
+        /* Custom item badge */
+        .custom-badge {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white; font-size: 10px; font-weight: 700; padding: 4px 8px;
+            border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
 
         /* Closed destination styling */
         .dest-closed { position: relative; opacity: 0.5; }
@@ -237,6 +246,12 @@
                             <span class="text-xs text-slate-400" id="dest-count">0 places</span>
                         </div>
 
+                        <!-- Add Custom Button -->
+                        <button onclick="showCreateCustomModal()" class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-sm transition-colors border-2 border-dashed border-indigo-200 hover:border-indigo-300">
+                            <i class="fas fa-plus"></i>
+                            Add Custom Activity
+                        </button>
+
                         <div class="relative mb-4">
                             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                             <input type="text" id="destination-search" placeholder="Search..."
@@ -244,7 +259,7 @@
                                    oninput="filterDestinations(this.value)">
                         </div>
 
-                        <div class="space-y-4 max-h-[calc(100vh-280px)] overflow-y-auto scrollbar-thin pr-1" id="destination-list">
+                        <div class="space-y-4 max-h-[calc(100vh-320px)] overflow-y-auto scrollbar-thin pr-1" id="destination-list">
                             <!-- Populated by JS -->
                         </div>
                     </div>
@@ -310,6 +325,7 @@
                         <button onclick="filterByCountry('thailand')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="thailand">Thailand</button>
                         <button onclick="filterByCountry('cambodia')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="cambodia">Cambodia</button>
                         <button onclick="filterByCountry('taiwan')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="taiwan">Taiwan</button>
+                        <button onclick="filterByCountry('custom')" class="country-filter px-4 py-2 rounded-lg text-sm font-medium text-slate-500 hover:bg-slate-50" data-country="custom">Custom</button>
                     </div>
                     <div class="relative flex-1 max-w-xs ml-auto">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
@@ -757,6 +773,147 @@
         </div>
     </div>
 
+    <!-- Create Custom Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-white w-full md:max-w-lg md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden slide-up">
+            <div class="p-6 overflow-y-auto max-h-[90vh]">
+                <div class="flex items-start justify-between mb-5">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Add Custom Activity</h2>
+                        <p class="text-sm text-slate-500 mt-1">Create your own destination or activity</p>
+                    </div>
+                    <button onclick="closeCustomModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="custom-form" onsubmit="saveCustomActivity(event)" class="space-y-4">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Activity Name *</label>
+                        <input type="text" id="custom-name" required placeholder="e.g., Hidden Rooftop Bar"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all">
+                    </div>
+
+                    <!-- Country & Region -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Country *</label>
+                            <select id="custom-country" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="thailand">Thailand</option>
+                                <option value="cambodia">Cambodia</option>
+                                <option value="taiwan">Taiwan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">City/Region *</label>
+                            <input type="text" id="custom-region" required placeholder="e.g., Bangkok"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Type -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Type</label>
+                        <select id="custom-type" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="activity">Activity</option>
+                            <option value="food">Food & Dining</option>
+                            <option value="nightlife">Nightlife</option>
+                            <option value="temple">Temple</option>
+                            <option value="nature">Nature</option>
+                            <option value="beach">Beach</option>
+                            <option value="market">Market</option>
+                            <option value="culture">Culture</option>
+                            <option value="wellness">Wellness</option>
+                            <option value="neighborhood">Neighborhood</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Duration & Cost -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Duration (days)</label>
+                            <select id="custom-days" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="0.25">Quick (~1-2 hours)</option>
+                                <option value="0.5" selected>Half day</option>
+                                <option value="1">Full day</option>
+                                <option value="1.5">1.5 days</option>
+                                <option value="2">2 days</option>
+                                <option value="3">3 days</option>
+                                <option value="4">4 days</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Est. Cost (USD)</label>
+                            <input type="number" id="custom-cost" min="0" value="0" placeholder="0"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Crowds -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Expected Crowds</label>
+                        <div class="flex gap-2">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="custom-crowds" value="LOW" class="sr-only peer">
+                                <div class="text-center py-2 px-3 rounded-lg border-2 border-slate-200 text-sm font-medium text-slate-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 transition-all">
+                                    Quiet
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="custom-crowds" value="MODERATE" class="sr-only peer" checked>
+                                <div class="text-center py-2 px-3 rounded-lg border-2 border-slate-200 text-sm font-medium text-slate-600 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-700 transition-all">
+                                    Moderate
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="custom-crowds" value="HIGH" class="sr-only peer">
+                                <div class="text-center py-2 px-3 rounded-lg border-2 border-slate-200 text-sm font-medium text-slate-600 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 transition-all">
+                                    Busy
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Description</label>
+                        <textarea id="custom-desc" rows="2" placeholder="What is this place? Why do you want to go?"
+                                  class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all resize-none"></textarea>
+                    </div>
+
+                    <!-- Tips -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Notes/Tips</label>
+                        <textarea id="custom-tips" rows="2" placeholder="Any tips, booking info, or things to remember?"
+                                  class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all resize-none"></textarea>
+                    </div>
+
+                    <!-- Highlight -->
+                    <label class="flex items-center gap-3 p-3 bg-amber-50 rounded-xl cursor-pointer">
+                        <input type="checkbox" id="custom-highlight" class="w-5 h-5 rounded text-amber-500 focus:ring-amber-500">
+                        <div>
+                            <span class="font-medium text-slate-700">Mark as Must-See</span>
+                            <span class="text-sm text-slate-500 block">Highlight this as a priority activity</span>
+                        </div>
+                    </label>
+
+                    <!-- Hidden field for editing -->
+                    <input type="hidden" id="custom-edit-id" value="">
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="closeCustomModal()" class="flex-1 btn-secondary">Cancel</button>
+                        <button type="submit" class="flex-1 btn-primary">
+                            <i class="fas fa-plus mr-2"></i><span id="custom-submit-text">Add Activity</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Destination Data
         const destinations = [
@@ -915,10 +1072,16 @@
 
         // Itinerary state
         let itinerary = JSON.parse(localStorage.getItem('asiaItinerary')) || {};
+        let customActivities = JSON.parse(localStorage.getItem('asiaCustomActivities')) || [];
         let currentCountryFilter = 'all';
         let currentDurationFilter = 'all';
         let currentCostFilter = 'all';
         let currentCrowdsFilter = 'all';
+
+        // Get all destinations (built-in + custom)
+        function getAllDestinations() {
+            return [...destinations, ...customActivities];
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -967,7 +1130,10 @@
 
         // Update destination count
         function updateDestCount() {
-            document.getElementById('dest-count').textContent = `${destinations.length} places`;
+            const total = getAllDestinations().length;
+            const customCount = customActivities.length;
+            const text = customCount > 0 ? `${total} places (${customCount} custom)` : `${total} places`;
+            document.getElementById('dest-count').textContent = text;
         }
 
         // Render sidebar destination list
@@ -980,6 +1146,36 @@
             ];
 
             let html = '';
+
+            // Custom activities section (if any)
+            if (customActivities.length > 0) {
+                html += `<div class="mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                        <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wide">Your Custom</span>
+                        <span class="text-xs text-slate-400">(${customActivities.length})</span>
+                    </div>`;
+
+                customActivities.forEach(dest => {
+                    html += `
+                        <div class="dest-card p-2.5 mb-1.5 rounded-xl bg-indigo-50 hover:bg-white hover:shadow-sm accent-custom"
+                             draggable="true"
+                             ondragstart="dragStart(event, '${dest.id}')"
+                             ondragend="dragEnd(event)"
+                             onclick="showDestinationDetail('${dest.id}')">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <div class="font-medium text-sm text-slate-800 truncate">${dest.name}</div>
+                                    <div class="text-xs text-slate-500">${dest.region}</div>
+                                </div>
+                                ${dest.highlight ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : ''}
+                                <i class="fas fa-user-edit text-indigo-400 text-xs ml-1"></i>
+                            </div>
+                        </div>`;
+                });
+                html += '</div>';
+            }
+
             countries.forEach(({ key, label, color }) => {
                 const countryDests = destinations.filter(d => d.country === key);
 
@@ -1043,22 +1239,22 @@
         function renderDestinationsGrid() {
             const grid = document.getElementById('destinations-grid');
             let html = '';
+            const allDests = getAllDestinations();
 
-            destinations.forEach(dest => {
+            allDests.forEach(dest => {
+                const isCustom = dest.isCustom;
                 const closedClass = dest.closed ? 'dest-closed' : '';
-                const badge = dest.closed
-                    ? '<span class="closed-badge"><i class="fas fa-ban mr-1"></i>Closed</span>'
-                    : (dest.highlight ? '<span class="highlight-badge"><i class="fas fa-star mr-1"></i>Must See</span>' : '');
-
-                const countryColors = {
-                    thailand: { bg: 'amber', text: 'amber' },
-                    cambodia: { bg: 'rose', text: 'rose' },
-                    taiwan: { bg: 'emerald', text: 'emerald' }
-                };
-                const c = countryColors[dest.country];
+                let badge = '';
+                if (dest.closed) {
+                    badge = '<span class="closed-badge"><i class="fas fa-ban mr-1"></i>Closed</span>';
+                } else if (isCustom) {
+                    badge = '<span class="custom-badge"><i class="fas fa-user-edit mr-1"></i>Custom</span>';
+                } else if (dest.highlight) {
+                    badge = '<span class="highlight-badge"><i class="fas fa-star mr-1"></i>Must See</span>';
+                }
 
                 html += `
-                    <div class="card card-interactive p-5 ${closedClass}" data-country="${dest.country}" onclick="showDestinationDetail('${dest.id}')">
+                    <div class="card card-interactive p-5 ${closedClass}" data-country="${dest.country}" data-custom="${isCustom || false}" onclick="showDestinationDetail('${dest.id}')">
                         <div class="flex items-start justify-between mb-3">
                             <div>
                                 <h4 class="font-bold text-slate-800">${dest.name}</h4>
@@ -1067,14 +1263,14 @@
                             ${badge}
                         </div>
                         <div class="flex flex-wrap gap-1.5 mb-3">
-                            <span class="badge-${dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>
+                            <span class="badge-${isCustom ? 'custom' : dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>
                             <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-lg">${dest.type}</span>
                         </div>
-                        <p class="text-sm text-slate-600 mb-4 line-clamp-2">${dest.desc}</p>
+                        <p class="text-sm text-slate-600 mb-4 line-clamp-2">${dest.desc || 'No description'}</p>
                         <div class="flex items-center justify-between text-sm text-slate-500 pt-3 border-t border-slate-100">
                             <span><i class="far fa-clock mr-1"></i>${dest.days}d</span>
                             <span><i class="fas fa-dollar-sign mr-1"></i>${dest.cost}</span>
-                            <span class="text-xs">${dest.crowds}</span>
+                            <span class="text-xs">${dest.crowds || 'N/A'}</span>
                         </div>
                     </div>`;
             });
@@ -1147,13 +1343,15 @@
             if (dayDests.length === 0) {
                 html = '<p class="text-xs text-slate-400 text-center py-2">Drop here</p>';
             } else {
+                const allDests = getAllDestinations();
                 dayDests.forEach(destId => {
-                    const dest = destinations.find(d => d.id === destId);
+                    const dest = allDests.find(d => d.id === destId);
                     if (dest) {
                         const colors = { thailand: 'amber', cambodia: 'rose', taiwan: 'emerald' };
+                        const color = dest.isCustom ? 'indigo' : colors[dest.country];
                         html += `
-                            <div class="flex items-center gap-2 bg-${colors[dest.country]}-50 rounded-lg px-2 py-1.5 text-xs group">
-                                <span class="w-1.5 h-1.5 rounded-full bg-${colors[dest.country]}-500 flex-shrink-0"></span>
+                            <div class="flex items-center gap-2 bg-${color}-50 rounded-lg px-2 py-1.5 text-xs group">
+                                <span class="w-1.5 h-1.5 rounded-full bg-${color}-500 flex-shrink-0"></span>
                                 <span class="flex-1 truncate font-medium text-slate-700">${dest.name}</span>
                                 <button onclick="removeFromDay('${destId}', ${dayNum}, event)"
                                         class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity">
@@ -1288,18 +1486,20 @@
         function applyAllFilters() {
             const query = document.getElementById('dest-search-full')?.value?.toLowerCase() || '';
             const cards = document.querySelectorAll('#destinations-grid .card');
+            const allDests = getAllDestinations();
             let visibleCount = 0;
 
             cards.forEach(card => {
                 const destId = card.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
-                const dest = destinations.find(d => d.id === destId);
+                const dest = allDests.find(d => d.id === destId);
                 if (!dest) return;
 
                 // Search match
                 const matchesSearch = query === '' || card.textContent.toLowerCase().includes(query);
 
                 // Country match
-                const matchesCountry = currentCountryFilter === 'all' || dest.country === currentCountryFilter;
+                let matchesCountry = currentCountryFilter === 'all' || dest.country === currentCountryFilter;
+                if (currentCountryFilter === 'custom') matchesCountry = dest.isCustom === true;
 
                 // Duration match
                 let matchesDuration = true;
@@ -1342,7 +1542,7 @@
             if (hasActiveFilters) {
                 summary.classList.remove('hidden');
                 document.getElementById('visible-count').textContent = visibleCount;
-                document.getElementById('total-count').textContent = destinations.length;
+                document.getElementById('total-count').textContent = allDests.length;
             } else {
                 summary.classList.add('hidden');
             }
@@ -1400,19 +1600,31 @@
 
         // Destination detail modal
         function showDestinationDetail(destId) {
-            const dest = destinations.find(d => d.id === destId);
+            const allDests = getAllDestinations();
+            const dest = allDests.find(d => d.id === destId);
             if (!dest) return;
 
-            const colors = { thailand: 'amber', cambodia: 'rose', taiwan: 'emerald' };
-            const c = colors[dest.country];
+            const colors = { thailand: 'amber', cambodia: 'rose', taiwan: 'emerald', custom: 'indigo' };
+            const c = dest.isCustom ? 'indigo' : colors[dest.country];
             const modal = document.getElementById('modal');
             const content = document.getElementById('modal-content');
+
+            const customButtons = dest.isCustom ? `
+                <div class="flex gap-2 mb-4">
+                    <button onclick="showCreateCustomModal('${dest.id}')" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-sm font-medium transition-colors">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button onclick="deleteCustomActivity('${dest.id}')" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium transition-colors">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            ` : '';
 
             content.innerHTML = `
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
-                            <span class="badge-${dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>
+                            ${dest.isCustom ? '<span class="custom-badge">Custom</span>' : `<span class="badge-${dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>`}
                             <span class="text-xs text-slate-500">${dest.region}</span>
                         </div>
                         <h2 class="text-xl font-bold text-slate-800">${dest.name}</h2>
@@ -1421,6 +1633,8 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
+
+                ${customButtons}
 
                 ${dest.closed ? '<div class="bg-red-100 border border-red-200 rounded-xl p-3 mb-4 text-sm text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Currently Closed</strong> - Not recommended for this trip</div>' : ''}
 
@@ -1441,11 +1655,11 @@
                     </div>
                 </div>
 
-                <div class="bg-amber-50 rounded-xl p-4 mb-5">
-                    <div class="flex items-center gap-2 text-amber-800 font-semibold text-sm mb-1">
+                <div class="bg-${dest.isCustom ? 'indigo' : 'amber'}-50 rounded-xl p-4 mb-5">
+                    <div class="flex items-center gap-2 text-${dest.isCustom ? 'indigo' : 'amber'}-800 font-semibold text-sm mb-1">
                         <i class="fas fa-lightbulb"></i> Tips
                     </div>
-                    <p class="text-sm text-amber-700">${dest.tips}</p>
+                    <p class="text-sm text-${dest.isCustom ? 'indigo' : 'amber'}-700">${dest.tips}</p>
                 </div>
 
                 <div class="flex gap-3">
@@ -1506,6 +1720,102 @@
                 touchDragId = null;
             }
         }, { passive: true });
+
+        // Custom Activity Modal Functions
+        function showCreateCustomModal(editId = null) {
+            const modal = document.getElementById('custom-modal');
+            const form = document.getElementById('custom-form');
+            const title = document.getElementById('custom-modal-title');
+
+            if (editId) {
+                const activity = customActivities.find(a => a.id === editId);
+                if (activity) {
+                    title.textContent = 'Edit Custom Activity';
+                    form.dataset.editId = editId;
+                    document.getElementById('custom-name').value = activity.name;
+                    document.getElementById('custom-country').value = activity.country;
+                    document.getElementById('custom-region').value = activity.region;
+                    document.getElementById('custom-type').value = activity.type;
+                    document.getElementById('custom-duration').value = activity.days;
+                    document.getElementById('custom-cost').value = activity.cost;
+                    document.getElementById('custom-crowds').value = activity.crowds;
+                    document.getElementById('custom-desc').value = activity.desc;
+                    document.getElementById('custom-tips').value = activity.tips;
+                    document.getElementById('custom-highlight').checked = activity.highlight || false;
+                }
+            } else {
+                title.textContent = 'Create Custom Activity';
+                form.reset();
+                delete form.dataset.editId;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCustomModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveCustomActivity(event) {
+            event.preventDefault();
+            const form = document.getElementById('custom-form');
+            const editId = form.dataset.editId;
+
+            const activityData = {
+                id: editId || 'custom-' + Date.now(),
+                name: document.getElementById('custom-name').value,
+                country: document.getElementById('custom-country').value,
+                region: document.getElementById('custom-region').value,
+                type: document.getElementById('custom-type').value,
+                days: parseFloat(document.getElementById('custom-duration').value),
+                cost: parseInt(document.getElementById('custom-cost').value) || 0,
+                crowds: document.getElementById('custom-crowds').value,
+                desc: document.getElementById('custom-desc').value,
+                tips: document.getElementById('custom-tips').value || 'Custom activity added by user',
+                highlight: document.getElementById('custom-highlight').checked,
+                isCustom: true
+            };
+
+            if (editId) {
+                const index = customActivities.findIndex(a => a.id === editId);
+                if (index !== -1) customActivities[index] = activityData;
+            } else {
+                customActivities.push(activityData);
+            }
+
+            localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
+            closeCustomModal();
+            renderDestinationList();
+            if (currentTab === 'explore') renderDestinationsGrid();
+            updateDestCount();
+        }
+
+        function deleteCustomActivity(activityId) {
+            if (!confirm('Delete this custom activity? This cannot be undone.')) return;
+
+            customActivities = customActivities.filter(a => a.id !== activityId);
+            localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
+
+            // Remove from itinerary
+            Object.keys(itinerary).forEach(day => {
+                itinerary[day] = itinerary[day].filter(id => id !== activityId);
+            });
+            saveItinerary();
+
+            closeModal();
+            renderDestinationList();
+            if (currentTab === 'explore') renderDestinationsGrid();
+            if (currentTab === 'itinerary') renderItinerary();
+            updateDestCount();
+        }
+
+        // Close custom modal on background click
+        document.getElementById('custom-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'custom-modal') closeCustomModal();
+        });
     </script>
 </body>
 </html>
