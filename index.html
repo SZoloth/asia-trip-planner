@@ -1042,6 +1042,7 @@
         let customActivitiesListener = null;
         let isSyncingItinerary = false;
         let isSyncingCustom = false;
+        let isInitialLoad = true; // Skip first listener fire after join
         let membersListener = null;
 
         // Destination Data
@@ -2178,29 +2179,37 @@
 
             // Listen for itinerary changes
             itineraryListener = roomRef.child('itinerary').on('value', (snapshot) => {
-                // Skip if we're the one who just synced (prevents echo)
-                if (isSyncingItinerary) return;
+                // Skip initial fire (we already loaded data in joinRoom)
+                // and skip if we're the one who just synced (prevents echo)
+                if (isInitialLoad || isSyncingItinerary) {
+                    console.log('Skipping itinerary update (initial or self-sync)');
+                    return;
+                }
 
                 const remoteItinerary = snapshot.val() || {};
 
                 if (JSON.stringify(remoteItinerary) !== JSON.stringify(itinerary)) {
-                    console.log('Received remote itinerary update');
+                    console.log('Received remote itinerary update from collaborator');
                     itinerary = remoteItinerary;
                     localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
                     renderCalendar();
                     updateBudget();
+                    showToast('Itinerary updated by collaborator', 'info');
                 }
             });
 
             // Listen for custom activities changes
             customActivitiesListener = roomRef.child('customActivities').on('value', (snapshot) => {
-                // Skip if we're the one who just synced (prevents echo)
-                if (isSyncingCustom) return;
+                // Skip initial fire and self-syncs
+                if (isInitialLoad || isSyncingCustom) {
+                    console.log('Skipping custom activities update (initial or self-sync)');
+                    return;
+                }
 
                 const remoteCustom = snapshot.val() || [];
 
                 if (JSON.stringify(remoteCustom) !== JSON.stringify(customActivities)) {
-                    console.log('Received remote custom activities update');
+                    console.log('Received remote custom activities update from collaborator');
                     customActivities = remoteCustom;
                     localStorage.setItem('asiaCustomActivities', JSON.stringify(customActivities));
                     renderDestinationList();
@@ -2208,6 +2217,12 @@
                     updateDestCount();
                 }
             });
+
+            // Clear initial load flag after listeners have fired once
+            setTimeout(() => {
+                isInitialLoad = false;
+                console.log('Initial load complete, now listening for collaborator updates');
+            }, 1000);
 
             // Listen for member changes
             membersListener = roomRef.child('members').on('value', (snapshot) => {
@@ -2229,6 +2244,7 @@
             isCollaborating = false;
             currentRoomCode = null;
             roomRef = null;
+            isInitialLoad = true; // Reset for next join
 
             const url = new URL(window.location);
             url.searchParams.delete('room');
