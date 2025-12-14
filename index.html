@@ -109,6 +109,55 @@
             50% { border-color: #a855f7; box-shadow: 0 0 16px 2px rgba(192,132,252,0.2); }
         }
 
+        /* Flight pills */
+        .flight-pill {
+            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+            border: 1px solid #7dd3fc;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #0369a1;
+        }
+        .flight-departure { border-left: 3px solid #0284c7; }
+        .flight-arrival { border-left: 3px solid #0ea5e9; }
+
+        /* Hotel banners */
+        .hotel-banner-container {
+            position: relative;
+            margin-bottom: 8px;
+            min-height: 32px;
+        }
+        .hotel-banner {
+            position: absolute;
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            border: 1px solid #c4b5fd;
+            border-radius: 8px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: #5b21b6;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .hotel-banner:hover {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            cursor: pointer;
+        }
+
+        /* Day background colors by country */
+        .day-thailand { background: #fffbeb !important; }
+        .day-cambodia { background: #fff1f2 !important; }
+        .day-taiwan { background: #ecfdf5 !important; }
+        .day-mixed { background: #f8fafc !important; }
+
         /* Tab indicators */
         .tab-active { color: #0ea5e9; }
         .tab-active::after {
@@ -256,10 +305,27 @@
                         </div>
 
                         <!-- Add Custom Button -->
-                        <button onclick="showCreateCustomModal()" class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-sm transition-colors border-2 border-dashed border-indigo-200 hover:border-indigo-300">
+                        <button onclick="showCreateCustomModal()" class="w-full mb-3 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-sm transition-colors border-2 border-dashed border-indigo-200 hover:border-indigo-300">
                             <i class="fas fa-plus"></i>
                             Add Custom Activity
                         </button>
+
+                        <!-- Logistics Buttons -->
+                        <div class="flex gap-2 mb-4">
+                            <button onclick="showFlightModal()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium text-sm transition-colors border border-sky-200">
+                                <i class="fas fa-plane"></i>
+                                Flight
+                            </button>
+                            <button onclick="showHotelModal()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 font-medium text-sm transition-colors border border-violet-200">
+                                <i class="fas fa-hotel"></i>
+                                Hotel
+                            </button>
+                        </div>
+
+                        <!-- Logistics List -->
+                        <div id="logistics-list" class="mb-4 space-y-2">
+                            <!-- Populated by JS -->
+                        </div>
 
                         <div class="relative mb-4">
                             <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
@@ -287,6 +353,11 @@
                                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-rose-400"></span>Cambodia</span>
                                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-emerald-400"></span>Taiwan</span>
                             </div>
+                        </div>
+
+                        <!-- Hotel Banners -->
+                        <div id="hotel-banners" class="mb-4">
+                            <!-- Populated by JS -->
                         </div>
 
                         <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-5 gap-3" id="calendar-grid">
@@ -1016,6 +1087,164 @@
         </div>
     </div>
 
+    <!-- Flight Modal -->
+    <div id="flight-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-white w-full md:max-w-md md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden slide-up">
+            <div class="p-6 overflow-y-auto max-h-[90vh]">
+                <div class="flex items-start justify-between mb-5">
+                    <div>
+                        <h2 id="flight-modal-title" class="text-xl font-bold text-slate-800">
+                            <i class="fas fa-plane mr-2 text-sky-500"></i>Add Flight
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Add flight details to your itinerary</p>
+                    </div>
+                    <button onclick="closeFlightModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="flight-form" onsubmit="saveFlight(event)" class="space-y-4">
+                    <!-- From / To -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">From *</label>
+                            <input type="text" id="flight-from" required placeholder="LAX"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">To *</label>
+                            <input type="text" id="flight-to" required placeholder="BKK"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Departure Day & Time -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Departure Day *</label>
+                            <select id="flight-departure-day" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Departure Time</label>
+                            <input type="time" id="flight-departure-time"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Arrival Day & Time -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Arrival Day *</label>
+                            <select id="flight-arrival-day" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Arrival Time</label>
+                            <input type="time" id="flight-arrival-time"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Airline & Flight Number -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Airline</label>
+                            <input type="text" id="flight-airline" placeholder="Thai Airways"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Flight #</label>
+                            <input type="text" id="flight-number" placeholder="TG695"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Hidden field for editing -->
+                    <input type="hidden" id="flight-edit-id" value="">
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="closeFlightModal()" class="flex-1 btn-secondary">Cancel</button>
+                        <button type="submit" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-medium py-3 px-6 rounded-xl transition-all">
+                            <i class="fas fa-plane mr-2"></i><span id="flight-submit-text">Add Flight</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hotel Modal -->
+    <div id="hotel-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-end md:items-center justify-center">
+        <div class="bg-white w-full md:max-w-md md:rounded-2xl rounded-t-3xl max-h-[90vh] overflow-hidden slide-up">
+            <div class="p-6 overflow-y-auto max-h-[90vh]">
+                <div class="flex items-start justify-between mb-5">
+                    <div>
+                        <h2 id="hotel-modal-title" class="text-xl font-bold text-slate-800">
+                            <i class="fas fa-hotel mr-2 text-violet-500"></i>Add Hotel
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-1">Add accommodation to your trip</p>
+                    </div>
+                    <button onclick="closeHotelModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="hotel-form" onsubmit="saveHotel(event)" class="space-y-4">
+                    <!-- Hotel Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1.5">Hotel Name *</label>
+                        <input type="text" id="hotel-name" required placeholder="Marriott Bangkok"
+                               class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 focus:bg-white transition-all">
+                    </div>
+
+                    <!-- Location & Country -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">City/Location *</label>
+                            <input type="text" id="hotel-location" required placeholder="Bangkok"
+                                   class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 focus:bg-white transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Country *</label>
+                            <select id="hotel-country" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                                <option value="thailand">Thailand</option>
+                                <option value="cambodia">Cambodia</option>
+                                <option value="taiwan">Taiwan</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Check-in / Check-out -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Check-in Day *</label>
+                            <select id="hotel-checkin" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1.5">Check-out Day *</label>
+                            <select id="hotel-checkout" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500">
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Hidden field for editing -->
+                    <input type="hidden" id="hotel-edit-id" value="">
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 pt-2">
+                        <button type="button" onclick="closeHotelModal()" class="flex-1 btn-secondary">Cancel</button>
+                        <button type="submit" class="flex-1 bg-violet-500 hover:bg-violet-600 text-white font-medium py-3 px-6 rounded-xl transition-all">
+                            <i class="fas fa-hotel mr-2"></i><span id="hotel-submit-text">Add Hotel</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -1040,8 +1269,10 @@
         let isCollaborating = false;
         let itineraryListener = null;
         let customActivitiesListener = null;
+        let logisticsListener = null;
         let isSyncingItinerary = false;
         let isSyncingCustom = false;
+        let isSyncingLogistics = false;
         let isInitialLoad = true; // Skip first listener fire after join
         let membersListener = null;
 
@@ -1203,6 +1434,7 @@
         // Itinerary state
         let itinerary = JSON.parse(localStorage.getItem('asiaItinerary')) || {};
         let customActivities = JSON.parse(localStorage.getItem('asiaCustomActivities')) || [];
+        let logistics = JSON.parse(localStorage.getItem('asiaLogistics')) || [];
         let currentCountryFilter = 'all';
         let currentDurationFilter = 'all';
         let currentCostFilter = 'all';
@@ -1222,6 +1454,8 @@
             loadItinerary();
             updateBudget();
             updateDestCount();
+            renderLogisticsList();
+            renderHotelBanners();
         });
 
         // Tab switching
@@ -1269,6 +1503,102 @@
         }
 
         // Render sidebar destination list
+        // Render logistics list in sidebar
+        function renderLogisticsList() {
+            const container = document.getElementById('logistics-list');
+            if (!container) return;
+
+            const flights = logistics.filter(l => l.type === 'flight');
+            const hotels = logistics.filter(l => l.type === 'hotel');
+
+            if (flights.length === 0 && hotels.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Flights
+            flights.forEach(f => {
+                const dayInfo = tripDays.find(d => d.day === f.departureDate);
+                html += `
+                    <div class="flex items-center justify-between p-2 bg-sky-50 rounded-lg border border-sky-100 group">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <i class="fas fa-plane text-sky-500 text-xs"></i>
+                            <span class="text-sm font-medium text-slate-700 truncate">${f.from} → ${f.to}</span>
+                            <span class="text-xs text-slate-400">Day ${f.departureDate}</span>
+                        </div>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="showFlightModal('${f.id}')" class="p-1 text-slate-400 hover:text-sky-600"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="deleteFlight('${f.id}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Hotels
+            hotels.forEach(h => {
+                const nights = h.checkOut - h.checkIn;
+                html += `
+                    <div class="flex items-center justify-between p-2 bg-violet-50 rounded-lg border border-violet-100 group">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <i class="fas fa-hotel text-violet-500 text-xs"></i>
+                            <span class="text-sm font-medium text-slate-700 truncate">${h.name}</span>
+                            <span class="text-xs text-slate-400">${nights} night${nights > 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="showHotelModal('${h.id}')" class="p-1 text-slate-400 hover:text-violet-600"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="deleteHotel('${h.id}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Render hotel banners above calendar
+        function renderHotelBanners() {
+            const container = document.getElementById('hotel-banners');
+            if (!container) return;
+
+            const hotels = logistics.filter(l => l.type === 'hotel');
+
+            if (hotels.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            // Get the calendar grid to calculate positions
+            const calendarGrid = document.getElementById('calendar-grid');
+            if (!calendarGrid) return;
+
+            let html = '<div class="space-y-2">';
+
+            hotels.forEach(h => {
+                const nights = h.checkOut - h.checkIn;
+                const countryColors = {
+                    thailand: 'from-amber-50 to-orange-50 border-amber-200 text-amber-800',
+                    cambodia: 'from-rose-50 to-pink-50 border-rose-200 text-rose-800',
+                    taiwan: 'from-emerald-50 to-teal-50 border-emerald-200 text-emerald-800'
+                };
+                const colorClass = countryColors[h.country] || 'from-violet-50 to-purple-50 border-violet-200 text-violet-800';
+
+                html += `
+                    <div class="flex items-center gap-3 p-2 rounded-lg bg-gradient-to-r ${colorClass} border cursor-pointer hover:shadow-sm transition-shadow"
+                         onclick="showHotelModal('${h.id}')">
+                        <i class="fas fa-hotel text-sm"></i>
+                        <span class="font-medium text-sm">${h.name}</span>
+                        <span class="text-xs opacity-70">${h.location}</span>
+                        <span class="ml-auto text-xs font-medium">Day ${h.checkIn}-${h.checkOut - 1} (${nights} night${nights > 1 ? 's' : ''})</span>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
         function renderDestinationList() {
             const list = document.getElementById('destination-list');
             const countries = [
@@ -1457,12 +1787,47 @@
             }
         }
 
+        // Get majority country for a day based on activities (not logistics)
+        function getMajorityCountry(dayNum) {
+            const dayDests = itinerary[dayNum] || [];
+            if (dayDests.length === 0) return null;
+
+            const allDests = getAllDestinations();
+            const countryCount = { thailand: 0, cambodia: 0, taiwan: 0 };
+
+            dayDests.forEach(destId => {
+                const dest = allDests.find(d => d.id === destId);
+                if (dest && dest.country && countryCount.hasOwnProperty(dest.country)) {
+                    countryCount[dest.country]++;
+                }
+            });
+
+            // Find majority
+            const sorted = Object.entries(countryCount)
+                .filter(([_, count]) => count > 0)
+                .sort((a, b) => b[1] - a[1]);
+
+            if (sorted.length === 0) return null;
+            if (sorted.length > 1 && sorted[0][1] === sorted[1][1]) return 'mixed'; // Tie
+            return sorted[0][0]; // Return country with most activities
+        }
+
         function updateDaySlotStyle(dayNum) {
             const slot = document.querySelector(`[data-day="${dayNum}"]`);
             if (!slot) return;
+
             const hasDests = itinerary[dayNum] && itinerary[dayNum].length > 0;
             slot.classList.toggle('day-slot-empty', !hasDests);
             slot.classList.toggle('day-slot-filled', hasDests);
+
+            // Remove existing country classes
+            slot.classList.remove('day-thailand', 'day-cambodia', 'day-taiwan', 'day-mixed');
+
+            // Apply majority country background
+            const majorityCountry = getMajorityCountry(dayNum);
+            if (majorityCountry) {
+                slot.classList.add(`day-${majorityCountry}`);
+            }
         }
 
         function renderDayDestinations(dayNum) {
@@ -1472,9 +1837,42 @@
             const dayDests = itinerary[dayNum] || [];
             let html = '';
 
-            if (dayDests.length === 0) {
+            // Render flight pills for this day
+            const dayFlights = logistics.filter(l => l.type === 'flight' && (l.departureDate === dayNum || l.arrivalDate === dayNum));
+            dayFlights.forEach(f => {
+                const isDeparture = f.departureDate === dayNum;
+                const isArrival = f.arrivalDate === dayNum;
+
+                if (isDeparture) {
+                    html += `
+                        <div class="flight-pill flight-departure mb-1">
+                            <i class="fas fa-plane-departure text-[10px]"></i>
+                            <span class="font-medium">${f.from}→${f.to}</span>
+                            <span class="text-sky-500">${f.departureTime}</span>
+                        </div>`;
+                }
+                if (isArrival && f.arrivalDate !== f.departureDate) {
+                    // Only show arrival pill if arriving on a different day
+                    html += `
+                        <div class="flight-pill flight-arrival mb-1">
+                            <i class="fas fa-plane-arrival text-[10px]"></i>
+                            <span class="font-medium">ARR ${f.to}</span>
+                            <span class="text-sky-500">${f.arrivalTime}</span>
+                        </div>`;
+                } else if (isArrival && f.arrivalDate === f.departureDate) {
+                    // Same day arrival - show combined arrival time
+                    html += `
+                        <div class="flight-pill flight-arrival mb-1">
+                            <i class="fas fa-plane-arrival text-[10px]"></i>
+                            <span class="font-medium">ARR ${f.to}</span>
+                            <span class="text-sky-500">${f.arrivalTime}</span>
+                        </div>`;
+                }
+            });
+
+            if (dayDests.length === 0 && dayFlights.length === 0) {
                 html = '<p class="text-xs text-slate-400 text-center py-2">Drop here</p>';
-            } else {
+            } else if (dayDests.length > 0) {
                 const allDests = getAllDestinations();
                 dayDests.forEach(destId => {
                     const dest = allDests.find(d => d.id === destId);
@@ -1506,6 +1904,13 @@
         function saveItinerary() {
             localStorage.setItem('asiaItinerary', JSON.stringify(itinerary));
             syncItinerary(); // Sync to Firebase if collaborating
+        }
+
+        function saveLogistics() {
+            localStorage.setItem('asiaLogistics', JSON.stringify(logistics));
+            syncLogistics(); // Sync to Firebase if collaborating
+            renderHotelBanners();
+            renderCalendar();
         }
 
         function clearItinerary() {
@@ -1892,6 +2297,180 @@
             modal.classList.remove('flex');
         }
 
+        // Flight Modal Functions
+        function populateDaySelects() {
+            const selects = ['flight-departure-day', 'flight-arrival-day', 'hotel-checkin', 'hotel-checkout'];
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    select.innerHTML = tripDays.map(d =>
+                        `<option value="${d.day}">Day ${d.day} (${d.shortDate})</option>`
+                    ).join('');
+                }
+            });
+        }
+
+        function showFlightModal(editId = null) {
+            populateDaySelects();
+            const modal = document.getElementById('flight-modal');
+            const form = document.getElementById('flight-form');
+            const title = document.getElementById('flight-modal-title');
+            const submitText = document.getElementById('flight-submit-text');
+
+            form.reset();
+            document.getElementById('flight-edit-id').value = editId || '';
+
+            if (editId) {
+                const flight = logistics.find(l => l.id === editId);
+                if (flight) {
+                    document.getElementById('flight-from').value = flight.from || '';
+                    document.getElementById('flight-to').value = flight.to || '';
+                    document.getElementById('flight-departure-day').value = flight.departureDate || 1;
+                    document.getElementById('flight-arrival-day').value = flight.arrivalDate || 1;
+                    document.getElementById('flight-departure-time').value = flight.departureTime || '';
+                    document.getElementById('flight-arrival-time').value = flight.arrivalTime || '';
+                    document.getElementById('flight-airline').value = flight.airline || '';
+                    document.getElementById('flight-number').value = flight.flightNumber || '';
+                    title.innerHTML = '<i class="fas fa-plane mr-2 text-sky-500"></i>Edit Flight';
+                    submitText.textContent = 'Update Flight';
+                }
+            } else {
+                title.innerHTML = '<i class="fas fa-plane mr-2 text-sky-500"></i>Add Flight';
+                submitText.textContent = 'Add Flight';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeFlightModal() {
+            const modal = document.getElementById('flight-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveFlight(event) {
+            event.preventDefault();
+
+            const editId = document.getElementById('flight-edit-id').value;
+            const toLocation = document.getElementById('flight-to').value.toUpperCase();
+
+            // Determine country from destination
+            let country = 'thailand';
+            if (['TPE', 'KHH', 'TNN', 'TSA'].includes(toLocation)) country = 'taiwan';
+            else if (['PNH', 'REP'].includes(toLocation)) country = 'cambodia';
+
+            const flight = {
+                id: editId || 'flight-' + Date.now(),
+                type: 'flight',
+                from: document.getElementById('flight-from').value.toUpperCase(),
+                to: toLocation,
+                departureDate: parseInt(document.getElementById('flight-departure-day').value),
+                arrivalDate: parseInt(document.getElementById('flight-arrival-day').value),
+                departureTime: document.getElementById('flight-departure-time').value || '',
+                arrivalTime: document.getElementById('flight-arrival-time').value || '',
+                airline: document.getElementById('flight-airline').value || '',
+                flightNumber: document.getElementById('flight-number').value || '',
+                country: country
+            };
+
+            if (editId) {
+                const idx = logistics.findIndex(l => l.id === editId);
+                if (idx !== -1) logistics[idx] = flight;
+            } else {
+                logistics.push(flight);
+            }
+
+            saveLogistics();
+            closeFlightModal();
+            showToast(editId ? 'Flight updated!' : 'Flight added!', 'success');
+        }
+
+        function deleteFlight(flightId) {
+            if (!confirm('Delete this flight?')) return;
+            logistics = logistics.filter(l => l.id !== flightId);
+            saveLogistics();
+            showToast('Flight deleted', 'info');
+        }
+
+        // Hotel Modal Functions
+        function showHotelModal(editId = null) {
+            populateDaySelects();
+            const modal = document.getElementById('hotel-modal');
+            const form = document.getElementById('hotel-form');
+            const title = document.getElementById('hotel-modal-title');
+            const submitText = document.getElementById('hotel-submit-text');
+
+            form.reset();
+            document.getElementById('hotel-edit-id').value = editId || '';
+
+            if (editId) {
+                const hotel = logistics.find(l => l.id === editId);
+                if (hotel) {
+                    document.getElementById('hotel-name').value = hotel.name || '';
+                    document.getElementById('hotel-location').value = hotel.location || '';
+                    document.getElementById('hotel-country').value = hotel.country || 'thailand';
+                    document.getElementById('hotel-checkin').value = hotel.checkIn || 1;
+                    document.getElementById('hotel-checkout').value = hotel.checkOut || 2;
+                    title.innerHTML = '<i class="fas fa-hotel mr-2 text-violet-500"></i>Edit Hotel';
+                    submitText.textContent = 'Update Hotel';
+                }
+            } else {
+                title.innerHTML = '<i class="fas fa-hotel mr-2 text-violet-500"></i>Add Hotel';
+                submitText.textContent = 'Add Hotel';
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeHotelModal() {
+            const modal = document.getElementById('hotel-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function saveHotel(event) {
+            event.preventDefault();
+
+            const editId = document.getElementById('hotel-edit-id').value;
+            const checkIn = parseInt(document.getElementById('hotel-checkin').value);
+            const checkOut = parseInt(document.getElementById('hotel-checkout').value);
+
+            if (checkOut <= checkIn) {
+                showToast('Check-out must be after check-in', 'warning');
+                return;
+            }
+
+            const hotel = {
+                id: editId || 'hotel-' + Date.now(),
+                type: 'hotel',
+                name: document.getElementById('hotel-name').value,
+                location: document.getElementById('hotel-location').value,
+                country: document.getElementById('hotel-country').value,
+                checkIn: checkIn,
+                checkOut: checkOut
+            };
+
+            if (editId) {
+                const idx = logistics.findIndex(l => l.id === editId);
+                if (idx !== -1) logistics[idx] = hotel;
+            } else {
+                logistics.push(hotel);
+            }
+
+            saveLogistics();
+            closeHotelModal();
+            showToast(editId ? 'Hotel updated!' : 'Hotel added!', 'success');
+        }
+
+        function deleteHotel(hotelId) {
+            if (!confirm('Delete this hotel?')) return;
+            logistics = logistics.filter(l => l.id !== hotelId);
+            saveLogistics();
+            showToast('Hotel deleted', 'info');
+        }
+
         function saveCustomActivity(event) {
             event.preventDefault();
             const form = document.getElementById('custom-form');
@@ -2149,6 +2728,7 @@
             // Sync local data to Firebase (our data is authoritative for this session)
             syncItinerary();
             syncCustomActivities();
+            syncLogistics();
 
             // Update URL
             const url = new URL(window.location);
@@ -2206,6 +2786,25 @@
                 }
             });
 
+            // Listen for logistics changes
+            logisticsListener = roomRef.child('logistics').on('value', (snapshot) => {
+                // Skip initial fire and self-syncs (prevents echo)
+                if (isInitialLoad || isSyncingLogistics) return;
+
+                const remoteLogistics = snapshot.val() || [];
+
+                // Don't let empty remote data overwrite non-empty local data
+                if (remoteLogistics.length === 0 && logistics.length > 0) return;
+
+                if (JSON.stringify(remoteLogistics) !== JSON.stringify(logistics)) {
+                    logistics = remoteLogistics;
+                    localStorage.setItem('asiaLogistics', JSON.stringify(logistics));
+                    renderHotelBanners();
+                    renderCalendar();
+                    showToast('Logistics updated by collaborator', 'info');
+                }
+            });
+
             // Clear initial load flag after listeners have fired once
             setTimeout(() => {
                 isInitialLoad = false;
@@ -2225,6 +2824,7 @@
             if (roomRef) {
                 if (itineraryListener) roomRef.child('itinerary').off('value', itineraryListener);
                 if (customActivitiesListener) roomRef.child('customActivities').off('value', customActivitiesListener);
+                if (logisticsListener) roomRef.child('logistics').off('value', logisticsListener);
                 if (membersListener) roomRef.child('members').off('value', membersListener);
             }
 
@@ -2270,6 +2870,22 @@
                     .catch((error) => {
                         console.error('Sync error:', error);
                         isSyncingCustom = false;
+                    });
+            }
+        }
+
+        // Sync logistics to Firebase
+        function syncLogistics() {
+            if (isCollaborating && roomRef) {
+                isSyncingLogistics = true;
+                roomRef.child('logistics').set(logistics)
+                    .then(() => {
+                        roomRef.child('lastUpdated').set(firebase.database.ServerValue.TIMESTAMP);
+                        setTimeout(() => { isSyncingLogistics = false; }, 1000);
+                    })
+                    .catch((error) => {
+                        console.error('Logistics sync error:', error);
+                        isSyncingLogistics = false;
                     });
             }
         }
