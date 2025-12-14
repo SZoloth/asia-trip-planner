@@ -1904,6 +1904,8 @@
             syncLogistics(); // Sync to Firebase if collaborating
             renderHotelBanners();
             renderCalendar();
+            loadItinerary(); // Re-render day content including flights/hotels
+            renderLogisticsList(); // Update sidebar list
         }
 
         function clearItinerary() {
