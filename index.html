@@ -7,7 +7,7 @@
 
     <!-- PWA Support -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0ea5e9">
+    <meta name="theme-color" content="#FAF8F5">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Asia Trip">
@@ -22,43 +22,102 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+                        sans: ['DM Sans', 'system-ui', 'sans-serif'],
+                        display: ['Cormorant Garamond', 'Georgia', 'serif'],
                     },
                     colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
+                        // Warm editorial palette
+                        paper: {
+                            50: '#FDFCFA',
+                            100: '#FAF8F5',
+                            200: '#F5F0E8',
+                            300: '#EBE4D8',
+                            400: '#D9CFC0',
                         },
-                        thailand: { bg: '#fef3c7', text: '#92400e', border: '#f59e0b' },
-                        cambodia: { bg: '#fee2e2', text: '#991b1b', border: '#ef4444' },
-                        taiwan: { bg: '#d1fae5', text: '#065f46', border: '#10b981' },
+                        ink: {
+                            50: '#F5F4F3',
+                            100: '#E8E6E3',
+                            200: '#C9C5BF',
+                            300: '#A39E96',
+                            400: '#7D776E',
+                            500: '#5C564D',
+                            600: '#3D3833',
+                            700: '#2A2622',
+                            800: '#1A1815',
+                            900: '#0D0C0A',
+                        },
+                        // Sophisticated country colors
+                        thailand: {
+                            bg: '#FDF6E9',
+                            text: '#8B5A2B',
+                            border: '#D4A853',
+                            accent: '#C9953C'
+                        },
+                        cambodia: {
+                            bg: '#FBF0ED',
+                            text: '#8B3A2F',
+                            border: '#B85C38',
+                            accent: '#C4785B'
+                        },
+                        taiwan: {
+                            bg: '#EEF6F3',
+                            text: '#1A5F5E',
+                            border: '#2D6E5E',
+                            accent: '#3A8577'
+                        },
+                        // Accent colors
+                        accent: {
+                            gold: '#C4A35A',
+                            terracotta: '#C4785B',
+                            teal: '#1A5F5E',
+                            sage: '#7D9B84',
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
+        /* ========================================
+           WANDERLUST EDITORIAL - Design System
+           ======================================== */
+
+        :root {
+            --paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            --grain-opacity: 0.03;
+        }
+
         /* Native app polish */
         * {
             -webkit-tap-highlight-color: transparent;
             -webkit-touch-callout: none;
         }
         html {
-            overscroll-behavior: none; /* Prevent pull-to-refresh */
+            overscroll-behavior: none;
         }
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-user-select: none;
             user-select: none;
+            background: #FAF8F5;
+            color: #3D3833;
+            letter-spacing: -0.01em;
+        }
+        /* Paper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: var(--paper-texture);
+            opacity: var(--grain-opacity);
+            pointer-events: none;
+            z-index: 9999;
         }
         /* Allow text selection only in content areas */
         .selectable, input, textarea {
@@ -67,10 +126,10 @@
         }
         /* Buttons & interactive elements */
         button, .card-interactive, .dest-card, [role="button"] {
-            touch-action: manipulation; /* Disable double-tap zoom */
+            touch-action: manipulation;
             cursor: pointer;
         }
-        /* Safe area for notched devices (iPhone X+) */
+        /* Safe area for notched devices */
         body {
             padding-top: env(safe-area-inset-top);
             padding-left: env(safe-area-inset-left);
@@ -79,7 +138,19 @@
         }
         /* Standalone mode tweaks */
         @media (display-mode: standalone) {
-            body { background: #f8fafc; }
+            body { background: #FAF8F5; }
+        }
+
+        /* Typography - Editorial Style */
+        .font-display {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        .font-display-light {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-weight: 400;
+            font-style: italic;
         }
 
         /* Smooth scrolling */
@@ -90,96 +161,155 @@
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .scrollbar-thin::-webkit-scrollbar { width: 4px; height: 4px; }
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-        .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: #D9CFC0; border-radius: 1px; }
 
-        /* Glass morphism */
-        .glass { background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-        .glass-dark { background: rgba(0,0,0,0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        /* Glass morphism - warm tinted */
+        .glass { background: rgba(250,248,245,0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .glass-dark { background: rgba(42,38,34,0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 
-        /* Card styles */
-        .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04); transition: all 0.2s ease; }
-        .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.06); }
+        /* Card styles - Editorial */
+        .card {
+            background: #FDFCFA;
+            border-radius: 4px;
+            border: 1px solid rgba(217,207,192,0.5);
+            box-shadow: 0 1px 2px rgba(61,56,51,0.04), 0 4px 16px rgba(61,56,51,0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+            box-shadow: 0 2px 4px rgba(61,56,51,0.06), 0 8px 24px rgba(61,56,51,0.06);
+            transform: translateY(-1px);
+        }
         .card-interactive { cursor: pointer; }
-        .card-interactive:active { transform: scale(0.98); }
+        .card-interactive:active { transform: scale(0.99) translateY(0); }
 
         /* Destination card drag states */
-        .dest-card { cursor: grab; transition: all 0.15s ease; }
+        .dest-card {
+            cursor: grab;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 4px;
+        }
         .dest-card:active { cursor: grabbing; }
-        .dest-card.dragging { opacity: 0.4; transform: scale(0.95); }
+        .dest-card.dragging { opacity: 0.5; transform: scale(0.97) rotate(-1deg); }
 
         /* Day slot states */
-        .day-slot { transition: all 0.15s ease; }
-        .day-slot.drag-over { background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%); border-color: #818cf8; transform: scale(1.02); }
-        .day-slot-empty { border: 2px dashed #e2e8f0; }
-        .day-slot-filled { border: 2px solid #e2e8f0; background: white; }
+        .day-slot { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px; }
+        .day-slot.drag-over {
+            background: linear-gradient(135deg, #FDF6E9 0%, #EEF6F3 100%);
+            border-color: #C4A35A;
+            transform: scale(1.01);
+            box-shadow: 0 0 0 3px rgba(196,163,90,0.15);
+        }
+        .day-slot-empty { border: 1px dashed #D9CFC0; background: transparent; }
+        .day-slot-filled { border: 1px solid #EBE4D8; background: #FDFCFA; }
 
-        /* Country badges */
-        .badge-thailand { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; }
-        .badge-cambodia { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #991b1b; }
-        .badge-taiwan { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #065f46; }
-        .badge-custom { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4338ca; }
+        /* Country badges - Sophisticated, stamp-like */
+        .badge-thailand {
+            background: #FDF6E9;
+            border: 1px solid #D4A853;
+            color: #8B5A2B;
+            font-weight: 500;
+        }
+        .badge-cambodia {
+            background: #FBF0ED;
+            border: 1px solid #B85C38;
+            color: #8B3A2F;
+            font-weight: 500;
+        }
+        .badge-taiwan {
+            background: #EEF6F3;
+            border: 1px solid #2D6E5E;
+            color: #1A5F5E;
+            font-weight: 500;
+        }
+        .badge-custom {
+            background: #F5F0E8;
+            border: 1px solid #A39E96;
+            color: #5C564D;
+            font-weight: 500;
+        }
 
-        /* Country accents */
-        .accent-thailand { border-left: 3px solid #f59e0b; }
-        .accent-cambodia { border-left: 3px solid #ef4444; }
-        .accent-taiwan { border-left: 3px solid #10b981; }
-        .accent-custom { border-left: 3px solid #6366f1; }
+        /* Country accents - Refined borders */
+        .accent-thailand { border-left: 2px solid #D4A853; }
+        .accent-cambodia { border-left: 2px solid #B85C38; }
+        .accent-taiwan { border-left: 2px solid #2D6E5E; }
+        .accent-custom { border-left: 2px solid #7D776E; }
 
-        /* Custom item badge */
+        /* Custom item badge - Editorial style */
         .custom-badge {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: white; font-size: 10px; font-weight: 700; padding: 4px 8px;
-            border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;
+            background: #3D3833;
+            color: #FAF8F5;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
         }
 
         /* Closed destination styling */
-        .dest-closed { position: relative; opacity: 0.5; }
+        .dest-closed { position: relative; opacity: 0.4; }
         .dest-closed::after {
             content: ''; position: absolute; inset: 0;
-            background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(239,68,68,0.08) 8px, rgba(239,68,68,0.08) 16px);
+            background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(139,58,47,0.06) 6px, rgba(139,58,47,0.06) 12px);
             border-radius: inherit; pointer-events: none;
         }
 
-        /* NYE highlight */
+        /* NYE highlight - Warm gold glow */
         .nye-glow {
-            background: linear-gradient(135deg, #faf5ff, #fdf4ff);
-            border: 2px solid #c084fc;
-            animation: nye-pulse 3s ease-in-out infinite;
+            background: linear-gradient(135deg, #FDFAF3, #FDF6E9);
+            border: 1px solid #C4A35A;
+            animation: nye-pulse 4s ease-in-out infinite;
+            position: relative;
+        }
+        .nye-glow::before {
+            content: '✦';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            color: #C4A35A;
+            animation: sparkle 2s ease-in-out infinite;
         }
         @keyframes nye-pulse {
-            0%, 100% { border-color: #c084fc; box-shadow: 0 0 0 0 rgba(192,132,252,0.4); }
-            50% { border-color: #a855f7; box-shadow: 0 0 16px 2px rgba(192,132,252,0.2); }
+            0%, 100% { border-color: #C4A35A; box-shadow: 0 0 0 0 rgba(196,163,90,0.2); }
+            50% { border-color: #D4A853; box-shadow: 0 0 20px 2px rgba(196,163,90,0.12); }
+        }
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
         }
 
-        /* Flight pills */
+        /* Flight pills - Editorial style */
         .flight-pill {
-            background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-            border: 1px solid #7dd3fc;
-            border-radius: 6px;
-            padding: 4px 8px;
+            background: #F5F0E8;
+            border: 1px solid #D9CFC0;
+            border-radius: 2px;
+            padding: 4px 10px;
             font-size: 11px;
             display: flex;
             align-items: center;
-            gap: 4px;
-            color: #0369a1;
+            gap: 6px;
+            color: #5C564D;
+            font-weight: 500;
+            letter-spacing: 0.02em;
         }
-        .flight-departure { border-left: 3px solid #0284c7; }
-        .flight-arrival { border-left: 3px solid #0ea5e9; }
+        .flight-departure { border-left: 2px solid #C4A35A; }
+        .flight-arrival { border-left: 2px solid #7D9B84; }
 
-        /* Hotel banners */
+        /* Hotel banners - Refined */
         .hotel-banner-container {
             position: relative;
             margin-bottom: 8px;
-            min-height: 32px;
+            min-height: 28px;
         }
         .hotel-banner {
             position: absolute;
-            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
-            border: 1px solid #c4b5fd;
-            border-radius: 8px;
+            background: #FDFCFA;
+            border: 1px solid #EBE4D8;
+            border-radius: 2px;
             padding: 4px 12px;
-            font-size: 12px;
-            color: #5b21b6;
+            font-size: 11px;
+            color: #5C564D;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -187,40 +317,60 @@
             overflow: hidden;
             text-overflow: ellipsis;
             z-index: 10;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(61,56,51,0.06);
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
         .hotel-banner:hover {
-            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            background: #F5F0E8;
+            border-color: #D9CFC0;
             cursor: pointer;
         }
 
-        /* Day background colors by country */
-        .day-thailand { background: #fffbeb !important; }
-        .day-cambodia { background: #fff1f2 !important; }
-        .day-taiwan { background: #ecfdf5 !important; }
+        /* Day background colors by country - Warmer tones */
+        .day-thailand { background: #FDFAF3 !important; }
+        .day-cambodia { background: #FCF5F3 !important; }
+        .day-taiwan { background: #F5FAF8 !important; }
         .day-mixed { background: #f8fafc !important; }
 
-        /* Tab indicators */
-        .tab-active { color: #0ea5e9; }
+        /* Tab indicators - Editorial underline */
+        .tab-active { color: #3D3833; }
         .tab-active::after {
-            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 24px; height: 3px; background: #0ea5e9; border-radius: 3px 3px 0 0;
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+            height: 2px; background: #3D3833;
         }
 
-        /* Button styles */
+        /* Button styles - Refined editorial */
         .btn-primary {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: white; font-weight: 600; padding: 10px 20px; border-radius: 12px;
-            transition: all 0.15s ease; box-shadow: 0 2px 8px rgba(14,165,233,0.3);
+            background: #3D3833;
+            color: #FAF8F5;
+            font-weight: 500;
+            padding: 10px 24px;
+            border-radius: 2px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: none;
+            letter-spacing: 0.02em;
         }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14,165,233,0.4); }
+        .btn-primary:hover {
+            background: #2A2622;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(61,56,51,0.15);
+        }
         .btn-primary:active { transform: translateY(0); }
 
         .btn-secondary {
-            background: #f1f5f9; color: #475569; font-weight: 500; padding: 10px 20px; border-radius: 12px;
-            transition: all 0.15s ease;
+            background: transparent;
+            border: 1px solid #D9CFC0;
+            color: #5C564D;
+            font-weight: 500;
+            padding: 10px 24px;
+            border-radius: 2px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-secondary:hover {
+            background: #F5F0E8;
+            border-color: #A39E96;
+        }
 
         /* Highlight badge */
         .highlight-badge {
@@ -244,86 +394,125 @@
         }
 
         /* Animations */
-        .fade-in { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        /* Elegant entrance animations */
+        .fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        .slide-up { animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+        .slide-up {
+            animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(100%); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Empty state */
+        /* Staggered reveal for cards */
+        .stagger-1 { animation-delay: 0.05s; }
+        .stagger-2 { animation-delay: 0.1s; }
+        .stagger-3 { animation-delay: 0.15s; }
+        .stagger-4 { animation-delay: 0.2s; }
+        .stagger-5 { animation-delay: 0.25s; }
+
+        /* Elegant hover lift */
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(61,56,51,0.08);
+        }
+
+        /* Empty state - Editorial */
         .empty-state {
-            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-            border: 2px dashed #e2e8f0; border-radius: 12px;
+            background: linear-gradient(135deg, #FAF8F5, #F5F0E8);
+            border: 1px dashed #D9CFC0;
+            border-radius: 4px;
+        }
+
+        /* Toast notifications - Editorial style */
+        .toast-editorial {
+            background: #3D3833;
+            color: #FAF8F5;
+            border-radius: 2px;
+            font-size: 13px;
+            letter-spacing: 0.01em;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-20 md:pb-0">
-    <!-- Header -->
-    <header class="bg-white border-b border-slate-100 sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4">
+<body class="bg-paper-100 min-h-screen pb-20 md:pb-0">
+    <!-- Header - Editorial Magazine Style -->
+    <header class="bg-paper-50 border-b border-paper-300 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 md:py-5">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-400 to-violet-500 flex items-center justify-center text-white">
-                        <i class="fas fa-plane text-sm"></i>
+                <!-- Logo & Title - Magazine masthead feel -->
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex w-12 h-12 rounded-none bg-ink-700 items-center justify-center text-paper-50 relative overflow-hidden">
+                        <i class="fas fa-plane-departure text-sm transform -rotate-12"></i>
+                        <div class="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-slate-800">Asia 2025</h1>
-                        <p class="text-xs text-slate-500">Sam & Carter</p>
+                        <h1 class="font-display text-2xl md:text-3xl text-ink-700 tracking-tight">Asia 2025</h1>
+                        <p class="text-xs text-ink-400 tracking-widest uppercase mt-0.5">Sam & Carter</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2 text-sm bg-slate-100 rounded-full px-4 py-2">
-                        <i class="fas fa-calendar-alt text-slate-400"></i>
-                        <span class="font-medium text-slate-700">Dec 28 - Jan 16</span>
+                <!-- Right side controls -->
+                <div class="flex items-center gap-3 md:gap-4">
+                    <!-- Date range - Editorial label style -->
+                    <div class="hidden sm:flex items-center gap-2 text-xs text-ink-400 border border-paper-300 px-3 py-1.5">
+                        <span class="font-medium text-ink-600 tracking-wide">Dec 28 — Jan 16</span>
                     </div>
-                    <div class="flex items-center gap-2 bg-emerald-50 rounded-full px-4 py-2">
-                        <span class="text-sm font-semibold text-emerald-700" id="budget-header">$0</span>
+                    <!-- Budget - Refined pill -->
+                    <div class="flex items-center gap-2 bg-taiwan-bg border border-taiwan-border px-3 py-1.5">
+                        <span class="text-sm font-semibold text-taiwan-text" id="budget-header">$0</span>
                     </div>
-                    <!-- Export Buttons -->
-                    <div class="hidden sm:flex items-center gap-1">
-                        <button onclick="exportCSV()" class="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors" title="Export as CSV">
-                            <i class="fas fa-file-csv"></i>
-                            <span>CSV</span>
+                    <!-- Export Buttons - Minimal icons -->
+                    <div class="hidden md:flex items-center gap-1">
+                        <button onclick="exportCSV()" class="p-2 text-ink-400 hover:text-ink-600 hover:bg-paper-200 transition-colors" title="Export as CSV">
+                            <i class="fas fa-file-csv text-sm"></i>
                         </button>
-                        <button onclick="exportICS()" class="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full transition-colors" title="Export to Calendar">
-                            <i class="fas fa-calendar-plus"></i>
-                            <span>Cal</span>
+                        <button onclick="exportICS()" class="p-2 text-ink-400 hover:text-ink-600 hover:bg-paper-200 transition-colors" title="Export to Calendar">
+                            <i class="fas fa-calendar-plus text-sm"></i>
                         </button>
                     </div>
                     <!-- Network Status -->
-                    <div id="network-status" class="hidden items-center gap-2 bg-amber-50 rounded-full px-3 py-2">
-                        <i class="fas fa-bolt text-amber-600 text-xs"></i>
-                        <span class="text-xs font-medium text-amber-700">Offline</span>
+                    <div id="network-status" class="hidden items-center gap-2 bg-thailand-bg border border-thailand-border px-3 py-1.5">
+                        <i class="fas fa-bolt text-thailand-text text-xs"></i>
+                        <span class="text-xs font-medium text-thailand-text">Offline</span>
                     </div>
                     <!-- Sync Status -->
-                    <div id="sync-status" class="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 cursor-help" title="Last synced with cloud">
-                        <i class="fas fa-cloud"></i>
+                    <div id="sync-status" class="hidden sm:flex items-center gap-1.5 text-xs text-ink-300 cursor-help" title="Last synced with cloud">
+                        <i class="fas fa-cloud text-[10px]"></i>
                         <span id="sync-time">Synced</span>
                     </div>
                     <!-- Collaboration Status -->
-                    <div id="collab-status" class="hidden flex items-center gap-2 bg-purple-50 rounded-full px-4 py-2 cursor-pointer hover:bg-purple-100 transition-colors" onclick="showCollabModal()">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
-                        <span class="text-sm font-medium text-purple-700" id="collab-room-code">Room: ------</span>
+                    <div id="collab-status" class="hidden flex items-center gap-2 bg-paper-200 border border-paper-400 px-3 py-1.5 cursor-pointer hover:bg-paper-300 transition-colors" onclick="showCollabModal()">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent-teal animate-pulse"></span>
+                        <span class="text-xs font-medium text-ink-500" id="collab-room-code">Room: ------</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Desktop Navigation -->
-        <nav class="hidden md:block border-t border-slate-100">
+        <!-- Desktop Navigation - Magazine section tabs -->
+        <nav class="hidden md:block border-t border-paper-200">
             <div class="max-w-6xl mx-auto px-4">
-                <div class="flex gap-1">
-                    <button onclick="showTab('planner')" id="tab-planner" class="relative px-5 py-3 font-medium text-sm tab-active transition-colors">
-                        <i class="fas fa-map-marked-alt mr-2"></i>Planner
+                <div class="flex gap-0">
+                    <button onclick="showTab('planner')" id="tab-planner" class="relative px-6 py-3.5 text-sm tracking-wide tab-active transition-colors">
+                        Planner
                     </button>
-                    <button onclick="showTab('destinations')" id="tab-destinations" class="relative px-5 py-3 font-medium text-sm text-slate-500 hover:text-slate-700 transition-colors">
-                        <i class="fas fa-compass mr-2"></i>Explore
+                    <button onclick="showTab('destinations')" id="tab-destinations" class="relative px-6 py-3.5 text-sm text-ink-400 hover:text-ink-600 tracking-wide transition-colors">
+                        Explore
                     </button>
-                    <button onclick="showTab('decisions')" id="tab-decisions" class="relative px-5 py-3 font-medium text-sm text-slate-500 hover:text-slate-700 transition-colors">
-                        <i class="fas fa-lightbulb mr-2"></i>Decisions
+                    <button onclick="showTab('decisions')" id="tab-decisions" class="relative px-6 py-3.5 text-sm text-ink-400 hover:text-ink-600 tracking-wide transition-colors">
+                        Decisions
                     </button>
-                    <button onclick="showTab('logistics')" id="tab-logistics" class="relative px-5 py-3 font-medium text-sm text-slate-500 hover:text-slate-700 transition-colors">
-                        <i class="fas fa-info-circle mr-2"></i>Info
+                    <button onclick="showTab('logistics')" id="tab-logistics" class="relative px-6 py-3.5 text-sm text-ink-400 hover:text-ink-600 tracking-wide transition-colors">
+                        Info
                     </button>
                 </div>
             </div>
@@ -331,55 +520,55 @@
     </header>
 
     <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-4 py-6">
+    <main class="max-w-6xl mx-auto px-4 py-8">
         <!-- Planner Tab -->
         <div id="content-planner" class="fade-in">
-            <!-- Quick Templates -->
-            <div class="mb-6">
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Quick Start</h2>
-                    <button onclick="clearItinerary()" class="text-sm text-slate-400 hover:text-red-500 transition-colors">
-                        <i class="fas fa-eraser mr-1"></i>Clear all
+            <!-- Quick Templates - Editorial section -->
+            <div class="mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xs font-medium text-ink-400 uppercase tracking-[0.15em]">Quick Start</h2>
+                    <button onclick="clearItinerary()" class="text-xs text-ink-300 hover:text-cambodia-text transition-colors">
+                        Clear all
                     </button>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="loadTemplate('thailand')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium text-sm transition-colors">
-                        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <button onclick="loadTemplate('thailand')" class="inline-flex items-center gap-2 px-4 py-2 bg-thailand-bg border border-thailand-border hover:border-thailand-accent text-thailand-text font-medium text-sm transition-all hover:shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-thailand-border"></span>
                         Thailand Only
                     </button>
-                    <button onclick="loadTemplate('thailand-cambodia')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium text-sm transition-colors">
-                        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                    <button onclick="loadTemplate('thailand-cambodia')" class="inline-flex items-center gap-2 px-4 py-2 bg-cambodia-bg border border-cambodia-border hover:border-cambodia-accent text-cambodia-text font-medium text-sm transition-all hover:shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cambodia-border"></span>
                         + Cambodia
                     </button>
-                    <button onclick="loadTemplate('all')" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium text-sm transition-colors">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <button onclick="loadTemplate('all')" class="inline-flex items-center gap-2 px-4 py-2 bg-taiwan-bg border border-taiwan-border hover:border-taiwan-accent text-taiwan-text font-medium text-sm transition-all hover:shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-taiwan-border"></span>
                         All Three
                     </button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <!-- Sidebar - Destinations -->
                 <div class="lg:col-span-3">
-                    <div class="card p-4 sticky top-32">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="font-semibold text-slate-800">Destinations</h3>
-                            <span class="text-xs text-slate-400" id="dest-count">0 places</span>
+                    <div class="card p-5 sticky top-32">
+                        <div class="flex items-center justify-between mb-5">
+                            <h3 class="font-display text-lg text-ink-700">Destinations</h3>
+                            <span class="text-xs text-ink-300" id="dest-count">0 places</span>
                         </div>
 
                         <!-- Add Custom Button -->
-                        <button onclick="showCreateCustomModal()" class="w-full mb-3 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-medium text-sm transition-colors border-2 border-dashed border-indigo-200 hover:border-indigo-300">
-                            <i class="fas fa-plus"></i>
+                        <button onclick="showCreateCustomModal()" class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-paper-100 hover:bg-paper-200 text-ink-500 font-medium text-sm transition-colors border border-dashed border-paper-400 hover:border-ink-300">
+                            <i class="fas fa-plus text-xs"></i>
                             Add Custom Activity
                         </button>
 
                         <!-- Logistics Buttons -->
-                        <div class="flex gap-2 mb-4">
-                            <button onclick="showFlightModal()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-medium text-sm transition-colors border border-sky-200">
-                                <i class="fas fa-plane"></i>
+                        <div class="flex gap-2 mb-5">
+                            <button onclick="showFlightModal()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-paper-100 hover:bg-paper-200 text-ink-500 font-medium text-sm transition-colors border border-paper-300">
+                                <i class="fas fa-plane text-xs"></i>
                                 Flight
                             </button>
-                            <button onclick="showHotelModal()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 font-medium text-sm transition-colors border border-violet-200">
+                            <button onclick="showHotelModal()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-paper-100 hover:bg-paper-200 text-ink-500 font-medium text-sm transition-colors border border-paper-300">
                                 <i class="fas fa-hotel"></i>
                                 Hotel
                             </button>
