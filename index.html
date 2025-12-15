@@ -3059,6 +3059,57 @@
 
             inner.appendChild(timeline);
 
+            // Cost breakdown section
+            const costSection = document.createElement('div');
+            costSection.className = 'px-3 py-2 bg-ink-50/50 border-t border-ink-100 text-[11px]';
+
+            const costGrid = document.createElement('div');
+            costGrid.className = 'space-y-1';
+
+            // Add each leg
+            const legs = [
+                { key: 'toKohTao', icon: 'plane', color: 'sky' },
+                { key: 'toBangkok', icon: 'ship', color: 'teal' },
+                { key: 'toTaipei', icon: 'plane-departure', color: 'purple' }
+            ];
+
+            legs.forEach(leg => {
+                const c = result.costs[leg.key];
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between';
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'text-ink-500 flex items-center gap-1.5';
+                const legIcon = document.createElement('i');
+                legIcon.className = 'fas fa-' + leg.icon + ' text-' + leg.color + '-400 w-3';
+                labelSpan.appendChild(legIcon);
+                labelSpan.appendChild(document.createTextNode(c.label));
+                row.appendChild(labelSpan);
+
+                const priceSpan = document.createElement('span');
+                priceSpan.className = 'font-medium text-ink-700';
+                priceSpan.textContent = '$' + c.min + '-' + c.max;
+                row.appendChild(priceSpan);
+
+                costGrid.appendChild(row);
+            });
+
+            // Total row
+            const totalRow = document.createElement('div');
+            totalRow.className = 'flex items-center justify-between pt-1 mt-1 border-t border-ink-200 font-semibold';
+            const totalLabel = document.createElement('span');
+            totalLabel.className = 'text-ink-600';
+            totalLabel.textContent = 'Total transport';
+            totalRow.appendChild(totalLabel);
+            const totalPrice = document.createElement('span');
+            totalPrice.className = 'text-ink-800';
+            totalPrice.textContent = '$' + result.costMin + '-' + result.costMax;
+            totalRow.appendChild(totalPrice);
+            costGrid.appendChild(totalRow);
+
+            costSection.appendChild(costGrid);
+            inner.appendChild(costSection);
+
             // Footer - only show apply button for presets (not custom)
             if (!preset.isCustom) {
                 const footer = document.createElement('div');
@@ -3199,8 +3250,13 @@
         function generateItinerary(config) {
             const days = [];
             const warnings = [];
-            let costMin = 0;
-            let costMax = 0;
+
+            // Itemized cost tracking
+            const costs = {
+                toKohTao: { min: 0, max: 0, label: 'CNX → Koh Tao' },
+                toBangkok: { min: 50, max: 80, label: 'Koh Tao → BKK' },
+                toTaipei: { min: 0, max: 0, label: 'BKK → Taipei' }
+            };
 
             // Calculate dates based on PADI start
             const padiStartDates = { jan3: 3, jan4: 4, jan5: 5, jan6: 6 };
@@ -3212,12 +3268,13 @@
 
             // Route costs
             const routeCosts = {
-                surat: { min: 62, max: 115, name: 'Via Surat Thani', duration: 'CNX 10:55→KT 3:30' },
-                samui: { min: 100, max: 180, name: 'Via Koh Samui', duration: 'CNX 9:00→KT 2:00' }
+                surat: { min: 62, max: 95, name: 'Via Surat Thani', duration: 'CNX 10:55→KT 3:30' },
+                samui: { min: 140, max: 210, name: 'Via Koh Samui', duration: 'CNX 9:00→KT 2:00' }
             };
             const routeInfo = routeCosts[config.route];
-            costMin += routeInfo.min;
-            costMax += routeInfo.max;
+            costs.toKohTao.min = routeInfo.min;
+            costs.toKohTao.max = routeInfo.max;
+            costs.toKohTao.label = config.route === 'surat' ? 'CNX → Surat → Koh Tao' : 'CNX → Samui → Koh Tao';
 
             // Day 1: Travel to Koh Tao (Jan 2)
             days.push({
@@ -3297,8 +3354,7 @@
 
             // Travel to Bangkok
             const departKohTaoDay = currentDay;
-            costMin += 50; // Return ferry + flight
-            costMax += 100;
+            // costs.toBangkok already set to { min: 50, max: 80 }
 
             days.push({
                 date: 'Jan ' + currentDay,
@@ -3324,7 +3380,8 @@
 
             // BKK overnight or same-day Taipei
             if (config.bkkOvernight) {
-                // BKK → Taipei next day
+                // BKK → Taipei next day (better flight options)
+                costs.toTaipei = { min: 82, max: 150, label: 'BKK → Taipei (AM)' };
                 days.push({
                     date: 'Jan ' + currentDay,
                     dayNum: 7 + currentDay,
@@ -3335,16 +3392,13 @@
                     note: 'Begin ' + config.taiwanDays + ' days in Taiwan',
                     success: 'Morning flight - full day in Taipei'
                 });
-                costMin += 82;
-                costMax += 180;
                 currentDay++;
             } else {
-                // Same-day connection - update previous day
+                // Same-day connection - more expensive, worse timing
+                costs.toTaipei = { min: 120, max: 200, label: 'BKK → Taipei (PM rush)' };
                 const lastDay = days[days.length - 1];
                 lastDay.events.push({ time: '6:00 PM', text: 'Evening flight to Taipei' });
                 lastDay.warning = 'Long travel day - consider overnight in BKK';
-                costMin += 100; // Same-day flights more expensive
-                costMax += 220;
             }
 
             // Taiwan days
@@ -3372,7 +3426,11 @@
                 warnings.push('Total days (' + totalDays + ') exceeds available time');
             }
 
-            return { days, warnings, costMin, costMax };
+            // Calculate totals from breakdown
+            const costMin = costs.toKohTao.min + costs.toBangkok.min + costs.toTaipei.min;
+            const costMax = costs.toKohTao.max + costs.toBangkok.max + costs.toTaipei.max;
+
+            return { days, warnings, costMin, costMax, costs };
         }
 
         function renderGeneratedTimeline(result) {
