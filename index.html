@@ -3294,7 +3294,8 @@
                     { time: '12:00 PM', text: 'Lomprayah catamaran' },
                     { time: '2:00 PM', text: 'Arrive Koh Tao' }
                 ],
-                note: 'Book combo on 12go.asia ~$' + routeInfo.min + '-' + routeInfo.max
+                note: 'Book combo on 12go.asia ~$' + routeInfo.min + '-' + routeInfo.max,
+                warning: config.route === 'surat' ? '⚠️ Tight connection: 15 min to catch ferry. Book 8:40 AM flight if available.' : null
             });
 
             // Buffer days before PADI
