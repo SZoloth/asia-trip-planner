@@ -465,6 +465,20 @@
             animation: swipeHint 1.5s ease-in-out 2;
         }
 
+        /* Scenario comparison scroll */
+        .scenario-scroll {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scroll-snap-align-start {
+            scroll-snap-align: start;
+        }
+        @media (min-width: 768px) {
+            .scenario-scroll {
+                scroll-snap-type: none;
+            }
+        }
+
         /* Mobile destination picker bottom sheet */
         .mobile-picker-sheet {
             position: fixed;
@@ -1269,124 +1283,47 @@
             </div>
         </div>
 
-        <!-- ROUTES TAB - Route Comparison -->
+        <!-- ROUTES TAB - Scenario Comparison -->
         <div id="content-routes" class="hidden fade-in">
-            <div class="mb-8">
-                <h2 class="font-display text-2xl sm:text-3xl text-ink-700 mb-2">Route Planner</h2>
-                <p class="text-ink-400">Compare transport options and choose your path</p>
+            <div class="mb-6">
+                <h2 class="font-display text-2xl sm:text-3xl text-ink-700 mb-2">Itinerary Scenarios</h2>
+                <p class="text-ink-400">Compare how different routing choices affect your Jan 3-9 timeline</p>
             </div>
 
-            <!-- Leg 1: Chiang Mai to Koh Tao -->
-            <div class="mb-8">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 rounded-lg bg-sky-100 flex items-center justify-center">
-                        <i class="fas fa-plane text-sky-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-ink-700">Leg 1: Chiang Mai → Koh Tao</h3>
-                        <p class="text-sm text-ink-400">Jan 3 • Travel day after hill tribe</p>
-                    </div>
+            <!-- Legend -->
+            <div class="flex flex-wrap gap-4 mb-6 text-sm">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-slate-300"></span>
+                    <span class="text-ink-500">Unknown/Gap</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="leg1-options">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                    <span class="text-ink-500">Warning</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                    <span class="text-ink-500">Optimal</span>
+                </div>
+            </div>
+
+            <!-- Scenario Grid - scrollable on mobile -->
+            <div class="overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 scenario-scroll">
+                <div class="flex md:grid md:grid-cols-4 gap-4 min-w-max md:min-w-0" id="scenario-grid">
                     <!-- Rendered by JS -->
                 </div>
             </div>
 
-            <!-- PADI Timing -->
-            <div class="mb-8">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                        <i class="fas fa-water text-emerald-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-ink-700">PADI Timing</h3>
-                        <p class="text-sm text-ink-400">When to start your 3-day dive certification</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="padi-options">
-                    <!-- Rendered by JS -->
-                </div>
-            </div>
-
-            <!-- Leg 2: Koh Tao to Bangkok -->
-            <div class="mb-8">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                        <i class="fas fa-ship text-amber-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-ink-700">Leg 2: Koh Tao → Bangkok</h3>
-                        <p class="text-sm text-ink-400">Jan 8 • Return leg (reverse route)</p>
-                    </div>
-                </div>
-                <div class="card p-5">
-                    <div class="flex items-start gap-4">
-                        <div class="flex-1">
-                            <div class="font-semibold text-ink-700 mb-2">Reverse via Surat Thani</div>
-                            <div class="space-y-2 text-sm text-ink-500">
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-ship text-sky-500 w-5"></i>
-                                    <span>8:00 AM Lomprayah ferry from Koh Tao</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-bus text-amber-500 w-5"></i>
-                                    <span>~10:30 AM arrive Surat Thani pier → airport</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-plane text-sky-500 w-5"></i>
-                                    <span>~12:45 PM Thai AirAsia URT → BKK</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <i class="fas fa-map-marker-alt text-emerald-500 w-5"></i>
-                                    <span>~2:30 PM arrive Bangkok</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-ink-700">$80-100</div>
-                            <div class="text-xs text-ink-400">ferry + flight</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Leg 3: Bangkok to Taipei -->
-            <div class="mb-8">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center">
-                        <i class="fas fa-plane-departure text-teal-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-ink-700">Leg 3: Bangkok → Taipei</h3>
-                        <p class="text-sm text-ink-400">Jan 9 • International flight</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="leg3-options">
-                    <!-- Rendered by JS -->
-                </div>
-            </div>
-
-            <!-- Total Summary -->
-            <div class="card p-6 bg-gradient-to-r from-paper-100 to-paper-50 border-2 border-ink-200">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h3 class="font-bold text-ink-700 text-lg mb-1">Total Transport Estimate</h3>
-                        <p class="text-sm text-ink-400">Based on your selected routes</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-bold text-ink-700" id="total-estimate">$270-360</div>
-                        <div class="text-xs text-ink-400">per person</div>
-                    </div>
-                </div>
-                <div class="mt-4 pt-4 border-t border-ink-100 flex flex-wrap gap-3">
+            <!-- Booking Links -->
+            <div class="mt-6 pt-6 border-t border-ink-100">
+                <div class="flex flex-wrap gap-3">
                     <a href="https://12go.asia" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition-colors">
                         <i class="fas fa-external-link-alt"></i>
                         Book on 12go.asia
                     </a>
-                    <button onclick="exportRoutesToNotes()" class="inline-flex items-center gap-2 px-4 py-2 bg-ink-100 text-ink-600 text-sm font-medium rounded-lg hover:bg-ink-200 transition-colors">
-                        <i class="fas fa-copy"></i>
-                        Copy Summary
-                    </button>
+                    <a href="https://www.lomprayah.com" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-ink-100 text-ink-600 text-sm font-medium rounded-lg hover:bg-ink-200 transition-colors">
+                        <i class="fas fa-ship"></i>
+                        Lomprayah Ferries
+                    </a>
                 </div>
             </div>
         </div>
@@ -2293,6 +2230,119 @@
             leg3: 'airasia'
         };
 
+        // Scenario comparison data (Jan 3-9)
+        const scenarios = [
+            {
+                id: 'carter',
+                name: "Carter's Original",
+                subtitle: 'Baseline with gaps',
+                risk: 'unknown',
+                costMin: null,
+                costMax: null,
+                recommended: false,
+                days: [
+                    { date: 'Jan 3', dayNum: 8, title: '❓ How to get there?', icon: 'question', iconColor: 'slate', events: [], note: 'Route not specified in CSV' },
+                    { date: 'Jan 4', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'PADI certification begins' }], note: null },
+                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
+                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: null },
+                    { date: 'Jan 7', dayNum: 12, title: '❓ Gap day', icon: 'question', iconColor: 'slate', events: [], note: 'Not specified' },
+                    { date: 'Jan 8', dayNum: 13, title: '❓ Gap day', icon: 'question', iconColor: 'slate', events: [], note: 'Not specified' },
+                    { date: 'Jan 9', dayNum: 14, title: '"CJM→DMK→TPE"', icon: 'question', iconColor: 'slate', events: [], warning: 'Confusing - from Koh Tao not CNX?' }
+                ]
+            },
+            {
+                id: 'tight',
+                name: 'Tight Schedule',
+                subtitle: 'No buffer day',
+                risk: 'high',
+                costMin: 270,
+                costMax: 360,
+                recommended: false,
+                days: [
+                    { date: 'Jan 3', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
+                        { time: '10:55 AM', text: 'Depart Chiang Mai' },
+                        { time: '12:45 PM', text: 'Arrive Surat Thani' },
+                        { time: '1:00 PM', text: 'Lomprayah ferry' },
+                        { time: '3:30 PM', text: 'Arrive Koh Tao' }
+                    ], note: 'via Surat Thani' },
+                    { date: 'Jan 4', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'Certification begins' }], warning: 'No buffer if travel delayed!' },
+                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
+                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: 'Get certified!' },
+                    { date: 'Jan 7', dayNum: 12, title: 'Beach + Depart', icon: 'umbrella-beach', iconColor: 'amber', events: [
+                        { time: '8:00 AM', text: 'Lomprayah ferry' },
+                        { time: '12:45 PM', text: 'Fly URT → BKK' }
+                    ], warning: 'Rush to leave' },
+                    { date: 'Jan 8', dayNum: 13, title: '→ BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
+                        { time: 'Evening', text: 'BKK → TPE flight' }
+                    ], warning: 'Same-day connection risk' },
+                    { date: 'Jan 9', dayNum: 14, title: 'In Taipei', icon: 'map-marker-alt', iconColor: 'emerald', events: [], note: 'Arrived previous night' }
+                ]
+            },
+            {
+                id: 'recommended',
+                name: 'Recommended',
+                subtitle: 'Buffer day + BKK overnight',
+                risk: 'low',
+                costMin: 350,
+                costMax: 460,
+                recommended: true,
+                days: [
+                    { date: 'Jan 3', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
+                        { time: '10:55 AM', text: 'Depart Chiang Mai' },
+                        { time: '12:45 PM', text: 'Arrive Surat Thani' },
+                        { time: '1:00 PM', text: 'Lomprayah ferry' },
+                        { time: '3:30 PM', text: 'Arrive Koh Tao' }
+                    ], note: 'via Surat Thani', success: 'Relaxed arrival' },
+                    { date: 'Jan 4', dayNum: 9, title: 'REST DAY', icon: 'umbrella-beach', iconColor: 'emerald', events: [
+                        { time: 'All day', text: 'Explore island, rest up' }
+                    ], success: 'Buffer day - recover from travel' },
+                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'Certification begins' }], success: 'Well-rested start' },
+                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
+                    { date: 'Jan 7', dayNum: 12, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: 'Get certified!' },
+                    { date: 'Jan 8', dayNum: 13, title: 'Beach → Bangkok', icon: 'plane', iconColor: 'amber', events: [
+                        { time: '8:00 AM', text: 'Lomprayah ferry' },
+                        { time: '12:45 PM', text: 'Fly URT → BKK' },
+                        { time: '2:30 PM', text: 'Arrive Bangkok' },
+                        { time: 'Evening', text: 'Bangkok overnight' }
+                    ], success: 'Overnight buffer before Taiwan' },
+                    { date: 'Jan 9', dayNum: 14, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
+                        { time: 'Morning', text: 'BKK → TPE flight' }
+                    ], success: 'Relaxed morning departure' }
+                ]
+            },
+            {
+                id: 'premium',
+                name: 'Premium Fast',
+                subtitle: 'Samui route - fastest',
+                risk: 'low',
+                costMin: 430,
+                costMax: 555,
+                recommended: false,
+                days: [
+                    { date: 'Jan 3', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'purple', events: [
+                        { time: '11:00 AM', text: 'Depart Chiang Mai' },
+                        { time: '12:00 PM', text: 'Arrive Koh Samui' },
+                        { time: '12:30 PM', text: 'Ferry to Koh Tao' },
+                        { time: '2:00 PM', text: 'Arrive Koh Tao' }
+                    ], note: 'via Koh Samui', success: 'Fastest route - extra afternoon' },
+                    { date: 'Jan 4', dayNum: 9, title: 'REST DAY', icon: 'umbrella-beach', iconColor: 'emerald', events: [
+                        { time: 'All day', text: 'Explore island, rest up' }
+                    ], success: 'Buffer day' },
+                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'Certification begins' }], note: null },
+                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
+                    { date: 'Jan 7', dayNum: 12, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: 'Get certified!' },
+                    { date: 'Jan 8', dayNum: 13, title: 'Beach → Bangkok', icon: 'plane', iconColor: 'amber', events: [
+                        { time: '8:00 AM', text: 'Lomprayah ferry' },
+                        { time: '12:45 PM', text: 'Fly URT → BKK' },
+                        { time: 'Evening', text: 'Bangkok overnight' }
+                    ], success: 'Overnight buffer' },
+                    { date: 'Jan 9', dayNum: 14, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
+                        { time: 'Morning', text: 'BKK → TPE flight' }
+                    ], note: null }
+                ]
+            }
+        ];
+
         // Get all destinations (built-in + custom)
         function getAllDestinations() {
             return [...destinations, ...customActivities];
@@ -2573,283 +2623,219 @@
         }
 
         // ========================================
-        // ROUTES TAB RENDERING
+        // SCENARIO COMPARISON RENDERING
         // ========================================
 
         function renderRoutesTab() {
-            renderLeg1Options();
-            renderPadiOptions();
-            renderLeg3Options();
-            updateTotalEstimate();
+            renderScenarioComparison();
         }
 
-        function createRouteCard(route, leg, isSelected) {
-            const card = document.createElement('div');
-            card.className = `card card-interactive p-5 relative cursor-pointer transition-all ${isSelected ? 'ring-2 ring-sky-500 border-sky-300' : ''}`;
-            card.onclick = () => selectRoute(leg, route.id);
+        function renderScenarioComparison() {
+            const grid = document.getElementById('scenario-grid');
+            if (!grid) return;
+            grid.replaceChildren();
 
-            // Recommended badge
-            if (route.recommended) {
-                const badge = document.createElement('span');
-                badge.className = 'absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm';
-                badge.textContent = leg === 'leg3' ? 'BEST VALUE' : 'RECOMMENDED';
-                card.appendChild(badge);
-            }
+            scenarios.forEach(scenario => {
+                const column = createScenarioColumn(scenario);
+                grid.appendChild(column);
+            });
+        }
+
+        function createScenarioColumn(scenario) {
+            const column = document.createElement('div');
+            column.className = 'min-w-[280px] md:min-w-0 scroll-snap-align-start';
+
+            // Card container
+            const card = document.createElement('div');
+            const borderColor = scenario.recommended ? 'border-emerald-300 ring-2 ring-emerald-200' :
+                               scenario.risk === 'high' ? 'border-amber-200' :
+                               scenario.risk === 'unknown' ? 'border-slate-200' : 'border-ink-100';
+            card.className = 'card h-full ' + borderColor;
 
             // Header
             const header = document.createElement('div');
-            header.className = 'flex items-start justify-between mb-3';
+            header.className = 'p-4 border-b border-ink-100';
+
+            const headerTop = document.createElement('div');
+            headerTop.className = 'flex items-start justify-between mb-2';
 
             const titleDiv = document.createElement('div');
-            const title = document.createElement('h4');
+            const title = document.createElement('h3');
             title.className = 'font-bold text-ink-700';
-            title.textContent = route.name;
+            title.textContent = scenario.name;
             titleDiv.appendChild(title);
 
-            if (route.riskLabel) {
-                const riskBadge = document.createElement('span');
-                const riskColor = route.risk === 'medium' ? 'amber' : 'emerald';
-                riskBadge.className = `text-xs bg-${riskColor}-100 text-${riskColor}-700 px-2 py-0.5 rounded mt-1 inline-block`;
-                riskBadge.textContent = route.riskLabel;
-                titleDiv.appendChild(riskBadge);
+            const subtitle = document.createElement('p');
+            subtitle.className = 'text-xs text-ink-400';
+            subtitle.textContent = scenario.subtitle;
+            titleDiv.appendChild(subtitle);
+
+            headerTop.appendChild(titleDiv);
+
+            // Recommended badge
+            if (scenario.recommended) {
+                const badge = document.createElement('span');
+                badge.className = 'bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full';
+                badge.textContent = 'BEST';
+                headerTop.appendChild(badge);
             }
 
-            if (route.typeLabel) {
-                const typeBadge = document.createElement('span');
-                const typeColor = route.type === 'full' ? 'purple' : 'sky';
-                typeBadge.className = `text-xs bg-${typeColor}-100 text-${typeColor}-700 px-2 py-0.5 rounded mt-1 inline-block`;
-                typeBadge.textContent = route.typeLabel;
-                titleDiv.appendChild(typeBadge);
+            header.appendChild(headerTop);
+
+            // Cost and risk row
+            const meta = document.createElement('div');
+            meta.className = 'flex items-center gap-3 text-sm';
+
+            if (scenario.costMin !== null) {
+                const cost = document.createElement('span');
+                cost.className = 'font-semibold text-ink-700';
+                cost.textContent = '$' + scenario.costMin + '-' + scenario.costMax;
+                meta.appendChild(cost);
+            } else {
+                const cost = document.createElement('span');
+                cost.className = 'text-ink-400';
+                cost.textContent = 'Cost: ???';
+                meta.appendChild(cost);
             }
 
-            header.appendChild(titleDiv);
+            const riskBadge = document.createElement('span');
+            const riskColors = {
+                'low': 'bg-emerald-100 text-emerald-700',
+                'high': 'bg-amber-100 text-amber-700',
+                'unknown': 'bg-slate-100 text-slate-600'
+            };
+            const riskLabels = {
+                'low': 'Low Risk',
+                'high': 'High Risk',
+                'unknown': 'Gaps'
+            };
+            riskBadge.className = 'text-xs px-2 py-0.5 rounded ' + (riskColors[scenario.risk] || riskColors.unknown);
+            riskBadge.textContent = riskLabels[scenario.risk] || 'Unknown';
+            meta.appendChild(riskBadge);
 
-            if (isSelected) {
-                const check = document.createElement('i');
-                check.className = 'fas fa-check-circle text-sky-500 text-lg';
-                header.appendChild(check);
-            }
-
+            header.appendChild(meta);
             card.appendChild(header);
 
-            // Duration and cost
-            const stats = document.createElement('div');
-            stats.className = 'flex items-center gap-4 mb-3 text-sm';
+            // Days timeline
+            const timeline = document.createElement('div');
+            timeline.className = 'divide-y divide-ink-50';
 
-            const duration = document.createElement('span');
-            duration.className = 'flex items-center gap-1 text-ink-500';
-            const clockIcon = document.createElement('i');
-            clockIcon.className = 'fas fa-clock text-ink-300';
-            duration.appendChild(clockIcon);
-            duration.appendChild(document.createTextNode(' ' + route.duration));
-            stats.appendChild(duration);
+            scenario.days.forEach(day => {
+                const dayRow = createDayRow(day);
+                timeline.appendChild(dayRow);
+            });
 
-            const cost = document.createElement('span');
-            cost.className = 'font-semibold text-ink-700';
-            cost.textContent = `$${route.costMin}-${route.costMax}`;
-            stats.appendChild(cost);
+            card.appendChild(timeline);
+            column.appendChild(card);
 
-            card.appendChild(stats);
+            return column;
+        }
 
-            // Steps (for leg1)
-            if (route.steps) {
-                const stepsDiv = document.createElement('div');
-                stepsDiv.className = 'space-y-1.5 text-xs text-ink-500 mb-3';
-                route.steps.forEach(step => {
-                    const stepRow = document.createElement('div');
-                    stepRow.className = 'flex items-center gap-2';
-                    const icon = document.createElement('i');
-                    icon.className = `fas fa-${step.icon} text-${step.color}-500 w-4`;
-                    stepRow.appendChild(icon);
+        function createDayRow(day) {
+            const row = document.createElement('div');
+            row.className = 'p-3';
+
+            // Date and title row
+            const headerRow = document.createElement('div');
+            headerRow.className = 'flex items-start gap-2 mb-1';
+
+            // Icon
+            const iconWrapper = document.createElement('div');
+            const iconColors = {
+                'sky': 'bg-sky-100 text-sky-600',
+                'emerald': 'bg-emerald-100 text-emerald-600',
+                'amber': 'bg-amber-100 text-amber-600',
+                'teal': 'bg-teal-100 text-teal-600',
+                'purple': 'bg-purple-100 text-purple-600',
+                'slate': 'bg-slate-100 text-slate-500'
+            };
+            iconWrapper.className = 'w-6 h-6 rounded flex items-center justify-center flex-shrink-0 ' + (iconColors[day.iconColor] || iconColors.slate);
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-' + day.icon + ' text-xs';
+            iconWrapper.appendChild(icon);
+            headerRow.appendChild(iconWrapper);
+
+            // Date and title
+            const textDiv = document.createElement('div');
+            textDiv.className = 'flex-1 min-w-0';
+
+            const dateTitle = document.createElement('div');
+            dateTitle.className = 'flex items-baseline gap-2';
+
+            const dateSpan = document.createElement('span');
+            dateSpan.className = 'text-xs font-bold text-ink-400';
+            dateSpan.textContent = day.date;
+            dateTitle.appendChild(dateSpan);
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'text-sm font-medium text-ink-700 truncate';
+            titleSpan.textContent = day.title;
+            dateTitle.appendChild(titleSpan);
+
+            textDiv.appendChild(dateTitle);
+            headerRow.appendChild(textDiv);
+
+            row.appendChild(headerRow);
+
+            // Events
+            if (day.events && day.events.length > 0) {
+                const eventsDiv = document.createElement('div');
+                eventsDiv.className = 'ml-8 space-y-0.5';
+
+                day.events.forEach(event => {
+                    const eventRow = document.createElement('div');
+                    eventRow.className = 'text-xs text-ink-500 flex items-center gap-2';
+
+                    const time = document.createElement('span');
+                    time.className = 'text-ink-400 w-16 flex-shrink-0';
+                    time.textContent = event.time;
+                    eventRow.appendChild(time);
+
                     const text = document.createElement('span');
-                    text.textContent = step.text;
-                    stepRow.appendChild(text);
-                    stepsDiv.appendChild(stepRow);
+                    text.textContent = event.text;
+                    eventRow.appendChild(text);
+
+                    eventsDiv.appendChild(eventRow);
                 });
-                card.appendChild(stepsDiv);
+
+                row.appendChild(eventsDiv);
             }
 
-            // Pros and cons
-            if (route.pros || route.cons) {
-                const tagsDiv = document.createElement('div');
-                tagsDiv.className = 'flex flex-wrap gap-1';
-
-                (route.pros || []).forEach(pro => {
-                    const tag = document.createElement('span');
-                    tag.className = 'text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded';
-                    tag.textContent = '✓ ' + pro;
-                    tagsDiv.appendChild(tag);
-                });
-
-                (route.cons || []).forEach(con => {
-                    const tag = document.createElement('span');
-                    tag.className = 'text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded';
-                    tag.textContent = '⚠ ' + con;
-                    tagsDiv.appendChild(tag);
-                });
-
-                card.appendChild(tagsDiv);
+            // Warning
+            if (day.warning) {
+                const warning = document.createElement('div');
+                warning.className = 'ml-8 mt-1 text-xs text-amber-600 flex items-center gap-1';
+                const warnIcon = document.createElement('i');
+                warnIcon.className = 'fas fa-exclamation-triangle';
+                warning.appendChild(warnIcon);
+                const warnText = document.createElement('span');
+                warnText.textContent = day.warning;
+                warning.appendChild(warnText);
+                row.appendChild(warning);
             }
 
-            return card;
-        }
-
-        function renderLeg1Options() {
-            const container = document.getElementById('leg1-options');
-            if (!container) return;
-            container.replaceChildren();
-
-            routeOptions.leg1.forEach(route => {
-                const isSelected = selectedRoutes.leg1 === route.id;
-                container.appendChild(createRouteCard(route, 'leg1', isSelected));
-            });
-        }
-
-        function renderPadiOptions() {
-            const container = document.getElementById('padi-options');
-            if (!container) return;
-            container.replaceChildren();
-
-            routeOptions.padiTiming.forEach(option => {
-                const isSelected = selectedRoutes.padiTiming === option.id;
-
-                const card = document.createElement('div');
-                card.className = `card card-interactive p-5 relative cursor-pointer transition-all ${isSelected ? 'ring-2 ring-emerald-500 border-emerald-300' : ''}`;
-                card.onclick = () => selectRoute('padiTiming', option.id);
-
-                if (option.recommended) {
-                    const badge = document.createElement('span');
-                    badge.className = 'absolute -top-2 -right-2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm';
-                    badge.textContent = 'RECOMMENDED';
-                    card.appendChild(badge);
-                }
-
-                const header = document.createElement('div');
-                header.className = 'flex items-start justify-between mb-3';
-
-                const titleDiv = document.createElement('div');
-                const title = document.createElement('h4');
-                title.className = 'font-bold text-ink-700';
-                title.textContent = option.name;
-                titleDiv.appendChild(title);
-
-                const dateSpan = document.createElement('span');
-                dateSpan.className = 'text-sm text-ink-500 block mt-1';
-                dateSpan.textContent = option.dates;
-                titleDiv.appendChild(dateSpan);
-
-                header.appendChild(titleDiv);
-
-                if (isSelected) {
-                    const check = document.createElement('i');
-                    check.className = 'fas fa-check-circle text-emerald-500 text-lg';
-                    header.appendChild(check);
-                }
-
-                card.appendChild(header);
-
-                // Buffer indicator
-                const bufferDiv = document.createElement('div');
-                if (option.bufferDay) {
-                    bufferDiv.className = 'p-2 bg-emerald-50 border border-emerald-200 rounded-lg mb-3 text-xs text-emerald-700';
-                    bufferDiv.textContent = '✓ Jan 4 = buffer/rest day';
-                } else {
-                    bufferDiv.className = 'p-2 bg-amber-50 border border-amber-200 rounded-lg mb-3 text-xs text-amber-700';
-                    bufferDiv.textContent = '⚠ No buffer day';
-                }
-                card.appendChild(bufferDiv);
-
-                // Pros and cons
-                const tagsDiv = document.createElement('div');
-                tagsDiv.className = 'flex flex-wrap gap-1';
-
-                (option.pros || []).forEach(pro => {
-                    const tag = document.createElement('span');
-                    tag.className = 'text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded';
-                    tag.textContent = '✓ ' + pro;
-                    tagsDiv.appendChild(tag);
-                });
-
-                (option.cons || []).forEach(con => {
-                    const tag = document.createElement('span');
-                    tag.className = 'text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded';
-                    tag.textContent = '⚠ ' + con;
-                    tagsDiv.appendChild(tag);
-                });
-
-                card.appendChild(tagsDiv);
-                container.appendChild(card);
-            });
-        }
-
-        function renderLeg3Options() {
-            const container = document.getElementById('leg3-options');
-            if (!container) return;
-            container.replaceChildren();
-
-            routeOptions.leg3.forEach(route => {
-                const isSelected = selectedRoutes.leg3 === route.id;
-                container.appendChild(createRouteCard(route, 'leg3', isSelected));
-            });
-        }
-
-        function selectRoute(leg, optionId) {
-            selectedRoutes[leg] = optionId;
-            localStorage.setItem('asiaSelectedRoutes', JSON.stringify(selectedRoutes));
-            renderRoutesTab();
-        }
-
-        function updateTotalEstimate() {
-            const leg1 = routeOptions.leg1.find(r => r.id === selectedRoutes.leg1);
-            const leg3 = routeOptions.leg3.find(r => r.id === selectedRoutes.leg3);
-            const leg2Cost = { min: 80, max: 100 };
-
-            const minTotal = leg1.costMin + leg2Cost.min + leg3.costMin;
-            const maxTotal = leg1.costMax + leg2Cost.max + leg3.costMax;
-
-            const el = document.getElementById('total-estimate');
-            if (el) {
-                el.textContent = '$' + minTotal + '-' + maxTotal;
+            // Success
+            if (day.success) {
+                const success = document.createElement('div');
+                success.className = 'ml-8 mt-1 text-xs text-emerald-600 flex items-center gap-1';
+                const successIcon = document.createElement('i');
+                successIcon.className = 'fas fa-check-circle';
+                success.appendChild(successIcon);
+                const successText = document.createElement('span');
+                successText.textContent = day.success;
+                success.appendChild(successText);
+                row.appendChild(success);
             }
-        }
 
-        function exportRoutesToNotes() {
-            const leg1 = routeOptions.leg1.find(r => r.id === selectedRoutes.leg1);
-            const padi = routeOptions.padiTiming.find(r => r.id === selectedRoutes.padiTiming);
-            const leg3 = routeOptions.leg3.find(r => r.id === selectedRoutes.leg3);
+            // Note
+            if (day.note) {
+                const note = document.createElement('div');
+                note.className = 'ml-8 mt-1 text-xs text-ink-400 italic';
+                note.textContent = day.note;
+                row.appendChild(note);
+            }
 
-            const summary = [
-                'ASIA TRIP ROUTES - Selected Options',
-                '====================================',
-                '',
-                'LEG 1: Chiang Mai → Koh Tao (Jan 3)',
-                'Route: ' + leg1.name,
-                'Duration: ' + leg1.duration,
-                'Cost: $' + leg1.costMin + '-' + leg1.costMax,
-                '',
-                'PADI TIMING',
-                'Start: ' + padi.dates,
-                'Buffer day: ' + (padi.bufferDay ? 'Yes (Jan 4)' : 'No'),
-                '',
-                'LEG 2: Koh Tao → Bangkok (Jan 8)',
-                'Route: Via Surat Thani (reverse)',
-                'Cost: $80-100',
-                '',
-                'LEG 3: Bangkok → Taipei (Jan 9)',
-                'Airline: ' + leg3.name,
-                'Duration: ' + leg3.duration,
-                'Cost: $' + leg3.costMin + '-' + leg3.costMax,
-                '',
-                'TOTAL ESTIMATE: $' + (leg1.costMin + 80 + leg3.costMin) + '-' + (leg1.costMax + 100 + leg3.costMax) + ' per person',
-                '',
-                'Book at: 12go.asia'
-            ].join('\n');
-
-            navigator.clipboard.writeText(summary).then(function() {
-                alert('Route summary copied to clipboard!');
-            }).catch(function() {
-                alert('Could not copy to clipboard');
-            });
+            return row;
         }
 
         // Render calendar grid
