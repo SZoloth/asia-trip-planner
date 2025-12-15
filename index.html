@@ -1313,16 +1313,156 @@
                 </div>
             </div>
 
-            <!-- Booking Links -->
+            <!-- Transport Reference Section -->
+            <div class="mt-8 pt-6 border-t border-ink-100">
+                <button onclick="toggleTransportRef()" class="flex items-center justify-between w-full text-left mb-4 group">
+                    <h3 class="font-display text-lg text-ink-700 flex items-center gap-2">
+                        <i class="fas fa-database text-sky-500"></i>
+                        Transport Research & Sources
+                    </h3>
+                    <i id="transport-ref-chevron" class="fas fa-chevron-down text-ink-400 group-hover:text-ink-600 transition-transform"></i>
+                </button>
+
+                <div id="transport-ref-content" class="space-y-4">
+                    <!-- Flights -->
+                    <div class="bg-sky-50 border border-sky-100 rounded-lg p-4">
+                        <h4 class="font-semibold text-sky-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-plane"></i> Flights
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 py-2 border-b border-sky-100">
+                                <div>
+                                    <span class="font-medium text-ink-700">Chiang Mai → Surat Thani</span>
+                                    <span class="text-ink-400 ml-2">(CNX → URT)</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-ink-500">
+                                    <span>Thai AirAsia</span>
+                                    <span class="font-semibold text-ink-700">$50-80</span>
+                                    <span>1h 50m</span>
+                                    <a href="https://www.airasia.com" target="_blank" class="text-sky-600 hover:text-sky-800">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 py-2 border-b border-sky-100">
+                                <div>
+                                    <span class="font-medium text-ink-700">Surat Thani → Bangkok</span>
+                                    <span class="text-ink-400 ml-2">(URT → DMK)</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-ink-500">
+                                    <span>AirAsia/Nok/VietJet</span>
+                                    <span class="font-semibold text-ink-700">$27-50</span>
+                                    <span>1h 15m</span>
+                                    <a href="https://www.airasia.com" target="_blank" class="text-sky-600 hover:text-sky-800">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 py-2">
+                                <div>
+                                    <span class="font-medium text-ink-700">Bangkok → Taipei</span>
+                                    <span class="text-ink-400 ml-2">(BKK → TPE)</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-ink-500">
+                                    <span>VietJet/Scoot/EVA</span>
+                                    <span class="font-semibold text-ink-700">$82-280</span>
+                                    <span>3h 45m</span>
+                                    <a href="https://www.skyscanner.com" target="_blank" class="text-sky-600 hover:text-sky-800">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ferries -->
+                    <div class="bg-teal-50 border border-teal-100 rounded-lg p-4">
+                        <h4 class="font-semibold text-teal-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-ship"></i> Ferries (Lomprayah Catamaran)
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 py-2 border-b border-teal-100">
+                                <div>
+                                    <span class="font-medium text-ink-700">Surat Thani → Koh Tao</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-ink-500">
+                                    <span>฿900-1200 (~$26-35)</span>
+                                    <span>2.5-4 hrs</span>
+                                    <a href="https://www.lomprayah.com" target="_blank" class="text-teal-600 hover:text-teal-800">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 py-2">
+                                <div>
+                                    <span class="font-medium text-ink-700">Koh Tao → Surat Thani</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-ink-500">
+                                    <span>฿950-1200 (~$27-35)</span>
+                                    <span>4-5 hrs</span>
+                                    <span class="text-xs text-ink-400">7:00/9:30/10:15 AM</span>
+                                    <a href="https://www.lomprayah.com" target="_blank" class="text-teal-600 hover:text-teal-800">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combo Packages -->
+                    <div class="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                        <h4 class="font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                            <i class="fas fa-box"></i> Combo Packages (Recommended)
+                        </h4>
+                        <div class="text-sm">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2">
+                                <div>
+                                    <span class="font-medium text-ink-700">Chiang Mai → Koh Tao</span>
+                                    <span class="text-xs text-ink-400 block sm:inline sm:ml-2">Flight + transfer + ferry</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-semibold text-purple-700">$62-115</span>
+                                    <a href="https://12go.asia/en/travel/chiang-mai/koh-tao" target="_blank" class="px-3 py-1 bg-purple-600 text-white text-xs font-medium rounded hover:bg-purple-700 transition-colors">
+                                        Book on 12go.asia
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Notes -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <h4 class="font-semibold text-amber-800 mb-2 flex items-center gap-2">
+                            <i class="fas fa-info-circle"></i> Important Notes
+                        </h4>
+                        <ul class="text-sm text-amber-900 space-y-1">
+                            <li>• <strong>Dive-to-fly rule:</strong> Wait 18-24 hours after scuba diving before flying</li>
+                            <li>• <strong>Peak season:</strong> Dec 29 - Jan 2 is busiest week - book early!</li>
+                            <li>• <strong>Ferry timing:</strong> Last ferry to Koh Tao is ~1 PM; plan flights accordingly</li>
+                            <li>• Prices are per person, USD estimates for Jan 2026</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Booking Links -->
             <div class="mt-6 pt-6 border-t border-ink-100">
                 <div class="flex flex-wrap gap-3">
-                    <a href="https://12go.asia" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition-colors">
+                    <a href="https://12go.asia/en/travel/chiang-mai/koh-tao" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition-colors">
                         <i class="fas fa-external-link-alt"></i>
                         Book on 12go.asia
                     </a>
-                    <a href="https://www.lomprayah.com" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-ink-100 text-ink-600 text-sm font-medium rounded-lg hover:bg-ink-200 transition-colors">
+                    <a href="https://www.lomprayah.com" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors">
                         <i class="fas fa-ship"></i>
                         Lomprayah Ferries
+                    </a>
+                    <a href="https://www.airasia.com" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-ink-100 text-ink-600 text-sm font-medium rounded-lg hover:bg-ink-200 transition-colors">
+                        <i class="fas fa-plane"></i>
+                        Thai AirAsia
+                    </a>
+                    <a href="https://www.skyscanner.com/transport/flights/bkk/tpe/" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-ink-100 text-ink-600 text-sm font-medium rounded-lg hover:bg-ink-200 transition-colors">
+                        <i class="fas fa-search"></i>
+                        Skyscanner (BKK→TPE)
                     </a>
                 </div>
             </div>
@@ -2701,7 +2841,8 @@
             const borderColor = scenario.recommended ? 'border-emerald-300 ring-2 ring-emerald-200' :
                                scenario.risk === 'high' ? 'border-amber-200' :
                                scenario.risk === 'unknown' ? 'border-slate-200' : 'border-ink-100';
-            card.className = 'card h-full ' + borderColor;
+            card.className = 'card h-full scenario-card flex flex-col ' + borderColor;
+            card.dataset.scenarioId = scenario.id;
 
             // Header
             const header = document.createElement('div');
@@ -2769,7 +2910,7 @@
 
             // Days timeline
             const timeline = document.createElement('div');
-            timeline.className = 'divide-y divide-ink-50';
+            timeline.className = 'divide-y divide-ink-50 flex-1';
 
             scenario.days.forEach(day => {
                 const dayRow = createDayRow(day);
@@ -2777,6 +2918,27 @@
             });
 
             card.appendChild(timeline);
+
+            // Footer with select button
+            const footer = document.createElement('div');
+            footer.className = 'p-3 border-t border-ink-100 mt-auto';
+
+            const selectBtn = document.createElement('button');
+            selectBtn.className = 'scenario-select-btn w-full flex items-center justify-center gap-2 px-4 py-2 bg-ink-100 text-ink-600 text-sm font-medium rounded-lg hover:bg-ink-200 transition-colors';
+            selectBtn.dataset.scenarioId = scenario.id;
+            selectBtn.onclick = () => selectScenario(scenario.id);
+
+            const btnIcon = document.createElement('i');
+            btnIcon.className = 'fas fa-arrow-right';
+            selectBtn.appendChild(btnIcon);
+
+            const btnText = document.createElement('span');
+            btnText.textContent = 'Use This Plan';
+            selectBtn.appendChild(btnText);
+
+            footer.appendChild(selectBtn);
+            card.appendChild(footer);
+
             column.appendChild(card);
 
             return column;
@@ -2887,6 +3049,86 @@
             }
 
             return row;
+        }
+
+        // Toggle transport reference section
+        function toggleTransportRef() {
+            const content = document.getElementById('transport-ref-content');
+            const chevron = document.getElementById('transport-ref-chevron');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        // Currently selected scenario
+        let selectedScenarioId = null;
+
+        // Map scenario dates to trip day numbers
+        // Trip starts Dec 26 = Day 1, so:
+        // Dec 28 = Day 3, Dec 29 = Day 4, etc.
+        // Jan 1 = Day 7, Jan 2 = Day 8, Jan 3 = Day 9, etc.
+        const dateToDayNum = {
+            'Dec 28': 3, 'Dec 29': 4, 'Dec 30': 5, 'Dec 31': 6,
+            'Jan 1': 7, 'Jan 2': 8, 'Jan 3': 9, 'Jan 4': 10,
+            'Jan 5': 11, 'Jan 6': 12, 'Jan 7': 13, 'Jan 8': 14, 'Jan 9': 15,
+            'Jan 10': 16, 'Jan 11': 17, 'Jan 12': 18, 'Jan 13': 19, 'Jan 14': 20
+        };
+
+        // Select a scenario and mark it as chosen
+        function selectScenario(scenarioId) {
+            const scenario = scenarios.find(s => s.id === scenarioId);
+            if (!scenario) return;
+
+            selectedScenarioId = scenarioId;
+
+            // Update UI to show selected state
+            document.querySelectorAll('.scenario-select-btn').forEach(btn => {
+                if (btn.dataset.scenarioId === scenarioId) {
+                    btn.classList.remove('bg-ink-100', 'text-ink-600', 'hover:bg-ink-200');
+                    btn.classList.add('bg-emerald-500', 'text-white');
+                    btn.querySelector('span').textContent = 'Selected';
+                    btn.querySelector('i').className = 'fas fa-check';
+                } else {
+                    btn.classList.remove('bg-emerald-500', 'text-white');
+                    btn.classList.add('bg-ink-100', 'text-ink-600', 'hover:bg-ink-200');
+                    btn.querySelector('span').textContent = 'Use This Plan';
+                    btn.querySelector('i').className = 'fas fa-arrow-right';
+                }
+            });
+
+            // Update scenario card borders
+            document.querySelectorAll('.scenario-card').forEach(card => {
+                if (card.dataset.scenarioId === scenarioId) {
+                    card.classList.add('ring-2', 'ring-emerald-400', 'border-emerald-300');
+                } else {
+                    card.classList.remove('ring-2', 'ring-emerald-400', 'border-emerald-300');
+                }
+            });
+
+            // Show confirmation toast
+            showToast('✓ Selected: ' + scenario.name + ' (' + scenario.subtitle + ')');
+        }
+
+        // Simple toast notification
+        function showToast(message) {
+            // Remove existing toast
+            const existing = document.getElementById('scenario-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'scenario-toast';
+            toast.className = 'fixed bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 bg-ink-800 text-white px-4 py-2 rounded-lg shadow-lg text-sm z-50 animate-fade-in';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition-opacity');
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
         }
 
         // Render calendar grid
