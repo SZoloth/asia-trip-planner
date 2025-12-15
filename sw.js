@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asia-trip-v14-scenarios';
+const CACHE_NAME = 'asia-trip-v15-logistics';
 const OFFLINE_URL = '/asia-trip-planner/';
 
 // Assets to cache on install

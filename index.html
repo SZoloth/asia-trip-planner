@@ -2230,118 +2230,169 @@
             leg3: 'airasia'
         };
 
-        // Scenario comparison data (Jan 3-9)
+        // Scenario comparison data (Jan 2-9 island portion)
+        // Updated with real flight/ferry times and prices from research
         const scenarios = [
             {
-                id: 'carter',
-                name: "Carter's Original",
-                subtitle: 'Baseline with gaps',
-                risk: 'unknown',
-                costMin: null,
-                costMax: null,
+                id: 'standard',
+                name: 'Standard',
+                subtitle: '5 island / 5 Taiwan',
+                risk: 'low',
+                costMin: 280,
+                costMax: 400,
                 recommended: false,
+                taiwanDays: 5,
+                bookingLinks: [
+                    { name: '12go.asia', url: 'https://12go.asia/en/travel/chiang-mai/koh-tao', type: 'combo' },
+                    { name: 'Thai AirAsia', url: 'https://www.airasia.com', type: 'flight' },
+                    { name: 'Lomprayah', url: 'https://lomprayah.com', type: 'ferry' }
+                ],
                 days: [
-                    { date: 'Jan 3', dayNum: 8, title: '❓ How to get there?', icon: 'question', iconColor: 'slate', events: [], note: 'Route not specified in CSV' },
-                    { date: 'Jan 4', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'PADI certification begins' }], note: null },
-                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
-                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: null },
-                    { date: 'Jan 7', dayNum: 12, title: '❓ Gap day', icon: 'question', iconColor: 'slate', events: [], note: 'Not specified' },
-                    { date: 'Jan 8', dayNum: 13, title: '❓ Gap day', icon: 'question', iconColor: 'slate', events: [], note: 'Not specified' },
-                    { date: 'Jan 9', dayNum: 14, title: '"CJM→DMK→TPE"', icon: 'question', iconColor: 'slate', events: [], warning: 'Confusing - from Koh Tao not CNX?' }
+                    { date: 'Jan 2', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
+                        { time: '10:55 AM', text: 'Thai AirAsia FD5420 depart CNX' },
+                        { time: '12:45 PM', text: 'Arrive Surat Thani (URT)' },
+                        { time: '1:00 PM', text: 'Lomprayah catamaran (~฿1000)' },
+                        { time: '3:30 PM', text: 'Arrive Mae Haad Pier, Koh Tao' }
+                    ], note: 'Book combo on 12go.asia ~$65', warning: 'Tight ferry connection - need pre-arranged transfer' },
+                    { date: 'Jan 3', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [
+                        { time: '9:00 AM', text: 'Open Water certification begins' }
+                    ], note: 'Complete eLearning before trip!' },
+                    { date: 'Jan 4', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [
+                        { time: '8:00 AM', text: 'Boat dives' }
+                    ], note: null },
+                    { date: 'Jan 5', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [
+                        { time: '8:00 AM', text: 'Final dives + certification' }
+                    ], note: 'Get certified! Last dive ~4 PM', success: 'PADI complete' },
+                    { date: 'Jan 6', dayNum: 12, title: 'Beach Day', icon: 'umbrella-beach', iconColor: 'emerald', events: [
+                        { time: 'All day', text: 'No diving (24hr no-fly buffer)' }
+                    ], note: 'Snorkel, beach, massage', warning: 'NO diving - flight tomorrow' },
+                    { date: 'Jan 7', dayNum: 13, title: 'Koh Tao → BKK', icon: 'ship', iconColor: 'amber', events: [
+                        { time: '7:00 AM', text: 'Lomprayah ferry (~฿1000)' },
+                        { time: '11:00 AM', text: 'Arrive Tapee Pier + transfer' },
+                        { time: '1:30 PM', text: 'Thai AirAsia URT → DMK (~$35)' },
+                        { time: '2:45 PM', text: 'Arrive Bangkok' }
+                    ], note: 'Overnight BKK', success: '44+ hrs since last dive ✓' },
+                    { date: 'Jan 8', dayNum: 14, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
+                        { time: '9:00 AM', text: 'Thai Vietjet/Scoot BKK → TPE (~$90-150)' },
+                        { time: '2:00 PM', text: 'Arrive Taipei (local time)' }
+                    ], note: 'Taiwan begins!', success: 'Safe flying ✓' }
                 ]
             },
             {
-                id: 'tight',
-                name: 'Tight Schedule',
-                subtitle: 'No buffer day',
-                risk: 'high',
-                costMin: 270,
-                costMax: 360,
-                recommended: false,
-                days: [
-                    { date: 'Jan 3', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
-                        { time: '10:55 AM', text: 'Depart Chiang Mai' },
-                        { time: '12:45 PM', text: 'Arrive Surat Thani' },
-                        { time: '1:00 PM', text: 'Lomprayah ferry' },
-                        { time: '3:30 PM', text: 'Arrive Koh Tao' }
-                    ], note: 'via Surat Thani' },
-                    { date: 'Jan 4', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'Certification begins' }], warning: 'No buffer if travel delayed!' },
-                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
-                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: 'Get certified!' },
-                    { date: 'Jan 7', dayNum: 12, title: 'Beach + Depart', icon: 'umbrella-beach', iconColor: 'amber', events: [
-                        { time: '8:00 AM', text: 'Lomprayah ferry' },
-                        { time: '12:45 PM', text: 'Fly URT → BKK' }
-                    ], warning: 'Rush to leave' },
-                    { date: 'Jan 8', dayNum: 13, title: '→ BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
-                        { time: 'Evening', text: 'BKK → TPE flight' }
-                    ], warning: 'Same-day connection risk' },
-                    { date: 'Jan 9', dayNum: 14, title: 'In Taipei', icon: 'map-marker-alt', iconColor: 'emerald', events: [], note: 'Arrived previous night' }
-                ]
-            },
-            {
-                id: 'recommended',
-                name: 'Recommended',
-                subtitle: 'Buffer day + BKK overnight',
+                id: 'extended',
+                name: 'Extended',
+                subtitle: '6 island / 4 Taiwan',
                 risk: 'low',
                 costMin: 350,
-                costMax: 460,
+                costMax: 480,
                 recommended: true,
+                taiwanDays: 4,
+                bookingLinks: [
+                    { name: '12go.asia', url: 'https://12go.asia/en/travel/chiang-mai/koh-tao', type: 'combo' },
+                    { name: 'Thai AirAsia', url: 'https://www.airasia.com', type: 'flight' },
+                    { name: 'Lomprayah', url: 'https://lomprayah.com', type: 'ferry' }
+                ],
                 days: [
-                    { date: 'Jan 3', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
-                        { time: '10:55 AM', text: 'Depart Chiang Mai' },
-                        { time: '12:45 PM', text: 'Arrive Surat Thani' },
-                        { time: '1:00 PM', text: 'Lomprayah ferry' },
-                        { time: '3:30 PM', text: 'Arrive Koh Tao' }
-                    ], note: 'via Surat Thani', success: 'Relaxed arrival' },
-                    { date: 'Jan 4', dayNum: 9, title: 'REST DAY', icon: 'umbrella-beach', iconColor: 'emerald', events: [
-                        { time: 'All day', text: 'Explore island, rest up' }
-                    ], success: 'Buffer day - recover from travel' },
-                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'Certification begins' }], success: 'Well-rested start' },
-                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
-                    { date: 'Jan 7', dayNum: 12, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: 'Get certified!' },
-                    { date: 'Jan 8', dayNum: 13, title: 'Beach → Bangkok', icon: 'plane', iconColor: 'amber', events: [
-                        { time: '8:00 AM', text: 'Lomprayah ferry' },
-                        { time: '12:45 PM', text: 'Fly URT → BKK' },
-                        { time: '2:30 PM', text: 'Arrive Bangkok' },
-                        { time: 'Evening', text: 'Bangkok overnight' }
-                    ], success: 'Overnight buffer before Taiwan' },
-                    { date: 'Jan 9', dayNum: 14, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
-                        { time: 'Morning', text: 'BKK → TPE flight' }
-                    ], success: 'Relaxed morning departure' }
+                    { date: 'Jan 2', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
+                        { time: '10:55 AM', text: 'Thai AirAsia FD5420 depart CNX' },
+                        { time: '12:45 PM', text: 'Arrive Surat Thani (URT)' },
+                        { time: '1:00 PM', text: 'Lomprayah catamaran (~฿1000)' },
+                        { time: '3:30 PM', text: 'Arrive Mae Haad Pier' }
+                    ], note: 'Book combo on 12go.asia ~$65' },
+                    { date: 'Jan 3', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [
+                        { time: '9:00 AM', text: 'Open Water certification begins' }
+                    ], note: 'Complete eLearning before trip!' },
+                    { date: 'Jan 4', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [
+                        { time: '8:00 AM', text: 'Boat dives' }
+                    ], note: null },
+                    { date: 'Jan 5', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [
+                        { time: '8:00 AM', text: 'Final dives + certification' }
+                    ], success: 'PADI complete!' },
+                    { date: 'Jan 6', dayNum: 12, title: '🤿 FUN DIVE', icon: 'water', iconColor: 'purple', events: [
+                        { time: '7:00 AM', text: 'Sail Rock day trip (~$80-100)' },
+                        { time: '3:00 PM', text: 'Return to Koh Tao' }
+                    ], note: 'Whale sharks, barracuda schools!', success: 'USE your new cert!' },
+                    { date: 'Jan 7', dayNum: 13, title: 'Beach Day', icon: 'umbrella-beach', iconColor: 'emerald', events: [
+                        { time: 'All day', text: 'No diving (24hr no-fly buffer)' }
+                    ], note: 'Snorkel, beach, massage', warning: 'NO diving - flying soon' },
+                    { date: 'Jan 8', dayNum: 14, title: 'Koh Tao → BKK', icon: 'ship', iconColor: 'amber', events: [
+                        { time: '7:00 AM', text: 'Lomprayah ferry (~฿1000)' },
+                        { time: '11:00 AM', text: 'Arrive Tapee Pier' },
+                        { time: '1:30 PM', text: 'Thai AirAsia URT → DMK (~$35)' },
+                        { time: '2:45 PM', text: 'Arrive Bangkok' }
+                    ], note: 'Overnight BKK', success: '45+ hrs since last dive ✓' },
+                    { date: 'Jan 9', dayNum: 15, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
+                        { time: '9:00 AM', text: 'Thai Vietjet/Scoot BKK → TPE (~$90-150)' },
+                        { time: '2:00 PM', text: 'Arrive Taipei' }
+                    ], note: 'Taiwan: Jan 9-13 (4 days)', success: 'Safe flying ✓' }
                 ]
             },
             {
-                id: 'premium',
-                name: 'Premium Fast',
-                subtitle: 'Samui route - fastest',
+                id: 'maxisland',
+                name: 'Max Island',
+                subtitle: '7 island / 3 Taiwan',
                 risk: 'low',
-                costMin: 430,
-                costMax: 555,
+                costMin: 420,
+                costMax: 560,
                 recommended: false,
+                taiwanDays: 3,
+                bookingLinks: [
+                    { name: '12go.asia', url: 'https://12go.asia/en/travel/chiang-mai/koh-tao', type: 'combo' },
+                    { name: 'Thai AirAsia', url: 'https://www.airasia.com', type: 'flight' },
+                    { name: 'Lomprayah', url: 'https://lomprayah.com', type: 'ferry' }
+                ],
                 days: [
-                    { date: 'Jan 3', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'purple', events: [
-                        { time: '11:00 AM', text: 'Depart Chiang Mai' },
-                        { time: '12:00 PM', text: 'Arrive Koh Samui' },
-                        { time: '12:30 PM', text: 'Ferry to Koh Tao' },
-                        { time: '2:00 PM', text: 'Arrive Koh Tao' }
-                    ], note: 'via Koh Samui', success: 'Fastest route - extra afternoon' },
-                    { date: 'Jan 4', dayNum: 9, title: 'REST DAY', icon: 'umbrella-beach', iconColor: 'emerald', events: [
-                        { time: 'All day', text: 'Explore island, rest up' }
-                    ], success: 'Buffer day' },
-                    { date: 'Jan 5', dayNum: 10, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [{ time: '9:00 AM', text: 'Certification begins' }], note: null },
-                    { date: 'Jan 6', dayNum: 11, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [], note: null },
-                    { date: 'Jan 7', dayNum: 12, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [], note: 'Get certified!' },
-                    { date: 'Jan 8', dayNum: 13, title: 'Beach → Bangkok', icon: 'plane', iconColor: 'amber', events: [
-                        { time: '8:00 AM', text: 'Lomprayah ferry' },
-                        { time: '12:45 PM', text: 'Fly URT → BKK' },
-                        { time: 'Evening', text: 'Bangkok overnight' }
-                    ], success: 'Overnight buffer' },
-                    { date: 'Jan 9', dayNum: 14, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
-                        { time: 'Morning', text: 'BKK → TPE flight' }
-                    ], note: null }
+                    { date: 'Jan 2', dayNum: 8, title: 'CNX → Koh Tao', icon: 'plane', iconColor: 'sky', events: [
+                        { time: '10:55 AM', text: 'Thai AirAsia FD5420 depart CNX' },
+                        { time: '12:45 PM', text: 'Arrive Surat Thani (URT)' },
+                        { time: '1:00 PM', text: 'Lomprayah catamaran (~฿1000)' },
+                        { time: '3:30 PM', text: 'Arrive Mae Haad Pier' }
+                    ], note: 'Book combo on 12go.asia ~$65' },
+                    { date: 'Jan 3', dayNum: 9, title: 'PADI Day 1', icon: 'water', iconColor: 'sky', events: [
+                        { time: '9:00 AM', text: 'Open Water certification begins' }
+                    ], note: 'Complete eLearning before trip!' },
+                    { date: 'Jan 4', dayNum: 10, title: 'PADI Day 2', icon: 'water', iconColor: 'sky', events: [
+                        { time: '8:00 AM', text: 'Boat dives' }
+                    ], note: null },
+                    { date: 'Jan 5', dayNum: 11, title: 'PADI Day 3', icon: 'water', iconColor: 'sky', events: [
+                        { time: '8:00 AM', text: 'Final dives + certification' }
+                    ], success: 'PADI complete!' },
+                    { date: 'Jan 6', dayNum: 12, title: '🤿 FUN DIVE 1', icon: 'water', iconColor: 'purple', events: [
+                        { time: '7:00 AM', text: 'Sail Rock day trip (~$80-100)' }
+                    ], note: 'Best dive site in Gulf!', success: 'Whale sharks!' },
+                    { date: 'Jan 7', dayNum: 13, title: '🤿 FUN DIVE 2', icon: 'water', iconColor: 'purple', events: [
+                        { time: '8:00 AM', text: '2-tank dive Chumphon Pinnacle' }
+                    ], note: 'Or island hop to Koh Phangan?', success: 'Max diving!' },
+                    { date: 'Jan 8', dayNum: 14, title: 'Beach Day', icon: 'umbrella-beach', iconColor: 'emerald', events: [
+                        { time: 'All day', text: 'No diving (24hr no-fly buffer)' }
+                    ], warning: 'NO diving - flying tomorrow' },
+                    { date: 'Jan 9', dayNum: 15, title: 'Koh Tao → BKK', icon: 'ship', iconColor: 'amber', events: [
+                        { time: '7:00 AM', text: 'Lomprayah ferry' },
+                        { time: '1:30 PM', text: 'Thai AirAsia URT → DMK' },
+                        { time: '2:45 PM', text: 'Arrive Bangkok' }
+                    ], note: 'Overnight BKK', success: '45+ hrs since dive ✓' },
+                    { date: 'Jan 10', dayNum: 16, title: 'BKK → Taipei', icon: 'plane-departure', iconColor: 'teal', events: [
+                        { time: '9:00 AM', text: 'BKK → TPE (~$90-150)' }
+                    ], note: 'Taiwan: Jan 10-13 (3 days)' }
                 ]
             }
         ];
+
+        // Transport pricing reference (per person, USD estimates Jan 2026)
+        const transportPricing = {
+            flights: {
+                'CNX-URT': { airline: 'Thai AirAsia', price: '$50-80', duration: '1h 50m', book: 'airasia.com' },
+                'URT-DMK': { airline: 'Thai AirAsia/Nok/VietJet', price: '$27-50', duration: '1h 15m', book: 'airasia.com' },
+                'BKK-TPE': { airline: 'Thai Vietjet/Scoot/EVA', price: '$82-280', duration: '3h 45m', book: 'skyscanner.com' }
+            },
+            ferries: {
+                'URT-KohTao': { operator: 'Lomprayah', price: '฿900-1200 (~$26-35)', duration: '2.5-4 hrs', book: 'lomprayah.com' },
+                'KohTao-URT': { operator: 'Lomprayah', price: '฿950-1200 (~$27-35)', duration: '4-5 hrs', depart: '7:00/9:30/10:15 AM', book: 'lomprayah.com' }
+            },
+            combos: {
+                'CNX-KohTao': { via: '12go.asia', price: '$62-115', includes: 'Flight + transfer + ferry', book: '12go.asia/en/travel/chiang-mai/koh-tao' }
+            }
+        };
 
         // Get all destinations (built-in + custom)
         function getAllDestinations() {
