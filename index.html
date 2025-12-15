@@ -1382,14 +1382,35 @@
                 </div>
             </div>
 
-            <!-- Generated Timeline -->
+            <!-- Generated Timeline (Your Config) -->
             <div class="mb-6">
                 <h3 class="font-display text-lg text-ink-700 mb-4 flex items-center gap-2">
                     <i class="fas fa-calendar-alt text-sky-500"></i>
                     Your Itinerary
+                    <span class="text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded ml-2">Custom</span>
                 </h3>
                 <div id="generated-timeline" class="card divide-y divide-ink-50">
                     <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- Compare with Presets -->
+            <div class="mb-6">
+                <button onclick="togglePresetComparison()" class="flex items-center justify-between w-full text-left mb-4 group">
+                    <h3 class="font-display text-lg text-ink-700 flex items-center gap-2">
+                        <i class="fas fa-columns text-purple-500"></i>
+                        Compare with Presets
+                    </h3>
+                    <i id="preset-compare-chevron" class="fas fa-chevron-down text-ink-400 group-hover:text-ink-600 transition-transform"></i>
+                </button>
+
+                <div id="preset-comparison-content">
+                    <!-- Horizontal scroll container for preset cards -->
+                    <div class="overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0">
+                        <div class="flex md:grid md:grid-cols-3 gap-4 min-w-max md:min-w-0" id="preset-cards">
+                            <!-- Rendered by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -2917,6 +2938,146 @@
         function renderRoutesTab() {
             renderPresetButtons();
             updateFromControls();
+            renderPresetComparisonCards();
+        }
+
+        // Toggle preset comparison section
+        function togglePresetComparison() {
+            const content = document.getElementById('preset-comparison-content');
+            const chevron = document.getElementById('preset-compare-chevron');
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        // Render preset comparison cards
+        function renderPresetComparisonCards() {
+            const container = document.getElementById('preset-cards');
+            if (!container) return;
+            container.replaceChildren();
+
+            const presetInfo = [
+                { id: 'standard', name: 'Standard', config: presets.standard, recommended: false },
+                { id: 'extended', name: 'Extended', config: presets.extended, recommended: true },
+                { id: 'maxisland', name: 'Max Island', config: presets.maxisland, recommended: false }
+            ];
+
+            presetInfo.forEach(preset => {
+                const result = generateItinerary(preset.config);
+                const card = createPresetCard(preset, result);
+                container.appendChild(card);
+            });
+        }
+
+        function createPresetCard(preset, result) {
+            const card = document.createElement('div');
+            card.className = 'min-w-[280px] md:min-w-0';
+
+            const inner = document.createElement('div');
+            const borderClass = preset.recommended ? 'border-emerald-300 ring-1 ring-emerald-200' : 'border-ink-100';
+            inner.className = 'card h-full ' + borderClass;
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'p-3 border-b border-ink-100 flex items-center justify-between';
+
+            const titleDiv = document.createElement('div');
+            const title = document.createElement('h4');
+            title.className = 'font-bold text-ink-700';
+            title.textContent = preset.name;
+            titleDiv.appendChild(title);
+
+            const subtitle = document.createElement('p');
+            subtitle.className = 'text-xs text-ink-400';
+            subtitle.textContent = preset.config.islandDays + ' island / ' + preset.config.taiwanDays + ' Taiwan';
+            titleDiv.appendChild(subtitle);
+            header.appendChild(titleDiv);
+
+            // Badge + cost
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'text-right';
+
+            if (preset.recommended) {
+                const badge = document.createElement('span');
+                badge.className = 'text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded';
+                badge.textContent = 'BEST';
+                metaDiv.appendChild(badge);
+            }
+
+            const cost = document.createElement('p');
+            cost.className = 'text-sm font-semibold text-ink-700 mt-1';
+            cost.textContent = '$' + result.costMin + '-' + result.costMax;
+            metaDiv.appendChild(cost);
+            header.appendChild(metaDiv);
+
+            inner.appendChild(header);
+
+            // Compact timeline (just dates and titles)
+            const timeline = document.createElement('div');
+            timeline.className = 'divide-y divide-ink-50 text-sm max-h-[300px] overflow-y-auto';
+
+            result.days.forEach(day => {
+                const row = document.createElement('div');
+                row.className = 'px-3 py-2 flex items-center gap-2';
+
+                const date = document.createElement('span');
+                date.className = 'text-xs font-bold text-ink-400 w-12 flex-shrink-0';
+                date.textContent = day.date;
+                row.appendChild(date);
+
+                const iconWrapper = document.createElement('span');
+                const iconColors = {
+                    'sky': 'text-sky-500',
+                    'teal': 'text-teal-500',
+                    'amber': 'text-amber-500',
+                    'purple': 'text-purple-500',
+                    'emerald': 'text-emerald-500'
+                };
+                iconWrapper.className = iconColors[day.iconColor] || 'text-ink-400';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-' + day.icon + ' text-xs w-4';
+                iconWrapper.appendChild(icon);
+                row.appendChild(iconWrapper);
+
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'text-ink-600 truncate';
+                titleSpan.textContent = day.title;
+                row.appendChild(titleSpan);
+
+                if (day.warning) {
+                    const warn = document.createElement('i');
+                    warn.className = 'fas fa-exclamation-triangle text-amber-500 text-xs ml-auto';
+                    row.appendChild(warn);
+                }
+                if (day.success) {
+                    const check = document.createElement('i');
+                    check.className = 'fas fa-check-circle text-emerald-500 text-xs ml-auto';
+                    row.appendChild(check);
+                }
+
+                timeline.appendChild(row);
+            });
+
+            inner.appendChild(timeline);
+
+            // Apply button
+            const footer = document.createElement('div');
+            footer.className = 'p-3 border-t border-ink-100';
+
+            const btn = document.createElement('button');
+            btn.className = 'w-full text-sm text-sky-600 hover:text-sky-800 font-medium';
+            btn.textContent = 'Use this preset →';
+            btn.onclick = () => applyPreset(preset.id);
+            footer.appendChild(btn);
+
+            inner.appendChild(footer);
+            card.appendChild(inner);
+
+            return card;
         }
 
         function renderPresetButtons() {
