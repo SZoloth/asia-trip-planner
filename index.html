@@ -1286,29 +1286,109 @@
         <!-- ROUTES TAB - Scenario Comparison -->
         <div id="content-routes" class="hidden fade-in">
             <div class="mb-6">
-                <h2 class="font-display text-2xl sm:text-3xl text-ink-700 mb-2">Itinerary Scenarios</h2>
-                <p class="text-ink-400">Compare how different routing choices affect your Jan 3-9 timeline</p>
+                <h2 class="font-display text-2xl sm:text-3xl text-ink-700 mb-2">Build Your Itinerary</h2>
+                <p class="text-ink-400">Adjust the controls to see how your Jan 2-14 timeline changes</p>
             </div>
 
-            <!-- Legend -->
-            <div class="flex flex-wrap gap-4 mb-6 text-sm">
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-slate-300"></span>
-                    <span class="text-ink-500">Unknown/Gap</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
-                    <span class="text-ink-500">Warning</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
-                    <span class="text-ink-500">Optimal</span>
+            <!-- Quick Presets -->
+            <div class="mb-6">
+                <label class="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-2 block">Quick Presets</label>
+                <div class="flex flex-wrap gap-2" id="preset-buttons">
+                    <!-- Rendered by JS -->
                 </div>
             </div>
 
-            <!-- Scenario Grid - scrollable on mobile -->
-            <div class="overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 scenario-scroll">
-                <div class="flex md:grid md:grid-cols-4 gap-4 min-w-max md:min-w-0" id="scenario-grid">
+            <!-- Control Panel -->
+            <div class="card p-4 sm:p-6 mb-6 bg-gradient-to-br from-slate-50 to-white">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <!-- PADI Start Date -->
+                    <div>
+                        <label class="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-2 block">PADI Start Date</label>
+                        <select id="config-padi-start" onchange="updateFromControls()" class="w-full px-3 py-2 bg-white border border-ink-200 rounded-lg text-ink-700 focus:ring-2 focus:ring-sky-200 focus:border-sky-400">
+                            <option value="jan3">Jan 3 (no buffer)</option>
+                            <option value="jan4">Jan 4 (1 buffer day)</option>
+                            <option value="jan5" selected>Jan 5 (2 buffer days)</option>
+                            <option value="jan6">Jan 6 (3 buffer days)</option>
+                        </select>
+                    </div>
+
+                    <!-- Route to Koh Tao -->
+                    <div>
+                        <label class="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-2 block">Route to Koh Tao</label>
+                        <select id="config-route" onchange="updateFromControls()" class="w-full px-3 py-2 bg-white border border-ink-200 rounded-lg text-ink-700 focus:ring-2 focus:ring-sky-200 focus:border-sky-400">
+                            <option value="surat" selected>Via Surat Thani (~$65)</option>
+                            <option value="samui">Via Koh Samui (~$120)</option>
+                        </select>
+                    </div>
+
+                    <!-- Island Days Slider -->
+                    <div>
+                        <label class="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-2 block">
+                            Island Days: <span id="island-days-value" class="text-ink-700">6</span>
+                        </label>
+                        <input type="range" id="config-island-days" min="4" max="8" value="6"
+                               oninput="updateFromControls()"
+                               class="w-full h-2 bg-teal-100 rounded-lg appearance-none cursor-pointer accent-teal-500">
+                        <div class="flex justify-between text-[10px] text-ink-400 mt-1">
+                            <span>4 days</span>
+                            <span>8 days</span>
+                        </div>
+                    </div>
+
+                    <!-- Taiwan Days Slider -->
+                    <div>
+                        <label class="text-xs font-semibold text-ink-400 uppercase tracking-wide mb-2 block">
+                            Taiwan Days: <span id="taiwan-days-value" class="text-ink-700">5</span>
+                        </label>
+                        <input type="range" id="config-taiwan-days" min="3" max="6" value="5"
+                               oninput="updateFromControls()"
+                               class="w-full h-2 bg-purple-100 rounded-lg appearance-none cursor-pointer accent-purple-500">
+                        <div class="flex justify-between text-[10px] text-ink-400 mt-1">
+                            <span>3 days</span>
+                            <span>6 days</span>
+                        </div>
+                    </div>
+
+                    <!-- Buffer Day Toggle -->
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="config-buffer-day" checked onchange="updateFromControls()"
+                               class="w-5 h-5 rounded border-ink-300 text-emerald-500 focus:ring-emerald-200">
+                        <label for="config-buffer-day" class="text-sm text-ink-600">
+                            Beach day before flight<br>
+                            <span class="text-xs text-ink-400">(dive-to-fly buffer)</span>
+                        </label>
+                    </div>
+
+                    <!-- BKK Overnight Toggle -->
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="config-bkk-overnight" checked onchange="updateFromControls()"
+                               class="w-5 h-5 rounded border-ink-300 text-emerald-500 focus:ring-emerald-200">
+                        <label for="config-bkk-overnight" class="text-sm text-ink-600">
+                            Bangkok overnight<br>
+                            <span class="text-xs text-ink-400">(vs same-day to Taipei)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Summary Row -->
+                <div class="mt-4 pt-4 border-t border-ink-100 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <span id="config-cost" class="text-lg font-bold text-ink-700">$320-450</span>
+                        <span id="config-split" class="text-sm text-ink-500">6 island / 5 Taiwan</span>
+                    </div>
+                    <div id="config-warnings" class="flex flex-wrap gap-2">
+                        <!-- Warnings rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Timeline -->
+            <div class="mb-6">
+                <h3 class="font-display text-lg text-ink-700 mb-4 flex items-center gap-2">
+                    <i class="fas fa-calendar-alt text-sky-500"></i>
+                    Your Itinerary
+                </h3>
+                <div id="generated-timeline" class="card divide-y divide-ink-50">
                     <!-- Rendered by JS -->
                 </div>
             </div>
@@ -2814,22 +2894,346 @@
         }
 
         // ========================================
-        // SCENARIO COMPARISON RENDERING
+        // INTERACTIVE ITINERARY CONFIGURATOR
         // ========================================
 
+        // Configuration state
+        let tripConfig = {
+            padiStart: 'jan5',      // 'jan3', 'jan4', 'jan5', 'jan6'
+            islandDays: 6,          // 4-8
+            taiwanDays: 5,          // 3-6
+            bufferDay: true,        // Beach day before flight
+            bkkOvernight: true,     // Overnight in BKK before TPE
+            route: 'surat'          // 'surat' or 'samui'
+        };
+
+        // Preset configurations mapped from scenarios
+        const presets = {
+            standard: { padiStart: 'jan4', islandDays: 5, taiwanDays: 5, bufferDay: true, bkkOvernight: true, route: 'surat' },
+            extended: { padiStart: 'jan5', islandDays: 6, taiwanDays: 5, bufferDay: true, bkkOvernight: true, route: 'surat' },
+            maxisland: { padiStart: 'jan4', islandDays: 7, taiwanDays: 4, bufferDay: true, bkkOvernight: true, route: 'surat' }
+        };
+
         function renderRoutesTab() {
-            renderScenarioComparison();
+            renderPresetButtons();
+            updateFromControls();
         }
 
-        function renderScenarioComparison() {
-            const grid = document.getElementById('scenario-grid');
-            if (!grid) return;
-            grid.replaceChildren();
+        function renderPresetButtons() {
+            const container = document.getElementById('preset-buttons');
+            if (!container) return;
+            container.replaceChildren();
 
-            scenarios.forEach(scenario => {
-                const column = createScenarioColumn(scenario);
-                grid.appendChild(column);
+            const presetInfo = [
+                { id: 'standard', name: 'Standard', subtitle: '5/5 split', recommended: false },
+                { id: 'extended', name: 'Extended', subtitle: '6/5 split', recommended: true },
+                { id: 'maxisland', name: 'Max Island', subtitle: '7/4 split', recommended: false }
+            ];
+
+            presetInfo.forEach(preset => {
+                const btn = document.createElement('button');
+                btn.className = 'preset-btn px-4 py-2 rounded-lg border text-sm font-medium transition-all ' +
+                    (preset.recommended
+                        ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                        : 'bg-white border-ink-200 text-ink-600 hover:bg-ink-50');
+                btn.dataset.presetId = preset.id;
+                btn.onclick = () => applyPreset(preset.id);
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = preset.name;
+                btn.appendChild(nameSpan);
+
+                if (preset.recommended) {
+                    const badge = document.createElement('span');
+                    badge.className = 'ml-2 text-[10px] bg-emerald-500 text-white px-1.5 py-0.5 rounded';
+                    badge.textContent = 'BEST';
+                    btn.appendChild(badge);
+                }
+
+                const sub = document.createElement('span');
+                sub.className = 'ml-2 text-xs text-ink-400';
+                sub.textContent = preset.subtitle;
+                btn.appendChild(sub);
+
+                container.appendChild(btn);
             });
+        }
+
+        function applyPreset(presetId) {
+            const preset = presets[presetId];
+            if (!preset) return;
+
+            // Update config
+            tripConfig = { ...preset };
+
+            // Update form controls
+            document.getElementById('config-padi-start').value = preset.padiStart;
+            document.getElementById('config-route').value = preset.route;
+            document.getElementById('config-island-days').value = preset.islandDays;
+            document.getElementById('config-taiwan-days').value = preset.taiwanDays;
+            document.getElementById('config-buffer-day').checked = preset.bufferDay;
+            document.getElementById('config-bkk-overnight').checked = preset.bkkOvernight;
+
+            // Update display values
+            document.getElementById('island-days-value').textContent = preset.islandDays;
+            document.getElementById('taiwan-days-value').textContent = preset.taiwanDays;
+
+            // Highlight selected preset button
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                if (btn.dataset.presetId === presetId) {
+                    btn.classList.add('ring-2', 'ring-sky-400');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-sky-400');
+                }
+            });
+
+            // Regenerate itinerary
+            regenerateItinerary();
+            showToast('Applied: ' + presetId.charAt(0).toUpperCase() + presetId.slice(1) + ' preset');
+        }
+
+        function updateFromControls() {
+            // Read values from controls
+            tripConfig.padiStart = document.getElementById('config-padi-start').value;
+            tripConfig.route = document.getElementById('config-route').value;
+            tripConfig.islandDays = parseInt(document.getElementById('config-island-days').value);
+            tripConfig.taiwanDays = parseInt(document.getElementById('config-taiwan-days').value);
+            tripConfig.bufferDay = document.getElementById('config-buffer-day').checked;
+            tripConfig.bkkOvernight = document.getElementById('config-bkk-overnight').checked;
+
+            // Update display values
+            document.getElementById('island-days-value').textContent = tripConfig.islandDays;
+            document.getElementById('taiwan-days-value').textContent = tripConfig.taiwanDays;
+
+            // Clear preset highlight (user is customizing)
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-sky-400');
+            });
+
+            regenerateItinerary();
+        }
+
+        function regenerateItinerary() {
+            const result = generateItinerary(tripConfig);
+            renderGeneratedTimeline(result);
+            updateConfigSummary(result);
+        }
+
+        function generateItinerary(config) {
+            const days = [];
+            const warnings = [];
+            let costMin = 0;
+            let costMax = 0;
+
+            // Calculate dates based on PADI start
+            const padiStartDates = { jan3: 3, jan4: 4, jan5: 5, jan6: 6 };
+            const padiStartDay = padiStartDates[config.padiStart] || 5;
+
+            // Calculate travel day (day before PADI or same day if no buffer before PADI)
+            const bufferDaysBeforePadi = padiStartDay - 3; // Jan 3 = 0 buffer, Jan 5 = 2 buffer
+            const travelDay = 2; // Always travel on Jan 2
+
+            // Route costs
+            const routeCosts = {
+                surat: { min: 62, max: 115, name: 'Via Surat Thani', duration: 'CNX 10:55→KT 3:30' },
+                samui: { min: 100, max: 180, name: 'Via Koh Samui', duration: 'CNX 9:00→KT 2:00' }
+            };
+            const routeInfo = routeCosts[config.route];
+            costMin += routeInfo.min;
+            costMax += routeInfo.max;
+
+            // Day 1: Travel to Koh Tao (Jan 2)
+            days.push({
+                date: 'Jan 2',
+                dayNum: 8,
+                title: 'CNX → Koh Tao',
+                icon: 'plane',
+                iconColor: 'sky',
+                events: config.route === 'surat' ? [
+                    { time: '10:55 AM', text: 'Thai AirAsia FD5420 depart CNX' },
+                    { time: '12:45 PM', text: 'Arrive Surat Thani (URT)' },
+                    { time: '1:00 PM', text: 'Lomprayah catamaran' },
+                    { time: '3:30 PM', text: 'Arrive Koh Tao' }
+                ] : [
+                    { time: '9:00 AM', text: 'Bangkok Airways depart CNX' },
+                    { time: '10:30 AM', text: 'Arrive Koh Samui (USM)' },
+                    { time: '12:00 PM', text: 'Lomprayah catamaran' },
+                    { time: '2:00 PM', text: 'Arrive Koh Tao' }
+                ],
+                note: 'Book combo on 12go.asia ~$' + routeInfo.min + '-' + routeInfo.max
+            });
+
+            // Buffer days before PADI
+            let currentDay = 3;
+            for (let i = 0; i < bufferDaysBeforePadi; i++) {
+                days.push({
+                    date: 'Jan ' + currentDay,
+                    dayNum: 7 + currentDay,
+                    title: i === 0 ? 'Explore Koh Tao' : 'Beach Day',
+                    icon: 'umbrella-beach',
+                    iconColor: 'teal',
+                    events: [{ time: 'All day', text: i === 0 ? 'Settle in, explore the island' : 'Relax before diving starts' }],
+                    success: 'Buffer day before PADI'
+                });
+                currentDay++;
+            }
+
+            // PADI days (always 3)
+            for (let i = 0; i < 3; i++) {
+                const isLastPadiDay = i === 2;
+                days.push({
+                    date: 'Jan ' + currentDay,
+                    dayNum: 7 + currentDay,
+                    title: 'PADI Day ' + (i + 1),
+                    icon: 'water',
+                    iconColor: 'sky',
+                    events: i === 0
+                        ? [{ time: '9:00 AM', text: 'Open Water certification begins' }]
+                        : i === 1
+                            ? [{ time: '8:00 AM', text: 'Confined water + open water dives' }]
+                            : [{ time: '8:00 AM', text: 'Final dives + certification' }],
+                    note: isLastPadiDay ? 'Last dive ~2 PM' : null,
+                    warning: isLastPadiDay ? 'Dive-to-fly: 24hr before next flight' : null
+                });
+                currentDay++;
+            }
+
+            const lastDiveDay = currentDay - 1;
+
+            // Remaining island days (beach/chill)
+            const remainingIslandDays = config.islandDays - 3 - bufferDaysBeforePadi - 1; // -1 for travel day
+            const beachDaysNeeded = config.bufferDay ? Math.max(1, remainingIslandDays) : remainingIslandDays;
+
+            for (let i = 0; i < beachDaysNeeded; i++) {
+                const isPreFlightBuffer = i === beachDaysNeeded - 1 && config.bufferDay;
+                days.push({
+                    date: 'Jan ' + currentDay,
+                    dayNum: 7 + currentDay,
+                    title: isPreFlightBuffer ? 'Beach Day (No Diving)' : 'Beach Day',
+                    icon: 'sun',
+                    iconColor: 'amber',
+                    events: [{ time: 'All day', text: isPreFlightBuffer ? 'Relax - NO diving today' : 'Snorkeling, beach, explore' }],
+                    success: isPreFlightBuffer ? '24+ hrs since last dive - safe to fly' : null
+                });
+                currentDay++;
+            }
+
+            // Travel to Bangkok
+            const departKohTaoDay = currentDay;
+            costMin += 50; // Return ferry + flight
+            costMax += 100;
+
+            days.push({
+                date: 'Jan ' + currentDay,
+                dayNum: 7 + currentDay,
+                title: 'Koh Tao → Bangkok',
+                icon: 'ship',
+                iconColor: 'sky',
+                events: [
+                    { time: '8:00 AM', text: 'Lomprayah ferry depart' },
+                    { time: '12:00 PM', text: 'Arrive Surat Thani' },
+                    { time: '12:45 PM', text: 'Thai AirAsia to Bangkok' },
+                    { time: '2:30 PM', text: 'Arrive Bangkok (DMK)' }
+                ],
+                note: config.bkkOvernight ? 'Bangkok overnight' : 'Connect to Taipei same day'
+            });
+            currentDay++;
+
+            // Dive-to-fly validation
+            const hoursSinceLastDive = (departKohTaoDay - lastDiveDay) * 24 + 8; // 8 AM ferry
+            if (hoursSinceLastDive < 24) {
+                warnings.push('Violates dive-to-fly: only ' + hoursSinceLastDive + 'hrs since last dive');
+            }
+
+            // BKK overnight or same-day Taipei
+            if (config.bkkOvernight) {
+                // BKK → Taipei next day
+                days.push({
+                    date: 'Jan ' + currentDay,
+                    dayNum: 7 + currentDay,
+                    title: 'Bangkok → Taipei',
+                    icon: 'plane-departure',
+                    iconColor: 'purple',
+                    events: [{ time: '9:00 AM', text: 'Flight to Taipei (3h 45m)' }],
+                    note: 'Begin ' + config.taiwanDays + ' days in Taiwan',
+                    success: 'Morning flight - full day in Taipei'
+                });
+                costMin += 82;
+                costMax += 180;
+                currentDay++;
+            } else {
+                // Same-day connection - update previous day
+                const lastDay = days[days.length - 1];
+                lastDay.events.push({ time: '6:00 PM', text: 'Evening flight to Taipei' });
+                lastDay.warning = 'Long travel day - consider overnight in BKK';
+                costMin += 100; // Same-day flights more expensive
+                costMax += 220;
+            }
+
+            // Taiwan days
+            const taiwanStartDay = currentDay;
+            for (let i = 0; i < config.taiwanDays - 1; i++) { // -1 because arrival day counts
+                days.push({
+                    date: 'Jan ' + currentDay,
+                    dayNum: 7 + currentDay,
+                    title: i === 0 ? 'Taipei Day 1' : i === 1 ? 'Day Trip' : 'Taiwan Day ' + (i + 1),
+                    icon: 'landmark',
+                    iconColor: 'purple',
+                    events: [{ time: 'All day', text: i === 0 ? 'Explore Taipei' : i === 1 ? 'Jiufen / Shifen day trip' : 'Explore Taiwan' }]
+                });
+                currentDay++;
+            }
+
+            // Validation: check if we overflow past Jan 14
+            if (currentDay > 15) {
+                warnings.push('Itinerary extends past Jan 14 - reduce days');
+            }
+
+            // Total days validation
+            const totalDays = config.islandDays + config.taiwanDays + (config.bkkOvernight ? 1 : 0);
+            if (totalDays > 13) {
+                warnings.push('Total days (' + totalDays + ') exceeds available time');
+            }
+
+            return { days, warnings, costMin, costMax };
+        }
+
+        function renderGeneratedTimeline(result) {
+            const container = document.getElementById('generated-timeline');
+            if (!container) return;
+            container.replaceChildren();
+
+            result.days.forEach(day => {
+                const row = createDayRow(day);
+                container.appendChild(row);
+            });
+        }
+
+        function updateConfigSummary(result) {
+            document.getElementById('config-cost').textContent = '$' + result.costMin + '-' + result.costMax;
+            document.getElementById('config-split').textContent = tripConfig.islandDays + ' island / ' + tripConfig.taiwanDays + ' Taiwan';
+
+            const warningsContainer = document.getElementById('config-warnings');
+            warningsContainer.replaceChildren();
+
+            if (result.warnings.length === 0) {
+                const badge = document.createElement('span');
+                badge.className = 'text-xs px-2 py-1 bg-emerald-100 text-emerald-700 rounded';
+                badge.textContent = 'Dive-to-fly compliant';
+                warningsContainer.appendChild(badge);
+            } else {
+                result.warnings.forEach(warning => {
+                    const badge = document.createElement('span');
+                    badge.className = 'text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded';
+                    badge.textContent = warning;
+                    warningsContainer.appendChild(badge);
+                });
+            }
+        }
+
+        // Legacy function kept for compatibility
+        function renderScenarioComparison() {
+            // No longer used - configurator replaces this
         }
 
         function createScenarioColumn(scenario) {
