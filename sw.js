@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asia-trip-v21-ferry-warn';
+const CACHE_NAME = 'asia-trip-v22-locked-itinerary';
 const OFFLINE_URL = '/asia-trip-planner/';
 
 // Assets to cache on install

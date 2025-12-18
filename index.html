@@ -732,9 +732,15 @@
                         </div>
 
                         <!-- Add Custom Button -->
-                        <button onclick="showCreateCustomModal()" class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-paper-100 hover:bg-paper-200 text-ink-500 font-medium text-sm transition-colors border border-dashed border-paper-400 hover:border-ink-300">
+                        <button onclick="showCreateCustomModal()" class="w-full mb-2 flex items-center justify-center gap-2 px-4 py-2.5 bg-paper-100 hover:bg-paper-200 text-ink-500 font-medium text-sm transition-colors border border-dashed border-paper-400 hover:border-ink-300">
                             <i class="fas fa-plus text-xs"></i>
                             Add Custom Activity
+                        </button>
+
+                        <!-- Locked Itinerary Button -->
+                        <button onclick="loadTemplate('locked-2026')" class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2.5 bg-violet-50 hover:bg-violet-100 text-violet-700 font-semibold text-sm transition-colors border-2 border-violet-300 hover:border-violet-400 rounded">
+                            <i class="fas fa-check-circle text-xs"></i>
+                            Load Locked Itinerary
                         </button>
 
                         <!-- Logistics Buttons -->
@@ -4768,6 +4774,31 @@
                     15: ['jiufen', 'beitou'], 16: ['sun-moon-lake'],
                     17: ['alishan'], 18: ['taichung-theater'],
                     19: [], 20: []
+                };
+            } else if (template === 'locked-2026') {
+                // LOCKED ITINERARY as of Dec 18, 2025
+                // Order: Bangkok → Chiang Mai → Taiwan → Koh Tao → Bangkok → Home
+                itinerary = {
+                    1: ['wat-pho'],                    // Dec 28: Arrive Bangkok
+                    2: ['grand-palace', 'chinatown'], // Dec 29: Bangkok extra day
+                    3: [],                            // Dec 30: Fly to Chiang Mai 6:40pm
+                    4: ['lantern-festival'],          // Dec 31: NYE Lantern Festival 🎇
+                    5: ['cm-old-city', 'khao-soi'],   // Jan 1: Recovery day
+                    6: ['elephant-sanctuary'],        // Jan 2: Hill Tribe Day 1 (BOOKED)
+                    7: ['elephant-sanctuary'],        // Jan 3: Hill Tribe Day 2 (BOOKED)
+                    8: ['jiufen'],                    // Jan 4: Arrive Taiwan 4:55am → Taipei
+                    9: ['beitou'],                    // Jan 5: Hot springs (Jake's rec)
+                    10: [],                           // Jan 6: Taipei nightmarkets
+                    11: [],                           // Jan 7: Taipei / Wulai day trip
+                    12: [],                           // Jan 8: Taipei / Din Tai Fung
+                    13: ['sun-moon-lake'],            // Jan 9: Day trip (or Maokong)
+                    14: [],                           // Jan 10: Fly TPE → BKK evening
+                    15: [],                           // Jan 11: BKK → Surat Thani → Koh Tao
+                    16: ['koh-tao-scuba'],            // Jan 12: PADI Day 1
+                    17: ['koh-tao-scuba'],            // Jan 13: PADI Day 2
+                    18: ['koh-tao-scuba'],            // Jan 14: PADI Day 3
+                    19: [],                           // Jan 15: Koh Tao → Bangkok
+                    20: []                            // Jan 16: Fly home
                 };
             }
 
