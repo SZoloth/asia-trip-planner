@@ -1,4 +1,4 @@
-const CACHE_NAME = 'asia-trip-v23-timezone-fix';
+const CACHE_NAME = 'asia-trip-v24-locked-itinerary-final';
 const OFFLINE_URL = '/asia-trip-planner/';
 
 // Assets to cache on install
