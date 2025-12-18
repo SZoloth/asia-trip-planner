@@ -2321,7 +2321,7 @@
 
         // Trip dates
         const tripDays = [];
-        const startDate = new Date('2025-12-28');
+        const startDate = new Date(2025, 11, 28); // Dec 28, 2025 in local time (months are 0-indexed)
         for (let i = 0; i < 20; i++) {
             const date = new Date(startDate);
             date.setDate(date.getDate() + i);
@@ -3714,14 +3714,13 @@
         let selectedScenarioId = null;
 
         // Map scenario dates to trip day numbers
-        // Trip starts Dec 26 = Day 1, so:
-        // Dec 28 = Day 3, Dec 29 = Day 4, etc.
-        // Jan 1 = Day 7, Jan 2 = Day 8, Jan 3 = Day 9, etc.
+        // Trip starts Dec 28 = Day 1 (land in BKK)
         const dateToDayNum = {
-            'Dec 28': 3, 'Dec 29': 4, 'Dec 30': 5, 'Dec 31': 6,
-            'Jan 1': 7, 'Jan 2': 8, 'Jan 3': 9, 'Jan 4': 10,
-            'Jan 5': 11, 'Jan 6': 12, 'Jan 7': 13, 'Jan 8': 14, 'Jan 9': 15,
-            'Jan 10': 16, 'Jan 11': 17, 'Jan 12': 18, 'Jan 13': 19, 'Jan 14': 20
+            'Dec 28': 1, 'Dec 29': 2, 'Dec 30': 3, 'Dec 31': 4,
+            'Jan 1': 5, 'Jan 2': 6, 'Jan 3': 7, 'Jan 4': 8,
+            'Jan 5': 9, 'Jan 6': 10, 'Jan 7': 11, 'Jan 8': 12, 'Jan 9': 13,
+            'Jan 10': 14, 'Jan 11': 15, 'Jan 12': 16, 'Jan 13': 17, 'Jan 14': 18,
+            'Jan 15': 19, 'Jan 16': 20
         };
 
         // Select a scenario and mark it as chosen
