@@ -2166,6 +2166,18 @@
         // Collaboration state
         let currentUser = null;
         let currentRoomCode = null;
+
+        // Shared trip data comes from other room members: escape it before it
+        // goes into HTML, and keep only safe characters in IDs used in handlers.
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"'`]/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '`': '&#96;'
+            })[c]);
+        }
+
+        function safeId(value) {
+            return String(value ?? '').replace(/[^A-Za-z0-9_-]/g, '');
+        }
         let roomRef = null;
         let isCollaborating = false;
         let itineraryListener = null;
@@ -2727,12 +2739,12 @@
                     <div class="flex items-center justify-between p-2 bg-sky-50 rounded-lg border border-sky-100 group">
                         <div class="flex items-center gap-2 min-w-0">
                             <i class="fas fa-plane text-sky-500 text-xs"></i>
-                            <span class="text-sm font-medium text-slate-700 truncate">${f.from} → ${f.to}</span>
-                            <span class="text-xs text-slate-400">Day ${f.departureDate}</span>
+                            <span class="text-sm font-medium text-slate-700 truncate">${escapeHtml(f.from)} → ${escapeHtml(f.to)}</span>
+                            <span class="text-xs text-slate-400">Day ${escapeHtml(f.departureDate)}</span>
                         </div>
                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="showFlightModal('${f.id}')" class="p-1 text-slate-400 hover:text-sky-600"><i class="fas fa-edit text-xs"></i></button>
-                            <button onclick="deleteFlight('${f.id}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
+                            <button onclick="showFlightModal('${safeId(f.id)}')" class="p-1 text-slate-400 hover:text-sky-600"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="deleteFlight('${safeId(f.id)}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 `;
@@ -2745,12 +2757,12 @@
                     <div class="flex items-center justify-between p-2 bg-violet-50 rounded-lg border border-violet-100 group">
                         <div class="flex items-center gap-2 min-w-0">
                             <i class="fas fa-hotel text-violet-500 text-xs"></i>
-                            <span class="text-sm font-medium text-slate-700 truncate">${h.name}</span>
+                            <span class="text-sm font-medium text-slate-700 truncate">${escapeHtml(h.name)}</span>
                             <span class="text-xs text-slate-400">${nights} night${nights > 1 ? 's' : ''}</span>
                         </div>
                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="showHotelModal('${h.id}')" class="p-1 text-slate-400 hover:text-violet-600"><i class="fas fa-edit text-xs"></i></button>
-                            <button onclick="deleteHotel('${h.id}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
+                            <button onclick="showHotelModal('${safeId(h.id)}')" class="p-1 text-slate-400 hover:text-violet-600"><i class="fas fa-edit text-xs"></i></button>
+                            <button onclick="deleteHotel('${safeId(h.id)}')" class="p-1 text-slate-400 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button>
                         </div>
                     </div>
                 `;
@@ -2788,13 +2800,13 @@
                     html += `
                         <div class="dest-card p-2.5 mb-1.5 rounded-xl bg-indigo-50 hover:bg-white hover:shadow-sm accent-custom"
                              draggable="true"
-                             ondragstart="dragStart(event, '${dest.id}')"
+                             ondragstart="dragStart(event, '${safeId(dest.id)}')"
                              ondragend="dragEnd(event)"
-                             onclick="showDestinationDetail('${dest.id}')">
+                             onclick="showDestinationDetail('${safeId(dest.id)}')">
                             <div class="flex items-center justify-between">
                                 <div class="flex-1 min-w-0">
-                                    <div class="font-medium text-sm text-slate-800 truncate">${dest.name}</div>
-                                    <div class="text-xs text-slate-500">${dest.region}</div>
+                                    <div class="font-medium text-sm text-slate-800 truncate">${escapeHtml(dest.name)}</div>
+                                    <div class="text-xs text-slate-500">${escapeHtml(dest.region)}</div>
                                 </div>
                                 ${dest.highlight ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : ''}
                                 <i class="fas fa-user-edit text-indigo-400 text-xs ml-1"></i>
@@ -2819,13 +2831,13 @@
                     html += `
                         <div class="dest-card p-2.5 mb-1.5 rounded-xl bg-slate-50 hover:bg-white hover:shadow-sm accent-${key} ${closedClass}"
                              draggable="true"
-                             ondragstart="dragStart(event, '${dest.id}')"
+                             ondragstart="dragStart(event, '${safeId(dest.id)}')"
                              ondragend="dragEnd(event)"
-                             onclick="showDestinationDetail('${dest.id}')">
+                             onclick="showDestinationDetail('${safeId(dest.id)}')">
                             <div class="flex items-center justify-between">
                                 <div class="flex-1 min-w-0">
-                                    <div class="font-medium text-sm text-slate-800 truncate">${dest.name}</div>
-                                    <div class="text-xs text-slate-500">${dest.region}</div>
+                                    <div class="font-medium text-sm text-slate-800 truncate">${escapeHtml(dest.name)}</div>
+                                    <div class="text-xs text-slate-500">${escapeHtml(dest.region)}</div>
                                 </div>
                                 ${dest.highlight && !dest.closed ? '<i class="fas fa-star text-amber-400 text-xs"></i>' : ''}
                                 ${dest.closed ? '<i class="fas fa-ban text-red-400 text-xs"></i>' : ''}
@@ -2856,10 +2868,10 @@
                                      dest.country === 'Cambodia' || dest.country === 'cambodia' ? 'cambodia' : 'taiwan';
                 const isCustom = dest.isCustom;
                 html += '<div class="flex items-center justify-between py-2 border-b border-paper-200 touch-feedback" ' +
-                    'draggable="true" ondragstart="dragStart(event, \'' + dest.id + '\')" ondragend="dragEnd(event)" ' +
-                    'onclick="showDestinationDetail(\'' + dest.id + '\')">' +
+                    'draggable="true" ondragstart="dragStart(event, \'' + safeId(dest.id) + '\')" ondragend="dragEnd(event)" ' +
+                    'onclick="showDestinationDetail(\'' + safeId(dest.id) + '\')">' +
                     '<div class="flex-1 min-w-0">' +
-                        '<div class="font-medium text-ink-700 text-sm truncate">' + dest.name + '</div>' +
+                        '<div class="font-medium text-ink-700 text-sm truncate">' + escapeHtml(dest.name) + '</div>' +
                         '<div class="text-xs text-ink-400">' + (dest.region || dest.country) + '</div>' +
                     '</div>' +
                     '<div class="ml-2 flex items-center gap-2">' +
@@ -3849,23 +3861,23 @@
                 }
 
                 html += `
-                    <div class="card card-interactive p-5 ${closedClass}" data-country="${dest.country}" data-custom="${isCustom || false}" onclick="showDestinationDetail('${dest.id}')">
+                    <div class="card card-interactive p-5 ${closedClass}" data-country="${escapeHtml(dest.country)}" data-custom="${isCustom || false}" onclick="showDestinationDetail('${safeId(dest.id)}')">
                         <div class="flex items-start justify-between mb-3">
                             <div>
-                                <h4 class="font-bold text-slate-800">${dest.name}</h4>
-                                <p class="text-sm text-slate-500">${dest.region}</p>
+                                <h4 class="font-bold text-slate-800">${escapeHtml(dest.name)}</h4>
+                                <p class="text-sm text-slate-500">${escapeHtml(dest.region)}</p>
                             </div>
                             ${badge}
                         </div>
                         <div class="flex flex-wrap gap-1.5 mb-3">
-                            <span class="badge-${isCustom ? 'custom' : dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>
-                            <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-lg">${dest.type}</span>
+                            <span class="badge-${isCustom ? 'custom' : dest.country} text-xs px-2 py-1 rounded-lg font-medium">${escapeHtml(dest.country)}</span>
+                            <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-lg">${escapeHtml(dest.type)}</span>
                         </div>
-                        <p class="text-sm text-slate-600 mb-4 line-clamp-2">${dest.desc || 'No description'}</p>
+                        <p class="text-sm text-slate-600 mb-4 line-clamp-2">${escapeHtml(dest.desc || 'No description')}</p>
                         <div class="flex items-center justify-between text-sm text-slate-500 pt-3 border-t border-slate-100">
-                            <span><i class="far fa-clock mr-1"></i>${dest.days}d</span>
-                            <span><i class="fas fa-dollar-sign mr-1"></i>${dest.cost}</span>
-                            <span class="text-xs">${dest.crowds || 'N/A'}</span>
+                            <span><i class="far fa-clock mr-1"></i>${escapeHtml(dest.days)}d</span>
+                            <span><i class="fas fa-dollar-sign mr-1"></i>${escapeHtml(dest.cost)}</span>
+                            <span class="text-xs">${escapeHtml(dest.crowds || 'N/A')}</span>
                         </div>
                     </div>`;
             });
@@ -3991,8 +4003,8 @@
                 html += `
                     <div class="flex items-center gap-1.5 ${colorClass} border rounded-md px-2 py-1 text-[11px] mb-1 group min-w-0 overflow-hidden ${isFirstDay ? '' : 'opacity-50'}">
                         <i class="fas fa-${isFirstDay ? 'hotel' : 'bed'} text-[9px] flex-shrink-0"></i>
-                        <span class="font-medium truncate flex-1 cursor-pointer" onclick="showHotelModal('${h.id}')">${h.name}</span>
-                        <button onclick="deleteHotel('${h.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity flex-shrink-0">
+                        <span class="font-medium truncate flex-1 cursor-pointer" onclick="showHotelModal('${safeId(h.id)}')">${escapeHtml(h.name)}</span>
+                        <button onclick="deleteHotel('${safeId(h.id)}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity flex-shrink-0">
                             <i class="fas fa-times text-[9px]"></i>
                         </button>
                     </div>`;
@@ -4008,9 +4020,9 @@
                     html += `
                         <div class="flight-pill flight-departure mb-1 group">
                             <i class="fas fa-plane-departure text-[10px]"></i>
-                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${f.id}')">${f.from}→${f.to}</span>
-                            <span class="text-sky-500">${f.departureTime}</span>
-                            <button onclick="deleteFlight('${f.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
+                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${safeId(f.id)}')">${escapeHtml(f.from)}→${escapeHtml(f.to)}</span>
+                            <span class="text-sky-500">${escapeHtml(f.departureTime)}</span>
+                            <button onclick="deleteFlight('${safeId(f.id)}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
                                 <i class="fas fa-times text-[9px]"></i>
                             </button>
                         </div>`;
@@ -4019,9 +4031,9 @@
                     html += `
                         <div class="flight-pill flight-arrival mb-1 group">
                             <i class="fas fa-plane-arrival text-[10px]"></i>
-                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${f.id}')">ARR ${f.to}</span>
-                            <span class="text-sky-500">${f.arrivalTime}</span>
-                            <button onclick="deleteFlight('${f.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
+                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${safeId(f.id)}')">ARR ${escapeHtml(f.to)}</span>
+                            <span class="text-sky-500">${escapeHtml(f.arrivalTime)}</span>
+                            <button onclick="deleteFlight('${safeId(f.id)}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
                                 <i class="fas fa-times text-[9px]"></i>
                             </button>
                         </div>`;
@@ -4029,9 +4041,9 @@
                     html += `
                         <div class="flight-pill flight-arrival mb-1 group">
                             <i class="fas fa-plane-arrival text-[10px]"></i>
-                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${f.id}')">ARR ${f.to}</span>
-                            <span class="text-sky-500">${f.arrivalTime}</span>
-                            <button onclick="deleteFlight('${f.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
+                            <span class="font-medium cursor-pointer" onclick="showFlightModal('${safeId(f.id)}')">ARR ${escapeHtml(f.to)}</span>
+                            <span class="text-sky-500">${escapeHtml(f.arrivalTime)}</span>
+                            <button onclick="deleteFlight('${safeId(f.id)}')" class="opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity ml-auto">
                                 <i class="fas fa-times text-[9px]"></i>
                             </button>
                         </div>`;
@@ -4051,8 +4063,8 @@
                         html += `
                             <div class="flex items-center gap-2 bg-${color}-50 rounded-lg px-2 py-1.5 text-xs group min-w-0 overflow-hidden">
                                 <span class="w-1.5 h-1.5 rounded-full bg-${color}-500 flex-shrink-0"></span>
-                                <span class="flex-1 truncate font-medium text-slate-700">${dest.name}</span>
-                                <button onclick="removeFromDay('${destId}', ${dayNum}, event)"
+                                <span class="flex-1 truncate font-medium text-slate-700">${escapeHtml(dest.name)}</span>
+                                <button onclick="removeFromDay('${safeId(destId)}', ${dayNum}, event)"
                                         class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity flex-shrink-0">
                                     <i class="fas fa-times text-[10px]"></i>
                                 </button>
@@ -4206,8 +4218,8 @@
                 let name, location, time, details;
 
                 if (item.type === 'flight') {
-                    name = `${item.from} → ${item.to}`;
-                    location = `${item.from} to ${item.to}`;
+                    name = `${escapeHtml(item.from)} → ${escapeHtml(item.to)}`;
+                    location = `${escapeHtml(item.from)} to ${escapeHtml(item.to)}`;
                     time = item.departureTime || '';
                     details = [item.airline, item.flightNumber].filter(Boolean).join(' ');
                 } else if (item.type === 'hotel') {
@@ -4406,12 +4418,12 @@
                     const isAdded = dayDests.includes(dest.id);
                     const addedClass = isAdded ? ' picker-item-added' : '';
 
-                    html += '<div class="picker-item ' + country + addedClass + '" data-dest-id="' + dest.id + '">';
-                    html += '<div class="flex-1 min-w-0" onclick="togglePickerItem(\'' + dest.id + '\')">';
-                    html += '<div class="font-medium text-sm text-ink-700">' + dest.name + '</div>';
-                    html += '<div class="text-xs text-ink-400">' + (dest.region || country) + ' · ' + dest.days + 'd · $' + dest.cost + '</div>';
+                    html += '<div class="picker-item ' + country + addedClass + '" data-dest-id="' + safeId(dest.id) + '">';
+                    html += '<div class="flex-1 min-w-0" onclick="togglePickerItem(\'' + safeId(dest.id) + '\')">';
+                    html += '<div class="font-medium text-sm text-ink-700">' + escapeHtml(dest.name) + '</div>';
+                    html += '<div class="text-xs text-ink-400">' + escapeHtml(dest.region || country) + ' · ' + escapeHtml(dest.days) + 'd · $' + escapeHtml(dest.cost) + '</div>';
                     html += '</div>';
-                    html += '<button onclick="togglePickerItem(\'' + dest.id + '\')" class="picker-item-btn ' +
+                    html += '<button onclick="togglePickerItem(\'' + safeId(dest.id) + '\')" class="picker-item-btn ' +
                             (isAdded ? 'bg-emerald-500 text-white' : 'bg-white text-ink-400 border border-paper-300') + '">';
                     html += '<i class="fas ' + (isAdded ? 'fa-check' : 'fa-plus') + ' text-sm"></i>';
                     html += '</button>';
@@ -4508,10 +4520,10 @@
             listDiv.classList.remove('hidden');
             let html = '';
             customActivities.forEach(item => {
-                const country = (item.country || 'thailand').toLowerCase();
+                const country = escapeHtml((item.country || 'thailand').toLowerCase());
                 html += '<div class="picker-item ' + country + ' text-sm">';
-                html += '<span class="flex-1">' + item.name + '</span>';
-                html += '<button onclick="deleteCustomItem(\'' + item.id + '\')" class="text-ink-400 hover:text-red-500">';
+                html += '<span class="flex-1">' + escapeHtml(item.name) + '</span>';
+                html += '<button onclick="deleteCustomItem(\'' + safeId(item.id) + '\')" class="text-ink-400 hover:text-red-500">';
                 html += '<i class="fas fa-trash text-xs"></i>';
                 html += '</button>';
                 html += '</div>';
@@ -4817,10 +4829,10 @@
 
             const customButtons = dest.isCustom ? `
                 <div class="flex gap-2 mb-4">
-                    <button onclick="showCreateCustomModal('${dest.id}')" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-sm font-medium transition-colors">
+                    <button onclick="showCreateCustomModal('${safeId(dest.id)}')" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 hover:bg-indigo-100 text-sm font-medium transition-colors">
                         <i class="fas fa-edit"></i> Edit
                     </button>
-                    <button onclick="deleteCustomActivity('${dest.id}')" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium transition-colors">
+                    <button onclick="deleteCustomActivity('${safeId(dest.id)}')" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium transition-colors">
                         <i class="fas fa-trash"></i> Delete
                     </button>
                 </div>
@@ -4830,10 +4842,10 @@
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
-                            ${dest.isCustom ? '<span class="custom-badge">Custom</span>' : `<span class="badge-${dest.country} text-xs px-2 py-1 rounded-lg font-medium">${dest.country}</span>`}
-                            <span class="text-xs text-slate-500">${dest.region}</span>
+                            ${dest.isCustom ? '<span class="custom-badge">Custom</span>' : `<span class="badge-${escapeHtml(dest.country)} text-xs px-2 py-1 rounded-lg font-medium">${escapeHtml(dest.country)}</span>`}
+                            <span class="text-xs text-slate-500">${escapeHtml(dest.region)}</span>
                         </div>
-                        <h2 class="text-xl font-bold text-slate-800">${dest.name}</h2>
+                        <h2 class="text-xl font-bold text-slate-800">${escapeHtml(dest.name)}</h2>
                     </div>
                     <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors">
                         <i class="fas fa-times"></i>
@@ -4844,19 +4856,19 @@
 
                 ${dest.closed ? '<div class="bg-red-100 border border-red-200 rounded-xl p-3 mb-4 text-sm text-red-700"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Currently Closed</strong> - Not recommended for this trip</div>' : ''}
 
-                <p class="text-slate-600 mb-5">${dest.desc}</p>
+                <p class="text-slate-600 mb-5">${escapeHtml(dest.desc)}</p>
 
                 <div class="grid grid-cols-3 gap-3 mb-5">
                     <div class="bg-slate-50 rounded-xl p-3 text-center">
-                        <div class="text-xl font-bold text-slate-800">${dest.days}</div>
+                        <div class="text-xl font-bold text-slate-800">${escapeHtml(dest.days)}</div>
                         <div class="text-xs text-slate-500">Days</div>
                     </div>
                     <div class="bg-slate-50 rounded-xl p-3 text-center">
-                        <div class="text-xl font-bold text-emerald-600">$${dest.cost}</div>
+                        <div class="text-xl font-bold text-emerald-600">$${escapeHtml(dest.cost)}</div>
                         <div class="text-xs text-slate-500">Est. Cost</div>
                     </div>
                     <div class="bg-slate-50 rounded-xl p-3 text-center">
-                        <div class="text-sm font-bold text-amber-600">${dest.crowds}</div>
+                        <div class="text-sm font-bold text-amber-600">${escapeHtml(dest.crowds)}</div>
                         <div class="text-xs text-slate-500">Crowds</div>
                     </div>
                 </div>
@@ -4865,14 +4877,14 @@
                     <div class="flex items-center gap-2 text-${dest.isCustom ? 'indigo' : 'amber'}-800 font-semibold text-sm mb-1">
                         <i class="fas fa-lightbulb"></i> Tips
                     </div>
-                    <p class="text-sm text-${dest.isCustom ? 'indigo' : 'amber'}-700">${dest.tips}</p>
+                    <p class="text-sm text-${dest.isCustom ? 'indigo' : 'amber'}-700">${escapeHtml(dest.tips)}</p>
                 </div>
 
                 <div class="flex gap-3">
                     <select id="add-to-day-select" class="flex-1 bg-slate-50 border-0 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-sky-500">
                         ${tripDays.map(d => `<option value="${d.day}">Day ${d.day} - ${d.dateStr}${d.isNYE ? ' (NYE!)' : ''}</option>`).join('')}
                     </select>
-                    <button onclick="addFromModal('${dest.id}')" class="btn-primary">
+                    <button onclick="addFromModal('${safeId(dest.id)}')" class="btn-primary">
                         <i class="fas fa-plus mr-2"></i>Add
                     </button>
                 </div>
@@ -5244,7 +5256,7 @@
                         const urlParams = new URLSearchParams(window.location.search);
                         const roomFromUrl = urlParams.get('room');
                         if (roomFromUrl) {
-                            await joinRoom(roomFromUrl.toUpperCase(), user.displayName || 'Guest');
+                            await joinRoomFromInvite(roomFromUrl.toUpperCase(), user.displayName || 'Guest');
                         }
                         resolve(user);
                     } else {
@@ -5405,6 +5417,21 @@
 
             showToast(`Joined room ${roomCode}!`, 'success');
             return true;
+        }
+
+        // An invite link must not share the visitor's saved trip without asking.
+        async function joinRoomFromInvite(roomCode, userName) {
+            const code = safeId(roomCode).slice(0, 6);
+            const ok = code && window.confirm(
+                `Join trip room ${code}?\n\nYour current itinerary, custom activities, flights and hotels will be shared with everyone in this room.`
+            );
+            if (!ok) {
+                const url = new URL(window.location);
+                url.searchParams.delete('room');
+                window.history.replaceState({}, '', url);
+                return false;
+            }
+            return joinRoom(code, userName);
         }
 
         // Start real-time collaboration
@@ -5605,7 +5632,7 @@
 
             if (currentUser) {
                 if (currentUser.photoURL) {
-                    avatarEl.innerHTML = `<img src="${currentUser.photoURL}" class="w-10 h-10 rounded-full">`;
+                    avatarEl.innerHTML = `<img src="${escapeHtml(currentUser.photoURL)}" class="w-10 h-10 rounded-full">`;
                 } else {
                     avatarEl.innerHTML = `<i class="fas fa-user"></i>`;
                 }
@@ -5631,14 +5658,14 @@
                 const isYou = uid === currentUser?.uid;
                 const onlineClass = member.online ? 'bg-emerald-500' : 'bg-slate-300';
                 const photoHtml = member.photoURL
-                    ? `<img src="${member.photoURL}" class="w-6 h-6 rounded-full">`
+                    ? `<img src="${escapeHtml(member.photoURL)}" class="w-6 h-6 rounded-full">`
                     : `<span class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs"><i class="fas fa-user"></i></span>`;
 
                 html += `
                     <div class="flex items-center gap-3 p-2 rounded-lg ${isYou ? 'bg-purple-100' : ''}">
                         <span class="w-2 h-2 rounded-full ${onlineClass}"></span>
                         ${photoHtml}
-                        <span class="flex-1 font-medium text-slate-700">${member.name}</span>
+                        <span class="flex-1 font-medium text-slate-700">${escapeHtml(member.name)}</span>
                         ${isYou ? '<span class="text-xs text-purple-600">(You)</span>' : ''}
                     </div>
                 `;
